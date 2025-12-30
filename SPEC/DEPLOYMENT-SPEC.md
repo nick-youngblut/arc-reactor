@@ -177,6 +177,18 @@ RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 ```
 
+**Run status updates (required):**
+- The orchestrator image must include `orchestrator/update_status.py` at `/update_status.py`.
+- The container needs `asyncpg` and access to Cloud SQL via `DATABASE_URL`.
+- Batch job spec must pass `DATABASE_URL` and `RUN_ID` to the container.
+
+**Nextflow hook invocation (example):**
+```groovy
+workflow.onStart {
+  "python3 /update_status.py ${params.run_id} running --started_at '${new Date().toInstant().toString()}'".execute()
+}
+```
+
 ## CI/CD Pipeline
 
 ### GitHub Actions Workflow

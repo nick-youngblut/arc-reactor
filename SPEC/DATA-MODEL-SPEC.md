@@ -425,6 +425,52 @@ WHERE nr."name$" = 'NR-2024-0156'
                             └─────────────────┘
 ```
 
+### Status Update Mechanism
+
+The orchestrator container must update the `runs` table directly in PostgreSQL
+using a lightweight status update script. The script is invoked by Nextflow
+workflow hooks and only touches allowed fields.
+
+**Script location:** `orchestrator/update_status.py` (packaged into the orchestrator image)
+
+**Required environment:**
+- `DATABASE_URL` (Cloud SQL connection string; Batch service account has `roles/cloudsql.client`)
+
+**CLI usage (examples):**
+```
+python3 /update_status.py run-abc123 running --started_at 2025-12-30T18:22:11Z
+python3 /update_status.py run-abc123 completed \
+  --completed_at 2025-12-30T20:01:00Z \
+  --metrics '{"duration_seconds": 5929, "tasks_completed": 423}'
+python3 /update_status.py run-abc123 failed \
+  --failed_at 2025-12-30T20:01:00Z \
+  --exit_code 1 \
+  --error_message "Process failed: fastq_qc"
+```
+
+**Allowed fields:**
+- `status`, `submitted_at`, `started_at`, `completed_at`, `failed_at`, `cancelled_at`
+- `exit_code`, `error_message`, `error_task`
+- `metrics` (JSON)
+- `batch_job_name`
+
+**Nextflow hooks:**
+```groovy
+workflow.onStart {
+  "python3 /update_status.py ${params.run_id} running --started_at '${new Date().toInstant().toString()}'".execute()
+}
+
+workflow.onComplete {
+  if (workflow.success) {
+    "python3 /update_status.py ${params.run_id} completed --completed_at '${new Date().toInstant().toString()}'".execute()
+  }
+}
+
+workflow.onError {
+  "python3 /update_status.py ${params.run_id} failed --failed_at '${new Date().toInstant().toString()}' --error_message '${workflow.errorMessage}' --exit_code ${workflow.exitStatus}".execute()
+}
+```
+
 ## Data Integrity
 
 ### Consistency Rules

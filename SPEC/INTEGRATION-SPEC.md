@@ -182,7 +182,27 @@ logs_policy:
 | `CONFIG_GCS_PATH` | GCS path to config file |
 | `PARAMS_GCS_PATH` | GCS path to params file |
 | `WORK_DIR` | GCS work directory |
-| `FIRESTORE_PROJECT` | Project for status updates |
+| `DATABASE_URL` | Cloud SQL connection string for run status updates |
+
+### Run Status Updates (Orchestrator)
+
+The orchestrator container is responsible for updating the `runs` table in
+PostgreSQL via a lightweight script invoked by Nextflow hooks.
+
+**Script:** `orchestrator/update_status.py`
+
+**Typical flow:**
+1. Backend creates run with status `pending`
+2. Backend submits Batch job and sets status `submitted`
+3. Orchestrator starts Nextflow and sets status `running`
+4. Nextflow hooks set terminal status (`completed` or `failed`) and write metrics
+
+**Hook usage (example):**
+```groovy
+workflow.onStart {
+  "python3 /update_status.py ${params.run_id} running --started_at '${new Date().toInstant().toString()}'".execute()
+}
+```
 
 ### Nextflow → Batch Task Submission
 
