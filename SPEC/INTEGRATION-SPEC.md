@@ -199,7 +199,7 @@ process {
 
 google {
     project = "arc-ctc-project"
-    location = "us-central1"
+    location = "us-west1"
     batch {
         serviceAccountEmail = "nextflow-tasks@project.iam.gserviceaccount.com"
         spot = true

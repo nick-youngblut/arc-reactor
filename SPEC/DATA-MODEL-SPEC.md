@@ -96,7 +96,7 @@ type RunStatus =
   "submitted_at": "2024-12-18T14:31:00Z",
   "started_at": "2024-12-18T14:35:00Z",
   "gcs_path": "gs://arc-nf-pipeline-runs/runs/run-abc123",
-  "batch_job_name": "projects/arc-ctc-project/locations/us-central1/jobs/nf-run-abc123",
+  "batch_job_name": "projects/arc-ctc-project/locations/us-west1/jobs/nf-run-abc123",
   "params": {
     "genome": "GRCh38",
     "protocol": "10XV3",
