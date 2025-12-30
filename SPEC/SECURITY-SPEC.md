@@ -37,10 +37,10 @@ Security is implemented at multiple layers: network, authentication, authorizati
                                     │
                     ┌───────────────┼───────────────┐
                     ▼               ▼               ▼
-            ┌───────────┐   ┌───────────┐   ┌───────────┐
-            │ Firestore │   │    GCS    │   │ GCP Batch │
-            │ (VPC SC)  │   │ (VPC SC)  │   │           │
-            └───────────┘   └───────────┘   └───────────┘
+            ┌───────────┐   ┌───────────┐   ┌───────────┐   ┌───────────┐
+            │ Cloud SQL │   │ Firestore│   │    GCS    │   │ GCP Batch │
+            │ (VPC SC)  │   │ (VPC SC) │   │ (VPC SC)  │   │           │
+            └───────────┘   └───────────┘   └───────────┘   └───────────┘
 ```
 
 ## Authentication
@@ -148,7 +148,8 @@ async def authorize_run_access(
 ```yaml
 # arc-nf-platform@project.iam.gserviceaccount.com
 roles:
-  - roles/datastore.user           # Firestore read/write
+  - roles/cloudsql.client          # Cloud SQL access
+  - roles/datastore.user           # Firestore user accounts
   - roles/storage.objectAdmin      # GCS read/write (pipeline bucket)
   - roles/storage.objectViewer     # GCS read (NGS data bucket)
   - roles/batch.jobsEditor         # Create/manage Batch jobs
@@ -161,7 +162,7 @@ roles:
 ```yaml
 # nextflow-orchestrator@project.iam.gserviceaccount.com
 roles:
-  - roles/datastore.user           # Update run status
+  - roles/cloudsql.client          # Update run status
   - roles/storage.objectAdmin      # GCS read/write (pipeline bucket)
   - roles/storage.objectViewer     # GCS read (NGS data bucket)
   - roles/batch.jobsEditor         # Submit task jobs
@@ -193,6 +194,7 @@ roles:
 ### Encryption
 
 **At Rest:**
+- Cloud SQL: Google-managed encryption (AES-256)
 - Firestore: Google-managed encryption (AES-256)
 - GCS: Google-managed encryption (AES-256)
 - Secret Manager: Google-managed encryption

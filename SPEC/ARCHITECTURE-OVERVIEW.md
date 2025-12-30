@@ -68,14 +68,14 @@ The Arc Reactor follows a modern cloud-native architecture with clear separation
           │              │                    │                    │
           │              │                    │                    │
           ▼              ▼                    ▼                    ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│  Benchling   │  │  Firestore   │  │     GCS      │  │  GCP Batch   │
-│  Warehouse   │  │              │  │              │  │              │
-│              │  │  • runs      │  │  • inputs    │  │  • orchestr. │
-│  • samples   │  │  • users     │  │  • work      │  │  • tasks     │
-│  • runs      │  │  • sessions  │  │  • results   │  │              │
-│  • metadata  │  │              │  │  • logs      │  │              │
-└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  Benchling   │  │  Cloud SQL   │  │  Firestore  │  │     GCS      │  │  GCP Batch   │
+│  Warehouse   │  │ (PostgreSQL) │  │              │  │              │  │              │
+│              │  │  • runs      │  │  • users     │  │  • inputs    │  │  • orchestr. │
+│  • samples   │  │  • checkpoints│  │  • prefs     │  │  • work      │  │  • tasks     │
+│  • runs      │  │              │  │              │  │  • results   │  │              │
+│  • metadata  │  │              │  │              │  │  • logs      │  │              │
+└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
                                            │                    │
                                            │                    │
                                            ▼                    ▼
@@ -141,7 +141,7 @@ The core AI component that powers the conversational interface.
 |--------|---------|
 | **Framework** | LangChain v1 + DeepAgents |
 | **Model** | Claude Sonnet 4.5 (claude-sonnet-4-5-20250929; see `SPEC/CONFIG-SPEC.md`) |
-| **State** | In-memory per conversation (MemorySaver) |
+| **State** | PostgreSQL checkpointer (AsyncPostgresSaver) |
 | **Streaming** | Full token + tool streaming |
 
 #### Tool Suite
@@ -162,15 +162,18 @@ Custom tools that give the agent access to platform capabilities.
 
 ### Data Layer
 
-#### Firestore
+#### Cloud SQL (PostgreSQL)
 
-Document database for application state.
+Primary application database for run records and chat checkpoints.
 
-| Collection | Purpose | Access Pattern |
-|------------|---------|----------------|
-| `runs` | Pipeline run records | Write-heavy, real-time reads |
-| `users` | User profiles and preferences | Read-heavy |
-| `sessions` | Chat session state | Write-heavy, ephemeral |
+| Table | Purpose | Access Pattern |
+|-------|---------|----------------|
+| `runs` | Pipeline run records | Write-heavy, read with filters |
+| `checkpoints` | LangGraph chat checkpoints | Write-heavy, append-only |
+
+#### Firestore (User Accounts)
+
+Stores user profiles and preferences (read-heavy, low write volume).
 
 #### Google Cloud Storage
 
@@ -246,7 +249,7 @@ Agent Tool Call → Benchling Query → Data Transformation → CSV/Config Gener
 ```
 Submit Button → Frontend → REST API → Validation → GCS Upload → Batch Submit
                                                                      ↓
-                                                              Firestore Write
+                                                             PostgreSQL Write
                                                                      ↓
 User Feedback ← Frontend ← REST Response ← Job Created Confirmation
 ```
@@ -261,8 +264,8 @@ User Feedback ← Frontend ← REST Response ← Job Created Confirmation
                                        │
                                        ▼
                               ┌─────────────────┐
-Firestore Listener ◀────────  │ Firestore       │ ◀──────── Status Update Script
-(Frontend)                    │ runs/{id}       │           (in Batch container)
+SSE/HTTP Polling ◀──────────  │ PostgreSQL      │ ◀──────── Status Update Script
+(Frontend)                    │ runs            │           (in Batch container)
        │                      └─────────────────┘
        ▼
 UI Status Update
@@ -275,7 +278,7 @@ UI Status Update
 | Component | Scaling Strategy |
 |-----------|------------------|
 | Cloud Run | Auto-scale based on request concurrency |
-| Firestore | Automatic (serverless) |
+| Cloud SQL | Vertical scaling + read replicas if needed |
 | GCS | Automatic (serverless) |
 | GCP Batch | Queue-based, limited by quotas |
 
@@ -286,7 +289,7 @@ UI Status Update
 | Benchling query latency | Caching for metadata lookups |
 | LLM response time | Streaming responses |
 | GCP Batch quotas | Request quota increases, queue management |
-| Firestore write limits | Batch writes, denormalization |
+| Cloud SQL connection limits | Pooling, short-lived transactions |
 
 ## Failure Modes
 
@@ -311,7 +314,7 @@ UI Status Update
 
 | Failure | Detection | Recovery |
 |---------|-----------|----------|
-| Firestore write fail | Exception | Retry with backoff |
+| PostgreSQL write fail | Exception | Retry with backoff |
 | GCS upload fail | Exception | Retry, then fail submission |
 | State inconsistency | Periodic audit | Reconciliation job |
 
@@ -336,8 +339,8 @@ User → Cloud Load Balancer → IAP Authentication → Cloud Run
 
 | Service Account | Permissions | Used By |
 |-----------------|-------------|---------|
-| Cloud Run SA | Firestore R/W, GCS R/W, Batch submit | Web app |
-| Batch Orchestrator SA | GCS R/W, Firestore R/W, Batch spawn | Orchestrator jobs |
+| Cloud Run SA | Cloud SQL Client, GCS R/W, Batch submit | Web app |
+| Batch Orchestrator SA | GCS R/W, Cloud SQL Client, Batch spawn | Orchestrator jobs |
 | Nextflow Task SA | GCS R/W (work bucket only) | Pipeline tasks |
 
 ### Network Security
@@ -372,9 +375,9 @@ User → Cloud Load Balancer → IAP Authentication → Cloud Run
 - **Nextflow support**: Native GCP Batch executor
 - **Scaling**: Automatic resource provisioning
 
-### Why Firestore over PostgreSQL?
+### Why PostgreSQL over Firestore?
 
-- **Real-time**: Native real-time listeners for status updates
-- **Serverless**: No database management
-- **Flexibility**: Schema-less for evolving requirements
-- **Cost**: Pay per operation, good for bursty traffic
+- **Checkpointing**: AsyncPostgresSaver and LangGraph are first-class
+- **Transactions**: ACID guarantees for run state updates
+- **Querying**: Rich filtering and ordering for run history
+- **Consolidation**: Aligns with Benchling warehouse query patterns

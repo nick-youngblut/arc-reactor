@@ -4,13 +4,14 @@
 
 The platform uses multiple data stores, each optimized for its specific purpose:
 
-1. **Firestore**: Application state (runs, users, sessions)
-2. **Google Cloud Storage**: Pipeline files (inputs, outputs, logs)
-3. **Benchling Data Warehouse**: Sample and sequencing data (read-only)
+1. **Cloud SQL (PostgreSQL)**: Application state (runs, chat checkpoints)
+2. **Firestore**: User accounts and preferences
+3. **Google Cloud Storage**: Pipeline files (inputs, outputs, logs)
+4. **Benchling Data Warehouse**: Sample and sequencing data (read-only)
 
-## Firestore Collections
+## Cloud SQL (PostgreSQL)
 
-### Collection: `runs`
+### Table: `runs`
 
 Stores pipeline run metadata and status.
 
@@ -30,14 +31,14 @@ interface Run {
   user_email: string;                // IAP authenticated email
   user_name: string;                 // Display name
   
-  // Timestamps
-  created_at: Timestamp;             // When run was created in UI
-  updated_at: Timestamp;             // Last status update
-  submitted_at?: Timestamp;          // When submitted to Batch
-  started_at?: Timestamp;            // When Nextflow started
-  completed_at?: Timestamp;          // When Nextflow finished (success)
-  failed_at?: Timestamp;             // When Nextflow finished (failure)
-  cancelled_at?: Timestamp;          // When user cancelled
+  // Timestamps (TIMESTAMPTZ stored as ISO 8601)
+  created_at: string;                // When run was created in UI
+  updated_at: string;                // Last status update
+  submitted_at?: string;             // When submitted to Batch
+  started_at?: string;               // When Nextflow started
+  completed_at?: string;             // When Nextflow finished (success)
+  failed_at?: string;                // When Nextflow finished (failure)
+  cancelled_at?: string;             // When user cancelled
   
   // GCP resources
   gcs_path: string;                  // gs://bucket/runs/{run_id}
@@ -75,11 +76,37 @@ type RunStatus =
   | "cancelled";   // User cancelled
 ```
 
-**Indexes:**
-```
-- user_email ASC, created_at DESC  (user's runs, most recent first)
-- status ASC, created_at DESC      (runs by status)
-- created_at DESC                   (all runs, most recent first)
+**Schema (PostgreSQL):**
+```sql
+CREATE TABLE runs (
+    run_id VARCHAR(50) PRIMARY KEY,
+    pipeline VARCHAR(100) NOT NULL,
+    pipeline_version VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    user_email VARCHAR(255) NOT NULL,
+    user_name VARCHAR(255),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    submitted_at TIMESTAMPTZ,
+    started_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    failed_at TIMESTAMPTZ,
+    cancelled_at TIMESTAMPTZ,
+    gcs_path TEXT NOT NULL,
+    batch_job_name TEXT,
+    params JSONB NOT NULL,
+    sample_count INTEGER NOT NULL,
+    source_ngs_runs TEXT[],
+    source_project TEXT,
+    exit_code INTEGER,
+    error_message TEXT,
+    error_task TEXT,
+    metrics JSONB
+);
+
+CREATE INDEX idx_runs_user_email_created_at ON runs(user_email, created_at DESC);
+CREATE INDEX idx_runs_status_created_at ON runs(status, created_at DESC);
+CREATE INDEX idx_runs_created_at ON runs(created_at DESC);
 ```
 
 **Example Document:**
@@ -107,6 +134,24 @@ type RunStatus =
   "source_project": "CellAtlas"
 }
 ```
+
+### Table: `checkpoints`
+
+Stores LangGraph conversation checkpoints for reconnection and recovery.
+
+```sql
+CREATE TABLE checkpoints (
+    thread_id VARCHAR(100) NOT NULL,
+    checkpoint_id VARCHAR(100) NOT NULL,
+    parent_checkpoint_id VARCHAR(100),
+    checkpoint JSONB NOT NULL,
+    metadata JSONB,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    PRIMARY KEY (thread_id, checkpoint_id)
+);
+```
+
+## Firestore Collections (User Accounts)
 
 ### Collection: `users`
 
@@ -345,15 +390,15 @@ WHERE nr."name$" = 'NR-2024-0156'
 
 ```
 1. User creates run in UI
-   └── Firestore: Create run document (status: pending)
+   └── PostgreSQL: Create run record (status: pending)
 
 2. User submits run
    └── GCS: Upload samplesheet, config, params
-   └── Firestore: Update status to "submitted"
+   └── PostgreSQL: Update status to "submitted"
    └── Batch: Create orchestrator job
 
 3. Orchestrator starts
-   └── Firestore: Update status to "running"
+   └── PostgreSQL: Update status to "running"
 
 4. Nextflow executes
    └── GCS: Write to work/ directory
@@ -361,18 +406,18 @@ WHERE nr."name$" = 'NR-2024-0156'
 
 5. Nextflow completes
    └── GCS: Write logs
-   └── Firestore: Update status to "completed" or "failed"
+   └── PostgreSQL: Update status to "completed" or "failed"
 ```
 
 ### Status Update Flow
 
 ```
 ┌─────────────────┐         ┌─────────────────┐
-│  Batch Job      │         │  Firestore      │
-│  (Orchestrator) │ ──────▶ │  runs/{id}      │
+│  Batch Job      │         │  PostgreSQL     │
+│  (Orchestrator) │ ──────▶ │  runs           │
 └─────────────────┘         └────────┬────────┘
                                      │
-                                     │ Real-time listener
+                                     │ SSE or polling
                                      ▼
                             ┌─────────────────┐
                             │  Frontend       │
@@ -384,7 +429,7 @@ WHERE nr."name$" = 'NR-2024-0156'
 
 ### Consistency Rules
 
-1. **Run ID uniqueness**: Enforced by Firestore document ID
+1. **Run ID uniqueness**: Enforced by PostgreSQL primary key
 2. **Status transitions**: Only valid transitions allowed
    ```
    pending → submitted → running → completed|failed
@@ -409,7 +454,7 @@ WHERE nr."name$" = 'NR-2024-0156'
 |-----------|-----------|-------|
 | Run metadata | Indefinite | Never deleted |
 | User profiles | Indefinite | Never deleted |
-| Chat sessions | 24 hours | Auto-expire |
+| Chat checkpoints | 30 days | Prune old threads |
 | Input files | Indefinite | Never deleted |
 | Work directories | 30 days | Cleaned by lifecycle policy |
 | Result files | Indefinite | Never deleted |
@@ -417,11 +462,11 @@ WHERE nr."name$" = 'NR-2024-0156'
 
 ## Backup and Recovery
 
-### Firestore
+### Cloud SQL (PostgreSQL)
 
-- Automatic daily backups (GCP managed)
+- Automated daily backups (GCP managed)
 - Point-in-time recovery enabled
-- Cross-region replication
+- Read replicas for failover (if needed)
 
 ### GCS
 
@@ -436,7 +481,7 @@ WHERE nr."name$" = 'NR-2024-0156'
 | Query | Frequency | Index |
 |-------|-----------|-------|
 | List user's recent runs | Every page load | `user_email, created_at DESC` |
-| Get run by ID | Every status check | Document ID |
+| Get run by ID | Every status check | Primary key |
 | List running runs (all users) | Admin dashboard | `status, created_at DESC` |
 
 ### Low-Frequency Queries

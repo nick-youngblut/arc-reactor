@@ -103,7 +103,7 @@ Users can track their pipeline runs through:
 │  • Sample data  │    │  • Cloud Run    │    │  • scrnaseq     │
 │  • FASTQ paths  │    │  • Batch        │    │  • rnaseq       │
 │  • Metadata     │    │  • Storage      │    │  • (future)     │
-│                 │    │  • Firestore    │    │                 │
+│                 │    │  • Cloud SQL    │    │                 │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
@@ -157,7 +157,7 @@ Users can track their pipeline runs through:
 | **Backend** | FastAPI | Async, OpenAPI docs, Python ecosystem |
 | **AI Framework** | LangChain + DeepAgents | Tool use, streaming, state management |
 | **LLM** | Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`) | Best balance of capability and cost (see `SPEC/CONFIG-SPEC.md`) |
-| **Database** | Firestore | Real-time updates, serverless |
+| **Database** | Cloud SQL (PostgreSQL) | ACID transactions, rich queries |
 | **File Storage** | Google Cloud Storage | Native Nextflow integration |
 | **Job Execution** | GCP Batch | Long-running jobs, native GCP |
 | **Hosting** | Cloud Run | Serverless, auto-scaling |

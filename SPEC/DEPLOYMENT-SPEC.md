@@ -57,6 +57,10 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 | Timeout | 3600s | 3600s |
 | Concurrency | 80 | 40 |
 
+**Cloud SQL Connection:**
+- Attach Cloud SQL instance to Cloud Run service
+- Provide `DATABASE_URL` using the Cloud SQL Unix socket
+
 ### GCS Buckets
 
 | Bucket | Purpose | Environment |
@@ -65,7 +69,14 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 | `arc-nf-pipeline-runs-staging` | Staging run data | Staging |
 | `arc-nf-platform-build-cache` | Build artifacts | Shared |
 
-### Firestore
+### Cloud SQL (PostgreSQL)
+
+| Instance | Environment |
+|----------|-------------|
+| `arc-nf-platform-db` | Production |
+| `arc-nf-platform-db-staging` | Staging |
+
+### Firestore (User Accounts)
 
 | Database | Environment |
 |----------|-------------|
@@ -155,8 +166,8 @@ RUN apt-get update && apt-get install -y \
 RUN curl -sSL https://sdk.cloud.google.com | bash
 ENV PATH="/root/google-cloud-sdk/bin:$PATH"
 
-# Install Firestore client
-RUN pip3 install --no-cache-dir google-cloud-firestore
+# Install PostgreSQL client
+RUN pip3 install --no-cache-dir asyncpg
 
 # Copy scripts
 COPY orchestrator/entrypoint.sh /entrypoint.sh
@@ -413,7 +424,23 @@ resource "google_storage_bucket" "runs" {
   }
 }
 
-# Firestore database
+# Cloud SQL (PostgreSQL)
+resource "google_sql_database_instance" "main" {
+  name             = "arc-nf-platform-db"
+  database_version = "POSTGRES_15"
+  region           = var.region
+
+  settings {
+    tier = "db-f1-micro"
+
+    ip_configuration {
+      ipv4_enabled    = false
+      private_network = google_compute_network.vpc.id
+    }
+  }
+}
+
+# Firestore database (user accounts and preferences)
 resource "google_firestore_database" "database" {
   name        = var.firestore_database
   location_id = var.region
@@ -489,16 +516,17 @@ metrics:
 
 | Component | Backup Method | Frequency | Retention |
 |-----------|---------------|-----------|-----------|
-| Firestore | Automated export | Daily | 30 days |
+| Cloud SQL (PostgreSQL) | Automated backups | Daily | 7 days |
 | GCS (inputs/results) | Versioning | Continuous | 90 days |
 | Container images | GCR retention | Continuous | 90 days |
 
 ### Recovery Procedures
 
-**Firestore Recovery:**
+**Cloud SQL Recovery:**
 ```bash
-# Restore from backup
-gcloud firestore import gs://arc-nf-backups/firestore/BACKUP_DATE
+# Restore from backup (example)
+gcloud sql backups restore BACKUP_ID arc-nf-platform-db \
+  --restore-instance=arc-nf-platform-db
 ```
 
 **GCS Recovery:**
@@ -525,10 +553,11 @@ gsutil cp gs://arc-nf-pipeline-runs/runs/RUN_ID/file#VERSION gs://arc-nf-pipelin
 |----------|------------------------|
 | Cloud Run (2 instances avg) | $100 |
 | GCS (500 GB) | $10 |
-| Firestore (light usage) | $25 |
+| Cloud SQL (db-f1-micro) | $25 |
+| Firestore (user accounts) | $5 |
 | GCP Batch (10 runs/day) | $500 |
 | Networking | $50 |
-| **Total** | **~$685/month** |
+| **Total** | **~$690/month** |
 
 ### Cost Optimization
 

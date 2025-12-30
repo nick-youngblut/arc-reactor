@@ -7,9 +7,10 @@ The platform integrates with several external systems:
 1. **Benchling**: Sample and sequencing data (LIMS)
 2. **GCP Batch**: Pipeline execution
 3. **Google Cloud Storage**: File storage
-4. **Firestore**: Application database
-5. **Anthropic API**: AI model (Claude)
-6. **GCP IAP**: Authentication
+4. **Cloud SQL (PostgreSQL)**: Application database (runs + checkpoints)
+5. **Firestore**: User accounts and preferences
+6. **Anthropic API**: AI model (Claude)
+7. **GCP IAP**: Authentication
 
 ## Benchling Integration
 
@@ -289,50 +290,48 @@ def check_files_exist(gcs_paths: list[str]) -> dict[str, bool]:
 }
 ```
 
-## Firestore Integration
+## Cloud SQL (PostgreSQL) Integration
 
-### Client Configuration
-
-```python
-from google.cloud import firestore
-
-db = firestore.Client(project="arc-ctc-project")
-```
-
-### Real-time Listeners
-
-**Run Status Subscription:**
-```python
-async def subscribe_to_run(run_id: str) -> AsyncIterator[dict]:
-    """Subscribe to real-time run status updates."""
-    doc_ref = db.collection("runs").document(run_id)
-    
-    async for snapshot in doc_ref.snapshots():
-        if snapshot.exists:
-            yield snapshot.to_dict()
-```
-
-### Batch Operations
+### Connection Configuration
 
 ```python
-def update_run_metrics(run_id: str, metrics: dict) -> None:
-    """Update run with completion metrics."""
-    batch = db.batch()
-    
-    run_ref = db.collection("runs").document(run_id)
-    batch.update(run_ref, {
-        "metrics": metrics,
-        "updated_at": firestore.SERVER_TIMESTAMP,
-    })
-    
-    user_ref = db.collection("users").document(user_email)
-    batch.update(user_ref, {
-        "stats.total_runs": firestore.Increment(1),
-        "stats.successful_runs": firestore.Increment(1 if success else 0),
-    })
-    
-    batch.commit()
+from sqlalchemy.ext.asyncio import create_async_engine
+
+DATABASE_URL = (
+    "postgresql+asyncpg://{user}:{password}@/{db}"
+    "?host=/cloudsql/{connection_name}"
+)
+
+engine = create_async_engine(
+    DATABASE_URL,
+    pool_size=5,
+    max_overflow=10,
+    pool_timeout=30,
+    pool_recycle=1800,
+)
 ```
+
+### Run Status Queries
+
+```python
+async def get_run_status(run_id: str) -> dict:
+    query = text(
+        "SELECT status, updated_at, metrics FROM runs WHERE run_id = :run_id"
+    )
+    async with engine.begin() as conn:
+        row = (await conn.execute(query, {"run_id": run_id})).one()
+    return dict(row._mapping)
+```
+
+### SSE Integration
+
+The backend exposes `GET /api/runs/{id}/events` and polls PostgreSQL for status
+changes. The frontend uses EventSource for automatic reconnection.
+
+## Firestore Integration (User Accounts)
+
+Use Firestore for user profiles and preferences (read-heavy, low write volume)
+and avoid real-time listeners for run status.
 
 ## Anthropic API Integration
 
@@ -439,7 +438,7 @@ async def readiness_check():
     """Check all integration health."""
     checks = {
         "benchling": await check_benchling_connection(),
-        "firestore": await check_firestore_connection(),
+        "postgres": await check_postgres_connection(),
         "gcs": await check_gcs_connection(),
         "batch": await check_batch_api(),
         "anthropic": await check_anthropic_api(),
@@ -465,10 +464,11 @@ async def check_benchling_connection() -> bool:
     except Exception:
         return False
 
-async def check_firestore_connection() -> bool:
-    """Check Firestore connectivity."""
+async def check_postgres_connection() -> bool:
+    """Check Cloud SQL PostgreSQL connectivity."""
     try:
-        db.collection("health").document("check").get()
+        async with engine.begin() as conn:
+            await conn.execute(text("SELECT 1"))
         return True
     except Exception:
         return False
@@ -493,7 +493,7 @@ async def check_gcs_connection() -> bool:
 | Benchling warehouse | 100 concurrent connections | Pool size = 5 |
 | Anthropic API | 60 requests/minute | Per API key |
 | GCP Batch | 100 concurrent jobs | Per project |
-| Firestore | 10,000 writes/second | Per database |
+| Cloud SQL | Connection limits | Pool size = 5 |
 
 ### Internal Rate Limits
 
@@ -513,6 +513,6 @@ async def check_gcs_connection() -> bool:
 | GCP Batch | Job creation failed | "Unable to start pipeline" | Retry |
 | GCS | Access denied | "Storage access error" | Alert admin |
 | GCS | Object not found | "File not found" | Show file path |
-| Firestore | Write failed | "Unable to save" | Retry |
+| Cloud SQL | Write failed | "Unable to save" | Retry |
 | Anthropic | Rate limit | Automatic retry | Backoff |
 | Anthropic | Context exceeded | "Conversation too long" | Summarize |

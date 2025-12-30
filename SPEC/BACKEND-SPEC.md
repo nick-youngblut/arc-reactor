@@ -41,7 +41,8 @@ backend/
 │   ├── __init__.py
 │   ├── benchling.py        # Benchling data warehouse queries
 │   ├── batch.py            # GCP Batch job management
-│   ├── firestore.py        # Firestore operations
+│   ├── runs.py             # Run persistence (Cloud SQL PostgreSQL)
+│   ├── run_events.py       # SSE streaming for run status
 │   ├── storage.py          # GCS file operations
 │   └── pipelines.py        # Pipeline registry and templates
 │
@@ -139,6 +140,7 @@ production:
 | `DELETE /api/runs/{id}` | DELETE | Cancel run | Required |
 | `GET /api/runs/{id}/logs` | GET | Get run logs | Required |
 | `GET /api/runs/{id}/files` | GET | List run files | Required |
+| `GET /api/runs/{id}/events` | GET (SSE) | Stream run status updates | Required |
 
 ### Pipeline Management
 
@@ -330,19 +332,28 @@ gs://arc-nf-pipeline-runs/
             └── nextflow.log
 ```
 
-### FirestoreService
+### RunStoreService (PostgreSQL)
 
-Manages Firestore document operations.
+Manages run persistence in Cloud SQL PostgreSQL.
 
 **Key Methods:**
 
 | Method | Description | Returns |
 |--------|-------------|---------|
-| `create_run()` | Create run document | str (run_id) |
+| `create_run()` | Create run record | str (run_id) |
 | `update_run_status()` | Update run status | bool |
-| `get_run()` | Get run document | RunDocument |
-| `list_runs()` | Query runs with filters | list[RunDocument] |
-| `subscribe_run()` | Real-time run updates | AsyncIterator |
+| `get_run()` | Get run record | RunRecord |
+| `list_runs()` | Query runs with filters | list[RunRecord] |
+
+### RunEventService
+
+Streams run status updates over SSE by polling PostgreSQL.
+
+**Key Methods:**
+
+| Method | Description | Returns |
+|--------|-------------|---------|
+| `stream_run_events()` | Yield status changes | AsyncIterator[RunEvent] |
 
 ### PipelineRegistry
 
@@ -401,6 +412,27 @@ SCRNASEQ_CONFIG = PipelineConfig(
 4. Client sends chat messages
 5. Server streams AI responses
 6. Either side can close connection
+```
+
+## Chat State Persistence
+
+Conversation state is persisted in Cloud SQL PostgreSQL so reconnects can resume
+the same thread.
+
+```python
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+
+DATABASE_URL = (
+    "postgresql+asyncpg://{user}:{password}@/{db}"
+    "?host=/cloudsql/{connection_name}"
+)
+
+async with AsyncPostgresSaver.from_conn_string(DATABASE_URL) as checkpointer:
+    agent = create_deep_agent(
+        model=model,
+        tools=tools,
+        checkpointer=checkpointer,
+    )
 ```
 
 ### Message Format (AI SDK Compatible)
@@ -531,14 +563,14 @@ logger.info(
 | Pipeline configs | Permanent | In-memory |
 | Benchling metadata (projects, instruments) | 5 minutes | In-memory |
 | User preferences | 1 minute | In-memory |
-| Run status | No cache | Real-time from Firestore |
+| Run status | No cache | SSE or polling from PostgreSQL |
 
 ### Connection Pooling
 
 | Service | Pool Size | Timeout |
 |---------|-----------|---------|
 | Benchling DB | 5 connections | 30s |
-| Firestore | Default (async) | 30s |
+| Cloud SQL (PostgreSQL) | 5 connections | 30s |
 | GCS | Default | 60s |
 
 ### Rate Limiting

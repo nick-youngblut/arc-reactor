@@ -182,6 +182,10 @@ Detailed view of a specific run with logs and files.
 └────────────────┴────────────────────────────────────────────────────────────┘
 ```
 
+**Status Updates:**
+- Primary: SSE stream from `GET /api/runs/{id}/events` for real-time status changes
+- Fallback: Poll `GET /api/runs/{id}` every 5-30 seconds if SSE is unavailable
+
 ## Key Components
 
 ### PipelineWorkspace
@@ -451,6 +455,61 @@ function useRuns(filters: RunFilters = {}) {
     submit: submitMutation.mutate,
     cancel: cancelMutation.mutate,
   };
+}
+```
+
+### useRunEvents
+
+SSE-based hook for real-time run status updates.
+
+```typescript
+function useRunEvents(runId: string, enabled: boolean = true) {
+  const [status, setStatus] = useState<RunStatus | null>(null);
+
+  useEffect(() => {
+    if (!enabled || !runId) return;
+
+    const eventSource = new EventSource(`/api/runs/${runId}/events`);
+
+    eventSource.addEventListener("status", (event) => {
+      const data = JSON.parse(event.data);
+      setStatus(data);
+    });
+
+    eventSource.addEventListener("done", () => {
+      eventSource.close();
+    });
+
+    eventSource.onerror = () => {
+      // EventSource auto-reconnects by default
+      console.warn("Run events stream error, reconnecting...");
+    };
+
+    return () => eventSource.close();
+  }, [runId, enabled]);
+
+  return status;
+}
+```
+
+### useRunStatus (alternative)
+
+Polling-based hook using TanStack Query `refetchInterval`.
+
+```typescript
+function useRunStatus(runId: string) {
+  return useQuery({
+    queryKey: queryKeys.runs.detail(runId),
+    queryFn: () => api.runs.get(runId),
+    refetchInterval: (data) => {
+      if (!data) return 5000;
+      if (["completed", "failed", "cancelled"].includes(data.status)) {
+        return false;
+      }
+      return 5000;
+    },
+    enabled: !!runId,
+  });
 }
 ```
 
