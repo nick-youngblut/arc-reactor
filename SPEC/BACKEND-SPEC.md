@@ -100,6 +100,12 @@ default:
   
   # AI Configuration
   anthropic_model: "claude-sonnet-4-5-20250929"
+
+  # Circuit Breakers
+  benchling_cb_failure_threshold: 5
+  benchling_cb_recovery_timeout: 30
+  anthropic_cb_failure_threshold: 3
+  anthropic_cb_recovery_timeout: 60
   
   # Frontend
   frontend_out_dir: "/app/frontend/out"
@@ -128,7 +134,7 @@ production:
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/health` | GET | Basic health check |
-| `/ready` | GET | Readiness check (includes dependencies) |
+| `/ready` | GET | Readiness check (critical dependencies gate 200 vs 503, non-critical mark degraded) |
 
 ### Run Management
 

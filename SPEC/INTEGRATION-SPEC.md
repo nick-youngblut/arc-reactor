@@ -450,12 +450,34 @@ async def get_current_user(request: Request) -> User:
 
 ## Integration Health Checks
 
+## Circuit Breakers
+
+External services must be wrapped with circuit breakers to prevent cascading failures
+and runaway retry storms when upstream dependencies are degraded.
+
+```python
+from circuitbreaker import circuit
+
+@circuit(failure_threshold=5, recovery_timeout=30)
+async def query_benchling(query: str):
+    # Benchling query logic
+    pass
+
+@circuit(failure_threshold=3, recovery_timeout=60)
+async def call_anthropic(messages: list):
+    # Anthropic API call
+    pass
+```
+
+Circuit breaker thresholds are configurable via settings, and all external service
+clients should expose whether the breaker is open for readiness reporting.
+
 ### Readiness Check
 
 ```python
 @router.get("/ready")
 async def readiness_check():
-    """Check all integration health."""
+    """Check integration health with degraded mode support."""
     checks = {
         "benchling": await check_benchling_connection(),
         "postgres": await check_postgres_connection(),
@@ -464,11 +486,17 @@ async def readiness_check():
         "anthropic": await check_anthropic_api(),
     }
     
-    all_healthy = all(checks.values())
+    critical = ["postgres", "gcs", "batch"]
+    critical_healthy = all(checks[name] for name in critical)
+    degraded = not all(checks.values())
     
     return JSONResponse(
-        status_code=200 if all_healthy else 503,
-        content={"healthy": all_healthy, "checks": checks},
+        status_code=200 if critical_healthy else 503,
+        content={
+            "healthy": critical_healthy,
+            "degraded": degraded,
+            "checks": checks,
+        },
     )
 ```
 

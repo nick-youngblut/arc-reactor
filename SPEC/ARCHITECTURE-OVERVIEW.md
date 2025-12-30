@@ -118,6 +118,7 @@ Handles all API requests, WebSocket connections, and serves the static frontend.
 | **REST API** | Pydantic models, automatic OpenAPI docs |
 | **WebSocket** | Chat streaming via AI SDK-compatible format |
 | **Static files** | Serves Next.js build output |
+| **Resilience** | Circuit breakers for external services, readiness supports degraded mode |
 | **Auth context** | Extracts user identity from IAP headers |
 
 #### Next.js Frontend

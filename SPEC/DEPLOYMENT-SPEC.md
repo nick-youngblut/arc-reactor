@@ -498,6 +498,10 @@ gcloud run services update-traffic arc-nf-platform \
 | Liveness | `/health` | 30s |
 | Readiness | `/ready` | 30s |
 
+Readiness returns 200 when critical dependencies are healthy, and 503 only when
+critical dependencies fail. Non-critical failures (e.g., Benchling or Anthropic)
+return 200 with a degraded status in the response body.
+
 ### Cloud Monitoring Alerts
 
 | Alert | Condition | Severity |
