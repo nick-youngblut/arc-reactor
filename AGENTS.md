@@ -2,10 +2,9 @@
 
 ## Project Structure & Module Organization
 - Root: Dockerfile, env files, shared docs.
+- `SPEC/`: Specification documents.
 - `backend/`: FastAPI app (`main.py`), agents (`agents/`), routes (`api/`), tools (`tools/`), services (`services/`), settings (`settings.yml`).
 - `frontend/`: Next.js (App Router) with `app/`, `components/`, `hooks/`, `stores/`, `lib/`.
-- Notebooks and archived assets live outside runtime paths (`notebooks/`, `archive/`).
-  - Generally, ignore the notebooks and archived assets in the repo.
 
 ## Build, Test, and Development Commands
 - Backend install (dev): `uv pip install -e 'backend/.[dev]'`
@@ -13,8 +12,6 @@
 - Frontend dev: `cd frontend && npm install && npm run dev`
 - Backend tests: `cd backend && pytest`
 - Frontend tests: `cd frontend && npm test`
-- Lint/format (backend): `black backend/ && ruff check backend/`
-- Lint/format (frontend): `npm run lint && npm run format && npm run type-check`
 
 ## Coding Style & Naming Conventions
 - Python: Black (line length 100), Ruff for lint. Use `snake_case` for functions/vars, `PascalCase` for classes, module names in `snake_case`.
