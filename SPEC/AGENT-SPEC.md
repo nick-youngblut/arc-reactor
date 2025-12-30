@@ -374,7 +374,7 @@ This tool requires explicit user approval before execution.
 {
   "run_id": "run-abc123",
   "status": "submitted",
-  "gcs_path": "gs://arc-nf-pipeline-runs/runs/run-abc123",
+  "gcs_path": "gs://arc-reactor-runs/runs/run-abc123",
   "estimated_runtime": "4-6 hours",
   "message": "Pipeline run submitted successfully. You can track progress in the Runs tab."
 }

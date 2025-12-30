@@ -58,8 +58,8 @@ All user access is authenticated through GCP IAP with Google Workspace SSO.
 | Re-authentication | Required for sensitive operations |
 
 **Authorized Groups:**
-- `arc-nf-platform-users@arcinstitute.org` - Standard users
-- `arc-nf-platform-admins@arcinstitute.org` - Administrators
+- `arc-reactor-users@arcinstitute.org` - Standard users
+- `arc-reactor-admins@arcinstitute.org` - Administrators
 
 ### JWT Token Handling
 
@@ -90,7 +90,7 @@ Internal services authenticate using GCP service accounts.
 
 | Service | Service Account |
 |---------|-----------------|
-| Cloud Run | `arc-nf-platform@project.iam.gserviceaccount.com` |
+| Cloud Run | `arc-reactor@project.iam.gserviceaccount.com` |
 | Batch Orchestrator | `nextflow-orchestrator@project.iam.gserviceaccount.com` |
 | Nextflow Tasks | `nextflow-tasks@project.iam.gserviceaccount.com` |
 
@@ -146,7 +146,7 @@ async def authorize_run_access(
 ### Cloud Run Service Account
 
 ```yaml
-# arc-nf-platform@project.iam.gserviceaccount.com
+# arc-reactor@project.iam.gserviceaccount.com
 roles:
   - roles/cloudsql.client          # Cloud SQL access
   - roles/datastore.user           # Firestore user accounts
@@ -355,7 +355,7 @@ def sanitize_user_input(content: str) -> str:
 {
   "timestamp": "2024-12-18T14:30:00Z",
   "severity": "INFO",
-  "service": "arc-nf-platform",
+  "service": "arc-reactor",
   "user_email": "user@arcinstitute.org",
   "action": "run.submit",
   "resource": "run-abc123",

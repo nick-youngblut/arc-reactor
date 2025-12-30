@@ -236,7 +236,7 @@ google {
 
 | Bucket | Purpose | Access |
 |--------|---------|--------|
-| `arc-nf-pipeline-runs` | Run inputs, outputs, logs | Platform + Nextflow |
+| `arc-reactor-runs` | Run inputs, outputs, logs (from `settings.nextflow_bucket`) | Platform + Nextflow |
 | `arc-ngs-data` | Raw sequencing data | Read-only |
 
 ### Operations
@@ -248,13 +248,13 @@ from google.cloud import storage
 def upload_run_files(run_id: str, files: dict[str, str]) -> list[str]:
     """Upload input files for a run."""
     client = storage.Client()
-    bucket = client.bucket("arc-nf-pipeline-runs")
+    bucket = client.bucket(settings.nextflow_bucket)
     
     paths = []
     for filename, content in files.items():
         blob = bucket.blob(f"runs/{run_id}/inputs/{filename}")
         blob.upload_from_string(content)
-        paths.append(f"gs://arc-nf-pipeline-runs/runs/{run_id}/inputs/{filename}")
+        paths.append(f"gs://{settings.nextflow_bucket}/runs/{run_id}/inputs/{filename}")
     
     return paths
 ```
@@ -525,7 +525,7 @@ async def check_gcs_connection() -> bool:
     """Check GCS connectivity."""
     try:
         client = storage.Client()
-        bucket = client.bucket("arc-nf-pipeline-runs")
+        bucket = client.bucket(settings.nextflow_bucket)
         bucket.exists()
         return True
     except Exception:

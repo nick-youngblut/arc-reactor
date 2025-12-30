@@ -150,7 +150,7 @@ Users can track their pipeline runs through:
 | Layer | Technology | Rationale |
 |-------|------------|-----------|
 | **Frontend** | Next.js 14 (App Router) | Modern React, static export capability |
-| **UI Components** | Hero UI + Tailwind CSS | Clean, accessible components |
+| **UI Components** | HeroUI + Tailwind CSS | Clean, accessible components |
 | **Data Tables** | Handsontable | Excel-like editing for samplesheets |
 | **Code Editor** | Monaco Editor | VS Code-quality config editing |
 | **Chat Interface** | Vercel AI SDK | Streaming, tool calls, great DX |

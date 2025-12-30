@@ -35,7 +35,7 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 │  ┌───────────────────────────┐   ┌───────────────────────────┐              │
 │  │  Production Environment   │   │  Staging Environment      │              │
 │  │                           │   │                           │              │
-│  │  • arc-nf-platform (prod) │   │  • arc-nf-platform-staging│              │
+│  │  • arc-reactor (prod) │   │  • arc-reactor-staging│              │
 │  │  • IAP protected          │   │  • IAP protected          │              │
 │  │  • Production secrets     │   │  • Staging secrets        │              │
 │  └───────────────────────────┘   └───────────────────────────┘              │
@@ -48,7 +48,7 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 
 | Setting | Production | Staging |
 |---------|------------|---------|
-| Service name | `arc-nf-platform` | `arc-nf-platform-staging` |
+| Service name | `arc-reactor` | `arc-reactor-staging` |
 | Region | `us-west1` | `us-west1` |
 | Min instances | 1 | 0 |
 | Max instances | 10 | 3 |
@@ -65,16 +65,16 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 
 | Bucket | Purpose | Environment |
 |--------|---------|-------------|
-| `arc-nf-pipeline-runs` | Production run data | Production |
-| `arc-nf-pipeline-runs-staging` | Staging run data | Staging |
-| `arc-nf-platform-build-cache` | Build artifacts | Shared |
+| `arc-reactor-runs` | Production run data | Production |
+| `arc-reactor-runs-staging` | Staging run data | Staging |
+| `arc-reactor-build-cache` | Build artifacts | Shared |
 
 ### Cloud SQL (PostgreSQL)
 
 | Instance | Environment |
 |----------|-------------|
-| `arc-nf-platform-db` | Production |
-| `arc-nf-platform-db-staging` | Staging |
+| `arc-reactor-db` | Production |
+| `arc-reactor-db-staging` | Staging |
 
 ### Firestore (User Accounts)
 
@@ -267,10 +267,10 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "env=prod" >> $GITHUB_OUTPUT
-            echo "service=arc-nf-platform" >> $GITHUB_OUTPUT
+            echo "service=arc-reactor" >> $GITHUB_OUTPUT
           else
             echo "env=staging" >> $GITHUB_OUTPUT
-            echo "service=arc-nf-platform-staging" >> $GITHUB_OUTPUT
+            echo "service=arc-reactor-staging" >> $GITHUB_OUTPUT
           fi
           
       - name: Build and push
@@ -303,10 +303,10 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "env=prod" >> $GITHUB_OUTPUT
-            echo "service=arc-nf-platform" >> $GITHUB_OUTPUT
+            echo "service=arc-reactor" >> $GITHUB_OUTPUT
           else
             echo "env=staging" >> $GITHUB_OUTPUT
-            echo "service=arc-nf-platform-staging" >> $GITHUB_OUTPUT
+            echo "service=arc-reactor-staging" >> $GITHUB_OUTPUT
           fi
           
       - name: Deploy to Cloud Run
@@ -322,7 +322,7 @@ jobs:
             --cpu=2
             --timeout=3600
             --concurrency=80
-            --service-account=arc-nf-platform@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+            --service-account=arc-reactor@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
             --set-env-vars=ENV_FOR_DYNACONF=${{ steps.env.outputs.env }}
             --set-secrets=BENCHLING_WAREHOUSE_PASSWORD=benchling-warehouse-password:latest
             --set-secrets=ANTHROPIC_API_KEY=anthropic-api-key-${{ steps.env.outputs.env }}:latest
@@ -340,7 +340,7 @@ production:
   debug: false
   gcp_project: "arc-ctc-project"
   gcp_region: "us-west1"
-  nextflow_bucket: "arc-nf-pipeline-runs"
+  nextflow_bucket: "arc-reactor-runs"
   firestore_database: "(default)"
   log_level: "INFO"
 ```
@@ -353,7 +353,7 @@ staging:
   debug: true
   gcp_project: "arc-ctc-project"
   gcp_region: "us-west1"
-  nextflow_bucket: "arc-nf-pipeline-runs-staging"
+  nextflow_bucket: "arc-reactor-runs-staging"
   firestore_database: "staging"
   log_level: "DEBUG"
 ```
@@ -438,7 +438,7 @@ resource "google_storage_bucket" "runs" {
 
 # Cloud SQL (PostgreSQL)
 resource "google_sql_database_instance" "main" {
-  name             = "arc-nf-platform-db"
+  name             = "arc-reactor-db"
   database_version = "POSTGRES_15"
   region           = var.region
 
@@ -481,12 +481,12 @@ resource "google_firestore_database" "database" {
 
 ```bash
 # List recent revisions
-gcloud run revisions list --service=arc-nf-platform --region=us-west1
+gcloud run revisions list --service=arc-reactor --region=us-west1
 
 # Route traffic to previous revision
-gcloud run services update-traffic arc-nf-platform \
+gcloud run services update-traffic arc-reactor \
   --region=us-west1 \
-  --to-revisions=arc-nf-platform-00042-abc=100
+  --to-revisions=arc-reactor-00042-abc=100
 ```
 
 ## Monitoring and Alerting
@@ -541,17 +541,17 @@ metrics:
 **Cloud SQL Recovery:**
 ```bash
 # Restore from backup (example)
-gcloud sql backups restore BACKUP_ID arc-nf-platform-db \
-  --restore-instance=arc-nf-platform-db
+gcloud sql backups restore BACKUP_ID arc-reactor-db \
+  --restore-instance=arc-reactor-db
 ```
 
 **GCS Recovery:**
 ```bash
 # List object versions
-gsutil ls -a gs://arc-nf-pipeline-runs/runs/RUN_ID/
+gsutil ls -a gs://arc-reactor-runs/runs/RUN_ID/
 
 # Restore specific version
-gsutil cp gs://arc-nf-pipeline-runs/runs/RUN_ID/file#VERSION gs://arc-nf-pipeline-runs/runs/RUN_ID/file
+gsutil cp gs://arc-reactor-runs/runs/RUN_ID/file#VERSION gs://arc-reactor-runs/runs/RUN_ID/file
 ```
 
 ### RTO/RPO Targets

@@ -90,7 +90,7 @@ default:
   gcp_region: "us-west1"
   
   # Service Configuration
-  nextflow_bucket: "arc-nf-pipeline-runs"
+  nextflow_bucket: "arc-reactor-runs"
   nextflow_service_account: "nextflow-orchestrator@arc-ctc-project.iam.gserviceaccount.com"
   orchestrator_image: "gcr.io/arc-ctc-project/nextflow-orchestrator:latest"
   
@@ -112,7 +112,7 @@ default:
 
 development:
   debug: true
-  nextflow_bucket: "arc-nf-pipeline-runs-dev"
+  nextflow_bucket: "arc-reactor-runs-dev"
 
 production:
   debug: false
@@ -322,10 +322,10 @@ Manages GCS file operations.
 | `get_file_content()` | Download file content | str |
 | `generate_signed_url()` | Create signed URL for download | str |
 
-**Bucket Structure:**
+**Bucket Structure (from `settings.nextflow_bucket`):**
 
 ```
-gs://arc-nf-pipeline-runs/
+gs://{settings.nextflow_bucket}/
 └── runs/
     └── {run_id}/
         ├── inputs/

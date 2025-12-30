@@ -122,7 +122,7 @@ CREATE INDEX idx_runs_created_at ON runs(created_at DESC);
   "updated_at": "2024-12-18T14:35:00Z",
   "submitted_at": "2024-12-18T14:31:00Z",
   "started_at": "2024-12-18T14:35:00Z",
-  "gcs_path": "gs://arc-nf-pipeline-runs/runs/run-abc123",
+  "gcs_path": "gs://arc-reactor-runs/runs/run-abc123",
   "batch_job_name": "projects/arc-ctc-project/locations/us-west1/jobs/nf-run-abc123",
   "params": {
     "genome": "GRCh38",
@@ -237,10 +237,10 @@ interface Session {
 
 ## Google Cloud Storage Structure
 
-### Bucket: `arc-nf-pipeline-runs`
+### Bucket: `settings.nextflow_bucket` (default `arc-reactor-runs`)
 
 ```
-gs://arc-nf-pipeline-runs/
+gs://{settings.nextflow_bucket}/
 │
 ├── runs/
 │   └── {run_id}/

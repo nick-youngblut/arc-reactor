@@ -130,7 +130,7 @@ Static export served by FastAPI, providing the user interface.
 | **Rendering** | Static export (no SSR) |
 | **Routing** | App Router with client-side navigation |
 | **State** | TanStack Query + Zustand |
-| **Styling** | Tailwind CSS + Hero UI |
+| **Styling** | Tailwind CSS + HeroUI |
 
 ### AI/Agent Layer
 
@@ -182,10 +182,13 @@ Object storage for pipeline files.
 
 | Bucket Path | Content | Lifecycle |
 |-------------|---------|-----------|
-| `gs://arc-nf/runs/{id}/inputs/` | Samplesheet, config, params | Permanent |
-| `gs://arc-nf/runs/{id}/work/` | Nextflow work directory | Delete after 30 days |
-| `gs://arc-nf/runs/{id}/results/` | Pipeline outputs | Permanent |
-| `gs://arc-nf/runs/{id}/logs/` | Execution logs | Permanent |
+| `gs://{settings.nextflow_bucket}/runs/{id}/inputs/` | Samplesheet, config, params | Permanent |
+| `gs://{settings.nextflow_bucket}/runs/{id}/work/` | Nextflow work directory | Delete after 30 days |
+| `gs://{settings.nextflow_bucket}/runs/{id}/results/` | Pipeline outputs | Permanent |
+| `gs://{settings.nextflow_bucket}/runs/{id}/logs/` | Execution logs | Permanent |
+
+All bucket references are derived from configuration (`settings.nextflow_bucket`) rather
+than hardcoded paths.
 
 #### Benchling Data Warehouse
 
