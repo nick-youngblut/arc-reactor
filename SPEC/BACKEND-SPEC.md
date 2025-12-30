@@ -72,6 +72,12 @@ backend/
 
 Configuration uses Dynaconf with environment-based overrides.
 
+#### Shared Configuration Source
+
+Canonical AI configuration values (model ID, temperature, max tokens) are defined
+in `SPEC/CONFIG-SPEC.md`. Backend settings and examples must reference those
+values to avoid drift across specifications.
+
 ```yaml
 # settings.yaml
 default:

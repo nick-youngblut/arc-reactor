@@ -140,7 +140,7 @@ The core AI component that powers the conversational interface.
 | Aspect | Details |
 |--------|---------|
 | **Framework** | LangChain v1 + DeepAgents |
-| **Model** | Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) |
+| **Model** | Claude Sonnet 4.5 (claude-sonnet-4-5-20250929; see `SPEC/CONFIG-SPEC.md`) |
 | **State** | In-memory per conversation (MemorySaver) |
 | **Streaming** | Full token + tool streaming |
 

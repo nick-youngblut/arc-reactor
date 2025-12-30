@@ -57,11 +57,8 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 
 ### Model Selection
 
-| Aspect | Choice | Rationale |
-|--------|--------|-----------|
-| **Model** | Claude Sonnet 4.5 | Best balance of capability, speed, and cost |
-| **Temperature** | 0.1 | Low for consistency in tool use |
-| **Max completion tokens** | 6000 | Sufficient for detailed responses |
+Model configuration values are defined in `SPEC/CONFIG-SPEC.md` and must be
+referenced from there to avoid drift.
 
 ### System Prompt
 

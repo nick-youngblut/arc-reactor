@@ -338,11 +338,9 @@ def update_run_metrics(run_id: str, metrics: dict) -> None:
 
 ### Configuration
 
-| Parameter | Value |
-|-----------|-------|
-| Model | `claude-sonnet-4-5-20250929` |
-| Max tokens | 4096 |
-| Temperature | 0.3 |
+Model configuration values are defined in `SPEC/CONFIG-SPEC.md` and must be
+referenced from there to avoid drift. See the backend settings guidance in
+`SPEC/BACKEND-SPEC.md`.
 
 ### LangChain Integration
 
@@ -351,8 +349,8 @@ from langchain.chat_models import init_chat_model
 
 model = init_chat_model(
     "anthropic:claude-sonnet-4-5-20250929",
-    temperature=0.3,
-    max_tokens=4096,
+    temperature=0.1,
+    max_tokens=6000,
 )
 ```
 

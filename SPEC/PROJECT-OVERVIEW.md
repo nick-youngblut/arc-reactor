@@ -156,7 +156,7 @@ Users can track their pipeline runs through:
 | **Chat Interface** | Vercel AI SDK | Streaming, tool calls, great DX |
 | **Backend** | FastAPI | Async, OpenAPI docs, Python ecosystem |
 | **AI Framework** | LangChain + DeepAgents | Tool use, streaming, state management |
-| **LLM** | Claude Sonnet 4.5 | Best balance of capability and cost |
+| **LLM** | Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`) | Best balance of capability and cost (see `SPEC/CONFIG-SPEC.md`) |
 | **Database** | Firestore | Real-time updates, serverless |
 | **File Storage** | Google Cloud Storage | Native Nextflow integration |
 | **Job Execution** | GCP Batch | Long-running jobs, native GCP |
