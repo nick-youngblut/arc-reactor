@@ -1,0 +1,64 @@
+# Misc
+tmp/
+archive/
+sandbox/
+volumes/
+files/
+tasks/
+overview/
+screenlog.*
+
+# Bytecode compiled files
+*.pyc
+__pycache__/
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+# Only ignore top-level Python build lib directory, not nested frontend libs
+/lib/
+# Allow frontend library code
+!frontend/lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environment
+venv/
+env/
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE/Text editor specific
+.vscode/
+.idea/
+
+# If using a database, ignore the file where the database is stored, e.g. for SQLite:
+*.sqlite
+*.sqlite3
+
+# Ignore all local configuration files
+*.local
+
+# If there are any CSV, JSON, or Excel files that are data dumps not needed in the repo:
+*.csv
+*.xls
+*.xlsx
+
+# Environment variables file
+.env
