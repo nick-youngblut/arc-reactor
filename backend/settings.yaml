@@ -1,0 +1,33 @@
+default:
+  app_name: "Arc Reactor"
+  debug: false
+
+  gcp_project: "arc-ctc-project"
+  gcp_region: "us-west1"
+
+  nextflow_bucket: "arc-reactor-runs"
+  nextflow_service_account: "nextflow-orchestrator@arc-ctc-project.iam.gserviceaccount.com"
+  orchestrator_image: "gcr.io/arc-ctc-project/nextflow-orchestrator:latest"
+
+  benchling_warehouse_host: "benchling-warehouse.arcinstitute.org"
+  benchling_warehouse_db: "benchling"
+
+  gemini_model: "gemini-3-flash-preview"
+  gemini_thinking_level: "low"
+
+  frontend_out_dir: "/app/frontend/out"
+  cors_allowed_origins:
+    - "https://arc-reactor.arcinstitute.org"
+    - "http://localhost:3000"
+
+  benchling_cb_failure_threshold: 5
+  benchling_cb_recovery_timeout: 30
+  gemini_cb_failure_threshold: 3
+  gemini_cb_recovery_timeout: 60
+
+development:
+  debug: true
+  nextflow_bucket: "arc-reactor-runs-dev"
+
+production:
+  debug: false
