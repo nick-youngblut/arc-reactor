@@ -6,6 +6,9 @@
 - `backend/`: FastAPI app (`main.py`), agents (`agents/`), routes (`api/`), tools (`tools/`), services (`services/`), settings (`settings.yml`).
 - `frontend/`: Next.js (App Router) with `app/`, `components/`, `hooks/`, `stores/`, `lib/`.
 - `external-repos/`: Code repositories used as references for developing Arc Reactor.
+  - `arc-benchling-mcp/`: Use as a guide on developing tools for interfacing with Benchling
+  - `benchling-py/`: Use as the interface for interacting with Benchling
+  - `NGS_summary/`: Use as a guide on querying Benchling for comprehensive NGS run information (e.g., fastq files)
 
 ## Build, Test, and Development Commands
 - Backend install (dev): `uv pip install -e 'backend/.[dev]'`

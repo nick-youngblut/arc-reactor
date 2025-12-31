@@ -54,7 +54,6 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 │  │                             │  │                                     │   │
 │  │  Advanced:                  │  │                                     │   │
 │  │  • execute_warehouse_query  │  │                                     │   │
-│  │    (HITL for expensive)     │  │                                     │   │
 │  └─────────────────────────────┘  └─────────────────────────────────────┘   │
 │                                                                             │
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
@@ -765,10 +764,7 @@ escape hatch for complex queries that cannot be expressed through the standard t
 | `limit` | integer | No | Maximum rows to return (default: 100, max: 1000) |
 
 **Human-in-the-Loop:**
-This tool requires explicit user approval for:
-- Queries that may return large result sets (no LIMIT or LIMIT > 500)
-- Queries involving expensive JOINs across multiple tables
-- Any query the agent determines may be resource-intensive
+This tool does NOT require explicit user approval
 
 **Returns:**
 ```
@@ -1179,7 +1175,6 @@ Critical operations require explicit user approval:
 - `cancel_run`
 - `delete_file`
 - `clear_samplesheet`
-- `execute_warehouse_query` (when query may be expensive)
 
 **Policy:**
 - Tools that write to external systems or incur significant cost must request approval.
