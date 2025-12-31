@@ -12,7 +12,7 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 │                                                                             │
 │  ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐            │
 │  │  main branch    │   │  develop branch │   │  feature/*      │            │
-│  │  (production)   │   │  (staging)      │   │  branches       │            │
+│  │  (production)   │   │  (dev)          │   │  branches       │            │
 │  └────────┬────────┘   └────────┬────────┘   └────────┬────────┘            │
 └───────────┼─────────────────────┼─────────────────────┼─────────────────────┘
             │                     │                     │
@@ -33,11 +33,11 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 │                        Google Cloud Platform                                │
 │                                                                             │
 │  ┌───────────────────────────┐   ┌───────────────────────────┐              │
-│  │  Production Environment   │   │  Staging Environment      │              │
+│  │  Production Environment   │   │  Dev Environment          │              │
 │  │                           │   │                           │              │
-│  │  • arc-reactor (prod) │   │  • arc-reactor-staging│              │
+│  │  • arc-reactor (prod)     │   │  • arc-reactor-dev        │              │
 │  │  • IAP protected          │   │  • IAP protected          │              │
-│  │  • Production secrets     │   │  • Staging secrets        │              │
+│  │  • Production secrets     │   │  • Dev secrets            │              │
 │  └───────────────────────────┘   └───────────────────────────┘              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -46,9 +46,9 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 
 ### Cloud Run Service
 
-| Setting | Production | Staging |
+| Setting | Production | Dev |
 |---------|------------|---------|
-| Service name | `arc-reactor` | `arc-reactor-staging` |
+| Service name | `arc-reactor` | `arc-reactor-dev` |
 | Region | `us-west1` | `us-west1` |
 | Min instances | 1 | 0 |
 | Max instances | 10 | 3 |
@@ -66,7 +66,7 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 | Bucket | Purpose | Environment |
 |--------|---------|-------------|
 | `arc-reactor-runs` | Production run data | Production |
-| `arc-reactor-runs-staging` | Staging run data | Staging |
+| `arc-reactor-runs-dev` | Dev run data | Dev |
 | `arc-reactor-build-cache` | Build artifacts | Shared |
 
 ### Cloud SQL (PostgreSQL)
@@ -74,14 +74,14 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 | Instance | Environment |
 |----------|-------------|
 | `arc-reactor-db` | Production |
-| `arc-reactor-db-staging` | Staging |
+| `arc-reactor-db-dev` | Dev |
 
 ### Firestore (User Accounts)
 
 | Database | Environment |
 |----------|-------------|
 | `(default)` | Production |
-| `staging` | Staging |
+| `dev` | Dev |
 
 ### Secret Manager
 
@@ -268,8 +268,8 @@ jobs:
             echo "env=prod" >> $GITHUB_OUTPUT
             echo "service=arc-reactor" >> $GITHUB_OUTPUT
           else
-            echo "env=staging" >> $GITHUB_OUTPUT
-            echo "service=arc-reactor-staging" >> $GITHUB_OUTPUT
+            echo "env=dev" >> $GITHUB_OUTPUT
+            echo "service=arc-reactor-dev" >> $GITHUB_OUTPUT
           fi
           
       - name: Build and push
@@ -304,8 +304,8 @@ jobs:
             echo "env=prod" >> $GITHUB_OUTPUT
             echo "service=arc-reactor" >> $GITHUB_OUTPUT
           else
-            echo "env=staging" >> $GITHUB_OUTPUT
-            echo "service=arc-reactor-staging" >> $GITHUB_OUTPUT
+            echo "env=dev" >> $GITHUB_OUTPUT
+            echo "service=arc-reactor-dev" >> $GITHUB_OUTPUT
           fi
           
       - name: Deploy to Cloud Run
@@ -344,16 +344,16 @@ production:
   log_level: "INFO"
 ```
 
-### Staging (`ENV_FOR_DYNACONF=staging`)
+### Dev (`ENV_FOR_DYNACONF=dev`)
 
 ```yaml
-# settings.yaml - staging section
-staging:
+# settings.yaml - dev section
+dev:
   debug: true
   gcp_project: "arc-ctc-project"
   gcp_region: "us-west1"
-  nextflow_bucket: "arc-reactor-runs-staging"
-  firestore_database: "staging"
+  nextflow_bucket: "arc-reactor-runs-dev"
+  firestore_database: "dev"
   log_level: "DEBUG"
 ```
 
@@ -464,8 +464,8 @@ resource "google_firestore_database" "database" {
 ### Standard Deployment
 
 1. **Create PR** → Runs tests automatically
-2. **Merge to develop** → Deploys to staging
-3. **Test in staging** → Manual verification
+2. **Merge to develop** → Deploys to dev
+3. **Test in dev** → Manual verification
 4. **Merge to main** → Deploys to production
 
 ### Hotfix Deployment

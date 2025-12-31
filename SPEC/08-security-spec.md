@@ -38,8 +38,8 @@ Security is implemented at multiple layers: network, authentication, authorizati
                     ┌───────────────┼───────────────┐
                     ▼               ▼               ▼
             ┌───────────┐   ┌───────────┐   ┌───────────┐   ┌───────────┐
-            │ Cloud SQL │   │ Firestore│   │    GCS    │   │ GCP Batch │
-            │ (VPC SC)  │   │ (VPC SC) │   │ (VPC SC)  │   │           │
+            │ Cloud SQL │   │ Firestore │   │    GCS    │   │ GCP Batch │
+            │ (VPC SC)  │   │ (VPC SC)  │   │ (VPC SC)  │   │           │
             └───────────┘   └───────────┘   └───────────┘   └───────────┘
 ```
 
