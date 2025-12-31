@@ -700,6 +700,27 @@ apiClient.interceptors.response.use(
 );
 ```
 
+### API Path Strategy (Relative Paths Only)
+
+**Important:** The frontend uses **relative paths exclusively** for all API requests (e.g., `/api/runs`, `/api/chat`). This is an intentional architectural decision with the following implications:
+
+| Aspect | Detail |
+|--------|--------|
+| **No build-time URL config** | `NEXT_PUBLIC_API_URL` or similar build-time environment variables are **not required** |
+| **Single-container model** | Works because the static frontend is served by the same backend that handles `/api/*` routes |
+| **Docker builds** | The Dockerfile can run `npm run build` without passing API URL arguments |
+| **Environment portability** | The same build artifact works in dev, staging, and production without modification |
+
+**Why this works:**
+```
+Browser → https://arc-reactor.example.com/api/runs
+                     ↓
+              Cloud Run service
+                     ↓
+              FastAPI backend
+              (serves both static files AND /api/* routes)
+```
+
 ### API Functions
 
 ```typescript
