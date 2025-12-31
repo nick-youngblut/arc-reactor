@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import Any, AsyncIterator
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel, Field
@@ -29,12 +29,15 @@ async def _event_stream(
     *,
     thread_id: str,
     user: UserContext,
+    request: Request,
 ) -> AsyncIterator[bytes]:
     config = {
         "configurable": {
             "thread_id": thread_id,
             "user_email": user.email,
             "user_name": user.name,
+            "benchling_service": request.app.state.benchling_service,
+            "storage_service": request.app.state.storage_service,
         }
     }
     async with checkpointer_session(settings) as checkpointer:
@@ -45,7 +48,11 @@ async def _event_stream(
 
 
 @router.post("/chat")
-async def chat_rest(request: ChatRequest, user: UserContext = Depends(get_current_user_context)):
+async def chat_rest(
+    request: ChatRequest,
+    http_request: Request,
+    user: UserContext = Depends(get_current_user_context),
+):
     if request.type != "message":
         return StreamingResponse(
             iter([b"data: 3:\"Invalid message type\"\n\n"]),
@@ -55,6 +62,11 @@ async def chat_rest(request: ChatRequest, user: UserContext = Depends(get_curren
     thread_id = request.thread_id or f"thread-{uuid.uuid4().hex}"
     messages = [HumanMessage(content=request.content)]
     return StreamingResponse(
-        _event_stream(messages, thread_id=thread_id, user=user),
+        _event_stream(
+            messages,
+            thread_id=thread_id,
+            user=user,
+            request=http_request,
+        ),
         media_type="text/event-stream",
     )

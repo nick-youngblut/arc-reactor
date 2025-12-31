@@ -175,6 +175,9 @@ These tools are specifically designed to help users find and retrieve NGS sequen
 for samplesheet generation. They provide the primary workflow for locating samples based
 on user queries like "I want to process my SspArc0050 dataset".
 
+**Table formatting:** Any tabular tool output returned to the LLM agent must be encoded
+using the `toon` library (TOON format) for compact, token-efficient responses.
+
 ### search_ngs_runs
 
 Search for NGS runs with comprehensive filtering options. This is the primary tool for
@@ -198,7 +201,7 @@ helping users find their sequencing data.
 | `limit` | integer | No | Maximum results to return (default: 50, max: 500) |
 | `include_qc_summary` | boolean | No | Include basic QC metrics in results (default: false) |
 
-**Returns:**
+**Returns (TOON table):**
 ```
 Found 3 NGS runs matching your criteria:
 
@@ -402,7 +405,7 @@ metadata needed for samplesheet generation.
 
 *One of `ngs_run` or `pooled_sample` is required.
 
-**Returns:**
+**Returns (TOON table):**
 ```
 NGS Run: NR-2024-0156
 Pooled Sample: SspArc0050
@@ -411,7 +414,7 @@ Instrument: NovaSeqX
 Completion Date: 2024-12-18
 Sample Count: 24
 
-Samples:
+Samples (TOON):
 sample_id  | fastq_r1                                           | fastq_r2                                           | organism | cell_line | read_count | q30_percent
 -----------|----------------------------------------------------|----------------------------------------------------|----------|-----------|------------|------------
 LPS-001    | gs://arc-ngs-data/NR-2024-0156/LPS-001_R1.fastq.gz | gs://arc-ngs-data/NR-2024-0156/LPS-001_R2.fastq.gz | Human    | HeLa      | 45000000   | 94.2
@@ -564,7 +567,7 @@ Get detailed QC metrics for an NGS run, including per-lane and per-sample statis
 
 *One of `ngs_run` or `pooled_sample` is required.
 
-**Returns (summary level):**
+**Returns (summary level; tables in TOON):**
 ```
 NGS Run QC Summary: NR-2024-0156
 
@@ -576,13 +579,13 @@ Run Metrics:
   Average Q30: 94.5%
   Average Read Length: 150 bp
 
-Lane Summary:
+Lane Summary (TOON):
   Lane 1: 305M reads, 94.2% Q30, 0.8% error rate
   Lane 2: 298M reads, 94.8% Q30, 0.7% error rate
   Lane 3: 312M reads, 94.4% Q30, 0.9% error rate
   Lane 4: 285M reads, 94.6% Q30, 0.8% error rate
 
-QC Status: ✓ PASS (all lanes >90% Q30)
+QC Status: PASS (all lanes >90% Q30)
 ```
 
 **Implementation:**
@@ -633,15 +636,15 @@ know the sample IDs and just need the file paths.
 | `ngs_run` | string | No | Restrict to specific NGS run |
 | `validate_exists` | boolean | No | Check if files exist in GCS (default: false) |
 
-**Returns:**
+**Returns (TOON table):**
 ```
 FASTQ paths for 3 samples:
 
 sample_id | fastq_r1                                           | fastq_r2                                           | exists
 ----------|----------------------------------------------------|----------------------------------------------------|-------
-LPS-001   | gs://arc-ngs-data/NR-2024-0156/LPS-001_R1.fastq.gz | gs://arc-ngs-data/NR-2024-0156/LPS-001_R2.fastq.gz | ✓
-LPS-002   | gs://arc-ngs-data/NR-2024-0156/LPS-002_R1.fastq.gz | gs://arc-ngs-data/NR-2024-0156/LPS-002_R2.fastq.gz | ✓
-LPS-003   | gs://arc-ngs-data/NR-2024-0156/LPS-003_R1.fastq.gz | gs://arc-ngs-data/NR-2024-0156/LPS-003_R2.fastq.gz | ✓
+LPS-001   | gs://arc-ngs-data/NR-2024-0156/LPS-001_R1.fastq.gz | gs://arc-ngs-data/NR-2024-0156/LPS-001_R2.fastq.gz | YES
+LPS-002   | gs://arc-ngs-data/NR-2024-0156/LPS-002_R1.fastq.gz | gs://arc-ngs-data/NR-2024-0156/LPS-002_R2.fastq.gz | YES
+LPS-003   | gs://arc-ngs-data/NR-2024-0156/LPS-003_R1.fastq.gz | gs://arc-ngs-data/NR-2024-0156/LPS-003_R2.fastq.gz | YES
 
 All files verified in GCS.
 ```
@@ -735,7 +738,7 @@ Search for entities in the Benchling data warehouse with flexible filtering.
 | `use_wildcards` | boolean | No | Treat names as SQL wildcard patterns (default: false) |
 | `limit` | integer | No | Maximum results to return (default: 100) |
 
-**Returns:**
+**Returns (TOON table):**
 ```
 Found 3 entities matching "LPS-001%":
 
@@ -910,7 +913,7 @@ List available Nextflow pipelines with supported parameters.
 |------|------|----------|-------------|
 | `category` | string | No | Filter by category (e.g., "scRNA-seq", "bulk-RNA-seq") |
 
-**Returns:**
+**Returns (TOON table):**
 ```
 Available Pipelines:
 
@@ -1135,7 +1138,7 @@ escape hatch for complex queries that cannot be expressed through the standard t
 | `limit` | integer | No | Maximum rows to return (default: 100, max: 1000) |
 
 
-**Returns:**
+**Returns (TOON table):**
 ```
 Query results (42 rows):
 

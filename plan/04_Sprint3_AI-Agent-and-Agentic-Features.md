@@ -155,103 +155,106 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 > - [05-agentic-features-spec.md#ngs-data-discovery-tools](../spec/05-agentic-features-spec.md) - Tool specifications
 > - [06-data-model-spec.md#benchling-data-warehouse](../spec/06-data-model-spec.md) - Available tables
 
+> **Codebase References:**
+> - [external-repos/arc-benchling-mcp/](../external-repos/arc-benchling-mcp/) - Benchling tools reference
+
 ### Tool Base Infrastructure
 
-- [ ] Create `backend/agents/tools/__init__.py`:
-  - [ ] Export all tool functions
-  - [ ] Define tool categories
+- [x] Create `backend/agents/tools/__init__.py`:
+  - [x] Export all tool functions
+  - [x] Define tool categories
 
-- [ ] Create `backend/agents/tools/base.py`:
-  - [ ] Define common tool utilities
-  - [ ] Define result formatting helpers
-  - [ ] Define error handling decorators
+- [x] Create `backend/agents/tools/base.py`:
+  - [x] Define common tool utilities
+  - [x] Define result formatting helpers
+  - [x] Define error handling decorators
 
 ### search_ngs_runs Tool
 
 > **Spec References:**
 > - [05-agentic-features-spec.md#search_ngs_runs](../spec/05-agentic-features-spec.md) - Complete tool spec
 
-- [ ] Create `backend/agents/tools/ngs_discovery.py`:
-  - [ ] Implement `search_ngs_runs()` function with `@tool` decorator — *See [05-agentic-features-spec.md#search_ngs_runs](../spec/05-agentic-features-spec.md)*:
-    - [ ] Parameters:
-      - [ ] `ngs_run` (str, optional): NGS run name (supports wildcards)
-      - [ ] `pooled_sample` (str, optional): SspArc name (supports wildcards)
-      - [ ] `submitter` (str, optional): Submitter name
-      - [ ] `project` (str, optional): Project name
-      - [ ] `platform` (str, optional): Instrument platform
-      - [ ] `days_back` (int, optional): Days to look back (default 30)
-      - [ ] `min_date` (str, optional): Minimum date YYYY-MM-DD
-      - [ ] `max_date` (str, optional): Maximum date YYYY-MM-DD
-      - [ ] `status` (str, optional): Run status filter
-      - [ ] `use_wildcards` (bool, optional): Enable SQL wildcards
-      - [ ] `include_qc_summary` (bool, optional): Include QC metrics
-      - [ ] `limit` (int, optional): Max results (default 20)
-    - [ ] Query Benchling warehouse `ngs_run$raw` table — *See [06-data-model-spec.md#key-tables](../spec/06-data-model-spec.md)*
-    - [ ] Join with `ngs_pooled_sample$raw` for SspArc info
-    - [ ] Apply filters based on parameters
-    - [ ] Format output as readable table
-    - [ ] Include run name, SspArc, date, sample count, status, platform
+- [x] Create `backend/agents/tools/ngs_discovery.py`:
+  - [x] Implement `search_ngs_runs()` function with `@tool` decorator — *See [05-agentic-features-spec.md#search_ngs_runs](../spec/05-agentic-features-spec.md)*:
+    - [x] Parameters:
+      - [x] `ngs_run` (str, optional): NGS run name (supports wildcards)
+      - [x] `pooled_sample` (str, optional): SspArc name (supports wildcards)
+      - [x] `submitter` (str, optional): Submitter name
+      - [x] `project` (str, optional): Project name
+      - [x] `platform` (str, optional): Instrument platform
+      - [x] `days_back` (int, optional): Days to look back (default 30)
+      - [x] `min_date` (str, optional): Minimum date YYYY-MM-DD
+      - [x] `max_date` (str, optional): Maximum date YYYY-MM-DD
+      - [x] `status` (str, optional): Run status filter
+      - [x] `use_wildcards` (bool, optional): Enable SQL wildcards
+      - [x] `include_qc_summary` (bool, optional): Include QC metrics
+      - [x] `limit` (int, optional): Max results (default 20)
+    - [x] Query Benchling warehouse `ngs_run$raw` table — *See [06-data-model-spec.md#key-tables](../spec/06-data-model-spec.md)*
+    - [x] Join with `ngs_pooled_sample$raw` for SspArc info
+    - [x] Apply filters based on parameters
+    - [x] Format output as TOON table (toon library)
+    - [x] Include run name, SspArc, date, sample count, status, platform
 
 ### get_ngs_run_samples Tool
 
 > **Spec References:**
 > - [05-agentic-features-spec.md#get_ngs_run_samples](../spec/05-agentic-features-spec.md) - Complete tool spec
 
-- [ ] Implement `get_ngs_run_samples()` function — *See [05-agentic-features-spec.md#get_ngs_run_samples](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `ngs_run` (str, optional): NGS run name
-    - [ ] `pooled_sample` (str, optional): SspArc name
-    - [ ] `include_fastq_paths` (bool, optional): Include FASTQ URIs
-    - [ ] `include_metadata` (bool, optional): Include sample metadata
-    - [ ] `limit` (int, optional): Max samples (default 100)
-  - [ ] Query `ngs_run_output_v2$raw` and `library_prep_sample$raw` — *See [06-data-model-spec.md#query-patterns](../spec/06-data-model-spec.md)*
-  - [ ] Join to get complete sample information
-  - [ ] Include: sample name, organism, cell line, read counts
-  - [ ] Optionally include FASTQ paths from GCS
-  - [ ] Format as table with sample details
+- [x] Implement `get_ngs_run_samples()` function — *See [05-agentic-features-spec.md#get_ngs_run_samples](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `ngs_run` (str, optional): NGS run name
+    - [x] `pooled_sample` (str, optional): SspArc name
+    - [x] `include_fastq_paths` (bool, optional): Include FASTQ URIs
+    - [x] `include_metadata` (bool, optional): Include sample metadata
+    - [x] `limit` (int, optional): Max samples (default 100)
+  - [x] Query `ngs_run_output_v2$raw` and `library_prep_sample$raw` — *See [06-data-model-spec.md#query-patterns](../spec/06-data-model-spec.md)*
+  - [x] Join to get complete sample information
+  - [x] Include: sample name, organism, cell line, read counts
+  - [x] Optionally include FASTQ paths from GCS
+  - [x] Format as TOON table with sample details
 
 ### get_ngs_run_qc Tool
 
 > **Spec References:**
 > - [05-agentic-features-spec.md#get_ngs_run_qc](../spec/05-agentic-features-spec.md) - Complete tool spec
 
-- [ ] Implement `get_ngs_run_qc()` function — *See [05-agentic-features-spec.md#get_ngs_run_qc](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `ngs_run` (str, optional): NGS run name
-    - [ ] `pooled_sample` (str, optional): SspArc name
-    - [ ] `level` (str, optional): Detail level (summary, lane, sample)
-  - [ ] Query QC metrics from warehouse
-  - [ ] Calculate aggregated metrics:
-    - [ ] Total reads
-    - [ ] Average Q30 percentage
-    - [ ] Pass/fail status per sample
-  - [ ] Format output based on level:
-    - [ ] Summary: High-level metrics and status
-    - [ ] Lane: Per-lane breakdown
-    - [ ] Sample: Per-sample QC details
+- [x] Implement `get_ngs_run_qc()` function — *See [05-agentic-features-spec.md#get_ngs_run_qc](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `ngs_run` (str, optional): NGS run name
+    - [x] `pooled_sample` (str, optional): SspArc name
+    - [x] `level` (str, optional): Detail level (summary, lane, sample)
+  - [x] Query QC metrics from warehouse
+  - [x] Calculate aggregated metrics:
+    - [x] Total reads
+    - [x] Average Q30 percentage
+    - [x] Pass/fail status per sample
+  - [x] Format output based on level (TOON for tables):
+    - [x] Summary: High-level metrics and status
+    - [x] Lane: Per-lane breakdown
+    - [x] Sample: Per-sample QC details
 
 ### get_fastq_paths Tool
 
 > **Spec References:**
 > - [05-agentic-features-spec.md#get_fastq_paths](../spec/05-agentic-features-spec.md) - Complete tool spec
 
-- [ ] Implement `get_fastq_paths()` function — *See [05-agentic-features-spec.md#get_fastq_paths](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `ngs_run` (str, optional): NGS run name
-    - [ ] `pooled_sample` (str, optional): SspArc name
-    - [ ] `sample_names` (str, optional): Specific samples (semicolon-delimited)
-    - [ ] `verify_exists` (bool, optional): Check if files exist in GCS
-  - [ ] Query `ngs_run_output_v2$raw` for FASTQ paths
-  - [ ] Optionally verify file existence in GCS — *See [07-integration-spec.md#file-existence-check](../spec/07-integration-spec.md)*
-  - [ ] Return formatted list of samples with R1/R2 paths
+- [x] Implement `get_fastq_paths()` function — *See [05-agentic-features-spec.md#get_fastq_paths](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `ngs_run` (str, optional): NGS run name
+    - [x] `pooled_sample` (str, optional): SspArc name
+    - [x] `sample_names` (str, optional): Specific samples (semicolon-delimited)
+    - [x] `verify_exists` (bool, optional): Check if files exist in GCS
+  - [x] Query `ngs_run_output_v2$raw` for FASTQ paths
+  - [x] Optionally verify file existence in GCS — *See [07-integration-spec.md#file-existence-check](../spec/07-integration-spec.md)*
+  - [x] Return TOON-formatted list of samples with R1/R2 paths
 
 ### Unit Tests for NGS Tools
 
-- [ ] Create `backend/tests/test_ngs_tools.py`:
-  - [ ] Test search_ngs_runs with various filters
-  - [ ] Test get_ngs_run_samples with mocked warehouse
-  - [ ] Test get_ngs_run_qc at different levels
-  - [ ] Test get_fastq_paths with verification
+- [x] Create `backend/tests/test_ngs_tools.py`:
+  - [x] Test search_ngs_runs with various filters
+  - [x] Test get_ngs_run_samples with mocked warehouse
+  - [x] Test get_ngs_run_qc at different levels
+  - [x] Test get_fastq_paths with verification
 
 ---
 
