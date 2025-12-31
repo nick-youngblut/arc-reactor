@@ -20,7 +20,7 @@ class Checkpoint(Base):
     checkpoint: Mapped[dict[str, Any]] = mapped_column(
         JSONB().with_variant(JSON, "sqlite"), nullable=False
     )
-    metadata: Mapped[dict[str, Any] | None] = mapped_column(
+    checkpoint_metadata: Mapped[dict[str, Any] | None] = mapped_column(
         JSONB().with_variant(JSON, "sqlite")
     )
     created_at: Mapped[datetime] = mapped_column(

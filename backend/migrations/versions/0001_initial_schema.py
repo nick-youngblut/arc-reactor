@@ -130,7 +130,7 @@ def upgrade() -> None:
         sa.Column("checkpoint_id", sa.String(length=100), nullable=False),
         sa.Column("parent_checkpoint_id", sa.String(length=100), nullable=True),
         sa.Column("checkpoint", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("metadata", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+        sa.Column("checkpoint_metadata", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),

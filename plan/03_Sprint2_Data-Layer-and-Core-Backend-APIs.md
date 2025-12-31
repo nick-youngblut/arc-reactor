@@ -95,7 +95,7 @@ This sprint implements the data models, persistence layer, and core REST API end
     - [x] `checkpoint_id` (VARCHAR(100), NOT NULL)
     - [x] `parent_checkpoint_id` (VARCHAR(100), nullable)
     - [x] `checkpoint` (JSONB, NOT NULL)
-    - [x] `metadata` (JSONB, nullable)
+    - [x] `checkpoint_metadata` (JSONB, nullable) — renamed from `metadata` to avoid SQLAlchemy reserved name conflict
     - [x] `created_at` (TIMESTAMPTZ, DEFAULT NOW())
     - [x] PRIMARY KEY (thread_id, checkpoint_id)
 

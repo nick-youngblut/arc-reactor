@@ -79,7 +79,7 @@ def create_app() -> FastAPI:
     dist_dir = Path(settings.get("frontend_out_dir", "frontend/out")).resolve()
     _mount_static_assets(app, dist_dir)
 
-    @app.get("/{full_path:path}")
+    @app.get("/{full_path:path}", response_model=None)
     async def serve_frontend(full_path: str) -> FileResponse | JSONResponse:
         if not dist_dir.exists():
             return JSONResponse({"detail": "Frontend not built"}, status_code=404)

@@ -163,11 +163,13 @@ CREATE TABLE checkpoints (
     checkpoint_id VARCHAR(100) NOT NULL,
     parent_checkpoint_id VARCHAR(100),
     checkpoint JSONB NOT NULL,
-    metadata JSONB,
+    checkpoint_metadata JSONB,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     PRIMARY KEY (thread_id, checkpoint_id)
 );
 ```
+
+> **Note:** The column is named `checkpoint_metadata` instead of `metadata` to avoid conflicts with SQLAlchemy's reserved `metadata` attribute used for schema management.
 
 ### Table: `users`
 
