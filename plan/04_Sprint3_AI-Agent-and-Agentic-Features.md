@@ -266,10 +266,10 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 
 ### Entity Discovery Tools
 
-- [ ] Create `backend/agents/tools/benchling_discovery.py`:
+- [x] Create `backend/agents/tools/benchling_discovery.py`:
 
-- [ ] Implement `get_entities()` function — *See [05-agentic-features-spec.md#get_entities](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
+- [x] Implement `get_entities()` function — *See [05-agentic-features-spec.md#get_entities](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
     - [ ] `entity_names` (str, optional): Entity names (semicolon-delimited)
     - [ ] `entity_ids` (str, optional): Entity IDs (semicolon-delimited)
     - [ ] `schema_name` (str, optional): Filter by schema
@@ -282,21 +282,21 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
     - [ ] `fields` (str, optional): Fields to include (semicolon-delimited)
     - [ ] `allow_wildcards` (bool, optional): Enable SQL wildcards
     - [ ] `limit` (int, optional): Max results (default 40)
-  - [ ] Query appropriate schema table based on schema_name
-  - [ ] Apply filters dynamically
-  - [ ] Format output as YAML or table
+  - [x] Query appropriate schema table based on schema_name
+  - [x] Apply filters dynamically
+  - [x] Format output as YAML or table
 
-- [ ] Implement `get_entity_relationships()` function — *See [05-agentic-features-spec.md#get_entity_relationships](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
+- [x] Implement `get_entity_relationships()` function — *See [05-agentic-features-spec.md#get_entity_relationships](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
     - [ ] `entity_name` (str, required): Entity to start from
     - [ ] `schema_name` (str, optional): Schema hint for performance
     - [ ] `relationship_depth` (int, optional): Traversal depth (default 4, max 10)
     - [ ] `relationship_types` (str, optional): Specific fields to follow
     - [ ] `include_reverse_links` (bool, optional): Include back-references
     - [ ] `output_format` (str, optional): tree, yaml, or json
-  - [ ] Implement recursive relationship traversal
-  - [ ] Handle circular references
-  - [ ] Format output as tree structure
+  - [x] Implement recursive relationship traversal
+  - [x] Handle circular references
+  - [x] Format output as tree structure
 
 ### Notebook Entry Tools
 
@@ -304,8 +304,8 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 > - [05-agentic-features-spec.md#list_entries](../spec/05-agentic-features-spec.md) - Entry listing
 > - [05-agentic-features-spec.md#get_entry_content](../spec/05-agentic-features-spec.md) - Entry content
 
-- [ ] Implement `list_entries()` function — *See [05-agentic-features-spec.md#list_entries](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
+- [x] Implement `list_entries()` function — *See [05-agentic-features-spec.md#list_entries](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
     - [ ] `entry_names` (str, optional): Entry names (semicolon-delimited)
     - [ ] `project_names` (str, optional): Project filter
     - [ ] `folder_names` (str, optional): Folder filter
@@ -314,55 +314,55 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
     - [ ] `max_date` (str, optional): Max date
     - [ ] `allow_wildcards` (bool, optional): Enable wildcards
     - [ ] `archived` (bool, optional): Include archived
-  - [ ] Query `entry$raw` table — *See [06-data-model-spec.md#key-tables](../spec/06-data-model-spec.md)*
-  - [ ] Format output as list with metadata
+  - [x] Query `entry$raw` table — *See [06-data-model-spec.md#key-tables](../spec/06-data-model-spec.md)*
+  - [x] Format output as list with metadata
 
-- [ ] Implement `get_entry_content()` function — *See [05-agentic-features-spec.md#get_entry_content](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
+- [x] Implement `get_entry_content()` function — *See [05-agentic-features-spec.md#get_entry_content](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
     - [ ] `entry_names` (str, required): Entry names
     - [ ] `head` (int, optional): Lines from beginning
     - [ ] `tail` (int, optional): Lines from end
-  - [ ] Fetch entry content from warehouse
-  - [ ] Apply head/tail truncation
+  - [x] Fetch entry content from warehouse
+  - [x] Apply head/tail truncation
 
-- [ ] Implement `get_entry_entities()` function — *See [05-agentic-features-spec.md#get_entry_entities](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
+- [x] Implement `get_entry_entities()` function — *See [05-agentic-features-spec.md#get_entry_entities](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
     - [ ] `entry_name` (str, required): Entry name
     - [ ] `limit` (int, optional): Max entities (default 40)
-  - [ ] Query entities linked to entry
-  - [ ] Return formatted list
+  - [x] Query entities linked to entry
+  - [x] Return formatted list
 
 ### Schema & Metadata Tools
 
 > **Spec References:**
 > - [05-agentic-features-spec.md#schema-metadata-tools](../spec/05-agentic-features-spec.md) - Schema tools
 
-- [ ] Create `backend/agents/tools/schema_tools.py`:
+- [x] Create `backend/agents/tools/schema_tools.py`:
 
-- [ ] Implement `get_schemas()` function — *See [05-agentic-features-spec.md#get_schemas](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
+- [x] Implement `get_schemas()` function — *See [05-agentic-features-spec.md#get_schemas](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
     - [ ] `schema_names` (str, optional): Specific schemas (semicolon-delimited)
     - [ ] `get_all_schemas` (bool, optional): Return all schema names
-  - [ ] Query `schema$raw` table
-  - [ ] Return schema names and descriptions
+  - [x] Query `schema$raw` table
+  - [x] Return schema names and descriptions
 
-- [ ] Implement `get_schema_field_info()` function — *See [05-agentic-features-spec.md#get_schema_field_info](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
+- [x] Implement `get_schema_field_info()` function — *See [05-agentic-features-spec.md#get_schema_field_info](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
     - [ ] `schema_name` (str, required): Schema to inspect
-  - [ ] Query `schema_field$raw` table
-  - [ ] Return field names, types, required status, descriptions
+  - [x] Query `schema_field$raw` table
+  - [x] Return field names, types, required status, descriptions
 
-- [ ] Implement `get_dropdown_values()` function — *See [05-agentic-features-spec.md#get_dropdown_values](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
+- [x] Implement `get_dropdown_values()` function — *See [05-agentic-features-spec.md#get_dropdown_values](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
     - [ ] `dropdown_name` (str, required): Dropdown to query
-  - [ ] Query `dropdown$raw` and `dropdown_option$raw`
-  - [ ] Return list of valid values
+  - [x] Query `dropdown$raw` and `dropdown_option$raw`
+  - [x] Return list of valid values
 
-- [ ] Implement `list_projects()` function — *See [05-agentic-features-spec.md#list_projects](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
+- [x] Implement `list_projects()` function — *See [05-agentic-features-spec.md#list_projects](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
     - [ ] `wildcard_pattern` (str, optional): Filter pattern
-  - [ ] Query `project$raw` table
-  - [ ] Return project names and metadata
+  - [x] Query `project$raw` table
+  - [x] Return project names and metadata
 
 ### Advanced Query Tool
 
@@ -370,16 +370,16 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 > - [05-agentic-features-spec.md#execute_warehouse_query](../spec/05-agentic-features-spec.md) - Advanced SQL access
 > - [08-security-spec.md#sql-injection-prevention](../spec/08-security-spec.md) - Query safety
 
-- [ ] Implement `execute_warehouse_query()` function — *See [05-agentic-features-spec.md#execute_warehouse_query](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
+- [x] Implement `execute_warehouse_query()` function — *See [05-agentic-features-spec.md#execute_warehouse_query](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
     - [ ] `sql` (str, required): SQL query (SELECT only)
     - [ ] `params` (dict, optional): Query parameters
     - [ ] `limit` (int, optional): Max rows (default 100, max 1000)
-  - [ ] Validate query is SELECT only — *See [08-security-spec.md#sql-injection-prevention](../spec/08-security-spec.md)*
-  - [ ] Enforce limit clause
-  - [ ] Execute with parameterized query
-  - [ ] Format results as table
-  - [ ] Include row count in output
+  - [x] Validate query is SELECT only — *See [08-security-spec.md#sql-injection-prevention](../spec/08-security-spec.md)*
+  - [x] Enforce limit clause
+  - [x] Execute with parameterized query
+  - [x] Format results as table
+  - [x] Include row count in output
 
 ---
 
