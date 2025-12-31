@@ -5,6 +5,7 @@ sandbox/
 volumes/
 files/
 tasks/
+external-repos/
 screenlog.*
 
 # Bytecode compiled files

@@ -196,16 +196,6 @@ Users can track their pipeline runs through:
 - Multi-tenancy for different research groups
 - Pipeline marketplace for custom workflows
 
-## Success Metrics
-
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **Adoption** | 80% of eligible users within 6 months | Unique users per month |
-| **Self-service rate** | 90% of runs without comp bio support | Support tickets per run |
-| **Time to first run** | < 10 minutes for new users | Onboarding funnel |
-| **Run success rate** | > 95% for validated inputs | Failed runs / total runs |
-| **User satisfaction** | > 4.0/5.0 | Post-run survey |
-
 ## Risks and Mitigations
 
 | Risk | Impact | Likelihood | Mitigation |

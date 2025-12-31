@@ -46,8 +46,8 @@ The Arc Reactor follows a modern cloud-native architecture with clear separation
 │  │  │  │              DEEPAGENT ORCHESTRATOR                      │   │      │  │
 │  │  │  │                                                          │   │      │  │
 │  │  │  │   Tools:                    Subagents:                   │   │      │  │
-│  │  │  │   • search_ngs_runs         • benchling_expert           │   │      │  │
-│  │  │  │   • get_run_samples         • config_expert              │   │      │  │
+│  │  │  │   • get_entities            • benchling_expert           │   │      │  │
+│  │  │  │   • get_relationships       • config_expert              │   │      │  │
 │  │  │  │   • generate_samplesheet                                 │   │      │  │
 │  │  │  │   • generate_config                                      │   │      │  │
 │  │  │  │   • validate_inputs                                      │   │      │  │
@@ -136,30 +136,37 @@ Static export served by FastAPI, providing the user interface.
 
 #### DeepAgent Orchestrator
 
-The core AI component that powers the conversational interface.
+The core AI component that powers the conversational interface, utilizing a modular approach with specialized subagents and a middleware stack for complex work management.
 
 | Aspect | Details |
 |--------|---------|
 | **Framework** | LangChain v1 + DeepAgents |
-| **Model** | Gemini 3 Flash (gemini-3-flash-preview; see `SPEC/11-conf-spec.md`) |
-| **State** | PostgreSQL checkpointer (AsyncPostgresSaver) |
+| **Model** | Gemini 3 Flash (`gemini-3-flash-preview`; see `SPEC/11-conf-spec.md`) |
+| **State** | PostgreSQL checkpointer (`AsyncPostgresSaver`) |
 | **Streaming** | Full token + tool streaming |
+| **Middleware** | Task planning (TodoList), filesystem offloading, auto-summarization, HITL |
+
+#### Subagents
+
+Specialized agents that the orchestrator can delegate complex tasks to.
+
+| Subagent | Role |
+|----------|------|
+| `benchling_expert` | Handles complex multi-step queries, relationship traversal, and data reconciliation |
+| `config_expert` | Provides protocol recommendations, parameter optimization, and resource estimation |
 
 #### Tool Suite
 
-Custom tools that give the agent access to platform capabilities.
+Custom tools giving the agent comprehensive access to Benchling and platform capabilities.
 
-| Tool | Purpose | Data Source |
-|------|---------|-------------|
-| `search_ngs_runs` | Find NGS runs by date/project/instrument | Benchling |
-| `get_run_samples` | Get sample details for a run | Benchling |
-| `get_sample_metadata` | Get detailed sample metadata | Benchling |
-| `list_pipelines` | List available pipelines | Pipeline Registry |
-| `get_pipeline_schema` | Get pipeline input requirements | Pipeline Registry |
-| `generate_samplesheet` | Create CSV from samples | Benchling + Templates |
-| `generate_config` | Create Nextflow config | Templates |
-| `validate_inputs` | Check files and params | GCS + Validation Rules |
-| `submit_run` | Submit to GCP Batch | Batch API |
+| Category | Tools | Purpose |
+|----------|-------|---------|
+| **Benchling Discovery** | `get_entities`, `get_entity_relationships`, `list_entries`, `get_entry_content`, `get_entry_entities` | Search entities, traverse lineage, read notebook experimental context |
+| **Schema & Metadata** | `get_schemas`, `get_schema_field_info`, `get_dropdown_values`, `list_projects` | Self-discover warehouse structure and valid metadata options |
+| **Pipeline Info** | `list_pipelines`, `get_pipeline_schema` | Discover available Nextflow workflows and their input requirements |
+| **File Generation** | `generate_samplesheet`, `generate_config` | Automated creation of pipeline-ready input files from discovery results |
+| **Validation & Submission** | `validate_inputs`, `submit_run`, `cancel_run`, `delete_file`, `clear_samplesheet` | End-to-end verification and job management (with HITL approvals) |
+| **Advanced** | `execute_warehouse_query` | Raw SQL escape hatch for complex data reconciliation tasks |
 
 ### Data Layer
 

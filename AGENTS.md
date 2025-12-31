@@ -5,6 +5,7 @@
 - `SPEC/`: Specification documents.
 - `backend/`: FastAPI app (`main.py`), agents (`agents/`), routes (`api/`), tools (`tools/`), services (`services/`), settings (`settings.yml`).
 - `frontend/`: Next.js (App Router) with `app/`, `components/`, `hooks/`, `stores/`, `lib/`.
+- `external-repos/`: Code repositories used as references for developing Arc Reactor.
 
 ## Build, Test, and Development Commands
 - Backend install (dev): `uv pip install -e 'backend/.[dev]'`

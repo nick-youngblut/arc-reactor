@@ -24,15 +24,23 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 │  ┌─────────────────────────────┐  ┌─────────────────────────────────────┐   │
 │  │        TOOLS                │  │         SUBAGENTS                   │   │
 │  │                             │  │                                     │   │
-│  │  Sample Discovery:          │  │  benchling_expert:                  │   │
-│  │  • search_ngs_runs          │  │  • Complex multi-step queries       │   │
-│  │  • get_run_samples          │  │  • Relationship traversal           │   │
-│  │  • get_sample_metadata      │  │  • Data reconciliation              │   │
+│  │  Benchling Discovery:       │  │  benchling_expert:                  │   │
+│  │  • get_entities             │  │  • Complex multi-step queries       │   │
+│  │  • get_entity_relationships │  │  • Relationship traversal           │   │
+│  │  • list_entries             │  │  • Data reconciliation              │   │
+│  │  • get_entry_content        │  │                                     │   │
+│  │  • get_entry_entities       │  │  config_expert:                     │   │
+│  │                             │  │  • Protocol recommendations         │   │
+│  │  Schema & Metadata:         │  │  • Parameter optimization           │   │
+│  │  • get_schemas              │  │  • Resource estimation              │   │
+│  │  • get_schema_field_info    │  │                                     │   │
+│  │  • get_dropdown_values      │  │                                     │   │
+│  │  • list_projects            │  │                                     │   │
 │  │                             │  │                                     │   │
-│  │  Pipeline Info:             │  │  config_expert:                     │   │
-│  │  • list_pipelines           │  │  • Protocol recommendations         │   │
-│  │  • get_pipeline_schema      │  │  • Parameter optimization           │   │
-│  │  • get_pipeline_docs        │  │  • Resource estimation              │   │
+│  │  Pipeline Info:             │  │                                     │   │
+│  │  • list_pipelines           │  │                                     │   │
+│  │  • get_pipeline_schema      │  │                                     │   │
+│  │                             │  │                                     │   │
 │  │  File Generation:           │  │                                     │   │
 │  │  • generate_samplesheet     │  │                                     │   │
 │  │  • generate_config          │  │                                     │   │
@@ -43,6 +51,10 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 │  │  • cancel_run (HITL)        │  │                                     │   │
 │  │  • delete_file (HITL)       │  │                                     │   │
 │  │  • clear_samplesheet (HITL) │  │                                     │   │
+│  │                             │  │                                     │   │
+│  │  Advanced:                  │  │                                     │   │
+│  │  • execute_warehouse_query  │  │                                     │   │
+│  │    (HITL for expensive)     │  │                                     │   │
 │  └─────────────────────────────┘  └─────────────────────────────────────┘   │
 │                                                                             │
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
@@ -55,6 +67,15 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 │  └───────────────────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+## Reference code repositories
+
+- `./external-repos/arc-benchling-mcp`
+  - MCP server that includes many tools for read-only interfacing with Benchling
+  - Use as a guide for developing the Benchling tools for the Pipeline Agent
+- `./external-repos/benchling-py`
+  - Python package for interfacing with the Benchling postgres database and Python SDK
+  - Use as a dependency: `"benchling-py @ git+https://github.com/arcinstitute/benchling-py.git@main"`
 
 ## Agent Configuration
 
@@ -91,12 +112,13 @@ You are a helpful assistant for wet lab scientists at Arc Institute. Your job is
 
 ## Your Capabilities
 
-1. **Find samples**: Search Benchling for NGS runs and samples by date, project, instrument, or other criteria
-2. **Generate files**: Create samplesheet CSV files and Nextflow configuration files
-3. **Configure pipelines**: Help users choose appropriate pipeline parameters
-4. **Explain pipelines**: Provide pipeline documentation from local Markdown data files using progressive disclosure
-5. **Validate inputs**: Check that all required files exist and parameters are valid
-6. **Submit runs**: Submit validated pipeline runs to GCP Batch
+1. **Find samples**: Search Benchling for entities and samples by name, schema, project, or other criteria
+2. **Explore relationships**: Trace sample lineage through entity relationships
+3. **Access protocols**: Read notebook entries for experimental context
+4. **Generate files**: Create samplesheet CSV files and Nextflow configuration files
+5. **Configure pipelines**: Help users choose appropriate pipeline parameters
+6. **Validate inputs**: Check that all required files exist and parameters are valid
+7. **Submit runs**: Submit validated pipeline runs to GCP Batch
 
 ## Guidelines
 
@@ -106,7 +128,6 @@ You are a helpful assistant for wet lab scientists at Arc Institute. Your job is
 - Present options when there are multiple valid choices
 - Validate configurations before allowing submission
 - If you're unsure, ask clarifying questions
-- Use pipeline documentation via progressive disclosure: start with overview sections and expand only on request
 
 ## Workflow
 
@@ -121,7 +142,7 @@ A typical interaction follows this pattern:
 
 ## Important Rules
 
-- Never fabricate sample data; always query Benchling
+- Never fabricate sample data; always query Benchling; always validate any data in your responses
 - Always show the user what files you've generated
 - Require explicit user confirmation before submission
 - If a validation fails, explain clearly what's wrong and how to fix it
@@ -129,92 +150,347 @@ A typical interaction follows this pattern:
 
 ## Tool Specifications
 
-### Sample Discovery Tools
+### Benchling Service Dependency
 
-#### search_ngs_runs
+All Benchling tools use the `benchling-py` library for warehouse access. The service
+is initialized at application startup and injected into tools via FastAPI dependencies.
 
-Search for NGS runs in Benchling by various criteria.
+```python
+from benchling_py import WarehouseClient
+
+class BenchlingService:
+    """Service for Benchling data warehouse operations."""
+    
+    def __init__(self):
+        self._client = WarehouseClient()
+    
+    @property
+    def warehouse(self) -> WarehouseClient:
+        return self._client
+```
+
+### Benchling Discovery Tools
+
+#### get_entities
+
+Search for entities in the Benchling data warehouse with flexible filtering.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `days_back` | integer | No | How many days back to search (default: 30) |
-| `instrument` | string | No | Filter by instrument (NovaSeq, NextSeq, etc.) |
-| `project` | string | No | Filter by project name |
-| `submitter` | string | No | Filter by submitter email |
+| `entity_names` | string | Yes | Entity names (semicolon-delimited) |
+| `schema_names` | string | No | Filter by schema names (semicolon-delimited) |
+| `project_names` | string | No | Filter by project names (semicolon-delimited) |
+| `use_wildcards` | boolean | No | Treat names as SQL wildcard patterns (default: false) |
+| `limit` | integer | No | Maximum results to return (default: 100) |
 
 **Returns:**
 ```
-Found 3 NGS runs from the past 2 weeks:
+Found 3 entities matching "LPS-001%":
 
-• **NR-2024-0156** (Dec 18, 2024)
-  - Instrument: NovaSeq X
-  - Project: Smith_RNAseq
-  - Samples: 48
-  - Submitter: jane.smith@arcinstitute.org
+entity_id    | entity_name | schema_name           | project_name  | entity_url
+-------------|-------------|-----------------------|---------------|---------------------------
+bfi_abc123   | LPS-001     | NGS Library Prep Sample | Smith_RNAseq | https://arcinstitute...
+bfi_def456   | LPS-001-P1  | NGS Pooled Sample      | Smith_RNAseq | https://arcinstitute...
+bfi_ghi789   | LPS-001-R1  | NGS Run Output v2      | Smith_RNAseq | https://arcinstitute...
+```
 
-• **NR-2024-0152** (Dec 16, 2024)
-  - Instrument: NextSeq 2000
-  - Project: Garcia_TimeCourse
-  - Samples: 24
-  - Submitter: carlos.garcia@arcinstitute.org
+**Implementation:**
+```python
+from langchain.tools import tool
 
-• **NR-2024-0148** (Dec 14, 2024)
-  ...
+@tool
+def get_entities(
+    entity_names: str,
+    schema_names: str | None = None,
+    project_names: str | None = None,
+    use_wildcards: bool = False,
+    limit: int = 100,
+) -> str:
+    """Get entities from the Benchling data warehouse.
+    
+    Args:
+        entity_names: Entity names (semicolon-delimited)
+        schema_names: Filter by schema names (semicolon-delimited)
+        project_names: Filter by project names (semicolon-delimited)
+        use_wildcards: Treat names as SQL wildcard patterns
+        limit: Maximum results to return
+    
+    Returns:
+        Formatted table of matching entities
+    """
+    # Parse semicolon-delimited inputs
+    names = [n.strip() for n in entity_names.split(";") if n.strip()]
+    schemas = [s.strip() for s in schema_names.split(";")] if schema_names else None
+    projects = [p.strip() for p in project_names.split(";")] if project_names else None
+    
+    # Query warehouse via benchling-py
+    result = benchling_service.warehouse.entity.get(
+        entity_names=names,
+        schema_names=schemas,
+        project_names=projects,
+        use_wildcards=use_wildcards,
+        limit=limit,
+        return_format="dataframe",
+    )
+    
+    # Format for display
+    return format_entity_table(result)
+```
+
+#### get_entity_relationships
+
+Discover and traverse relationships between Benchling entities through custom entity link (CEL) fields.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `entity_name` | string | Yes | Name of the entity to analyze |
+| `relationship_depth` | integer | No | How many levels deep to traverse (1-10, default: 4) |
+| `relationship_types` | string | No | Field names to follow (semicolon-delimited; None = all) |
+| `include_reverse_links` | boolean | No | Include entities that link TO this entity (default: true) |
+| `schema_name` | string | No | Schema name if known (improves disambiguation) |
+| `output_format` | string | No | Output format: tree, yaml, or json (default: tree) |
+| `max_results` | integer | No | Maximum relationships to return (default: 500) |
+
+**Returns (tree format):**
+```
+Entity Relationships for LPS-001 (NGS Library Prep Sample)
+
+LPS-001 (NGS Library Prep Sample)
+├── [→ NGS Pooled Sample] LPS-001-P1
+│   └── [→ NGS Run] NR-2024-0156
+│       └── [→ NGS Run Output v2] LPS-001-R1
+│           ├── fastq_r1: gs://arc-ngs-data/NR-2024-0156/LPS-001_R1.fastq.gz
+│           └── fastq_r2: gs://arc-ngs-data/NR-2024-0156/LPS-001_R2.fastq.gz
+└── [← Cell Line Lot] HeLa-Lot-2024-001
+    └── [← Cell Line] HeLa
 ```
 
 **Implementation Notes:**
-- Queries `benchling_service.get_lib_prep_samples()` with date filter
-- Aggregates by `ngs_run` to provide summary
-- Caches instrument/project lists for autocomplete suggestions
+- Uses `benchling_py.warehouse.RelationshipNavigator` for traversal
+- Forward links (→) follow CEL fields from source entity
+- Reverse links (←) find entities that reference this entity
+- High `relationship_depth` (4-10) often needed for full NGS workflow traversal
 
-#### get_run_samples
+#### list_entries
 
-Get detailed sample information for a specific NGS run.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `ngs_run` | string | Yes | NGS run name (e.g., "NR-2024-0156") |
-| `include_metadata` | boolean | No | Include full metadata (default: true) |
-
-**Returns:**
-```
-**NR-2024-0156** contains 48 library prep samples:
-
-By Cell Line:
-• 24 samples: Human, HeLa
-• 24 samples: Human, HEK293
-
-By Protocol:
-• 48 samples: 10X Genomics 3' v3
-
-FASTQ Status:
-• 48/48 samples have FASTQ paths available
-• Location: gs://arc-ngs-data/NR-2024-0156/
-
-Sample IDs: LPS-001, LPS-002, LPS-003, ... (48 total)
-```
-
-#### get_sample_metadata
-
-Get detailed metadata for specific samples.
+List Benchling notebook entries with flexible filtering.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `sample_ids` | list[string] | Yes | List of sample IDs |
+| `entry_names` | string | No | Entry names (semicolon-delimited) |
+| `project_names` | string | No | Project names (semicolon-delimited) |
+| `folder_names` | string | No | Folder names (semicolon-delimited) |
+| `creator_names` | string | No | Creator names (semicolon-delimited) |
+| `min_date` | string | No | Minimum date (YYYY-MM-DD) |
+| `max_date` | string | No | Maximum date (YYYY-MM-DD) |
+| `archived` | boolean | No | Include archived entries (default: false) |
+| `allow_wildcards` | boolean | No | Recognize SQL wildcards (%, _) in names |
+| `limit` | integer | No | Maximum results (default: 50) |
 
 **Returns:**
 ```
-Sample: LPS-001
-• Organism: Homo sapiens
-• Cell Line: HeLa
-• Tissue: Cervix
-• Perturbation: DMSO control
-• Replicate: 1
-• FASTQ R1: gs://arc-ngs-data/NR-2024-0156/LPS-001_R1.fastq.gz
-• FASTQ R2: gs://arc-ngs-data/NR-2024-0156/LPS-001_R2.fastq.gz
+Found 5 entries in project "Smith_RNAseq":
+
+entry_name                    | project        | folder    | creator          | modified_at
+------------------------------|----------------|-----------|------------------|------------------
+10X Library Prep Protocol v3  | Smith_RNAseq   | Protocols | jane.smith       | 2024-12-15
+NR-2024-0156 QC Report        | Smith_RNAseq   | QC        | lab.automation   | 2024-12-18
+HeLa Perturbation Experiment  | Smith_RNAseq   | Data      | jane.smith       | 2024-12-10
+```
+
+**Implementation:**
+```python
+@tool
+def list_entries(
+    entry_names: str | None = None,
+    project_names: str | None = None,
+    folder_names: str | None = None,
+    creator_names: str | None = None,
+    min_date: str | None = None,
+    max_date: str | None = None,
+    archived: bool = False,
+    allow_wildcards: bool = False,
+    limit: int = 50,
+) -> str:
+    """List Benchling notebook entries filtered by optional criteria.
+    
+    Returns entry metadata only, not content. Use get_entry_content
+    to retrieve the full notebook content.
+    """
+    # Parse dates
+    min_dt = datetime.strptime(min_date, "%Y-%m-%d") if min_date else None
+    max_dt = datetime.strptime(max_date, "%Y-%m-%d") if max_date else None
+    
+    result = benchling_service.warehouse.entry.get(
+        entry_names=parse_semicolon(entry_names),
+        project_names=parse_semicolon(project_names),
+        folder_names=parse_semicolon(folder_names),
+        creator_names=parse_semicolon(creator_names),
+        min_modified_date=min_dt,
+        max_modified_date=max_dt,
+        archived=archived,
+        use_wildcards=allow_wildcards,
+        limit=limit,
+        return_format="dataframe",
+    )
+    
+    return format_entry_table(result)
+```
+
+#### get_entry_content
+
+Retrieve the full content of a Benchling notebook entry as markdown.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `entry_names` | string | Yes | Entry names (semicolon-delimited) |
+| `head` | integer | No | Number of lines from the beginning |
+| `tail` | integer | No | Number of lines from the end |
+
+**Returns:**
+```markdown
+# 10X Library Prep Protocol v3
+
+## Materials
+- 10X Genomics Chromium Controller
+- Chromium Single Cell 3' Reagent Kit v3
+- ...
+
+## Procedure
+1. Cell Preparation
+   - Harvest cells at 80-90% confluency
+   - ...
+
+## Quality Control
+- Target cell viability: >90%
+- Target cell concentration: 700-1200 cells/µL
+```
+
+**Implementation Notes:**
+- Uses Benchling API to fetch entry content
+- Converts structured entry content to markdown
+- `head`/`tail` parameters useful for long protocols
+
+#### get_entry_entities
+
+Get entities associated with a Benchling notebook entry.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `entry_name` | string | Yes | Entry name |
+| `limit` | integer | No | Maximum entities to return (default: 50) |
+
+**Returns:**
+```
+Entities registered from entry "HeLa Perturbation Experiment":
+
+entity_name | entity_schema           | entity_type | entity_url
+------------|-------------------------|-------------|---------------------------
+LPS-001     | NGS Library Prep Sample | custom      | https://arcinstitute...
+LPS-002     | NGS Library Prep Sample | custom      | https://arcinstitute...
+LPS-003     | NGS Library Prep Sample | custom      | https://arcinstitute...
+```
+
+**Use Cases:**
+- Find all samples registered from a specific experiment
+- Trace which entities originated from a protocol run
+- Link experimental context to pipeline inputs
+
+### Schema & Metadata Tools
+
+#### get_schemas
+
+Get information about Benchling schemas.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `schema_names` | string | No | Schema names (semicolon-delimited) |
+| `list_all` | boolean | No | Return list of all schema names (default: false) |
+
+**Returns:**
+```
+Schema information:
+
+name                    | system_name               | schema_type | field_count
+------------------------|---------------------------|-------------|------------
+NGS Library Prep Sample | ngs_library_prep_sample   | entity      | 24
+NGS Pooled Sample       | ngs_pooled_sample         | entity      | 12
+NGS Run                 | ngs_run                   | entity      | 18
+NGS Run Output v2       | ngs_run_output_v2         | entity      | 15
+```
+
+#### get_schema_field_info
+
+Get detailed field information for a specific schema.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `schema_name` | string | Yes | Name of the schema |
+
+**Returns:**
+```
+Fields for schema "NGS Library Prep Sample":
+
+field_name         | field_type           | linked_schema      | linked_dropdown    | required
+-------------------|----------------------|--------------------|--------------------|---------
+Sample_ID          | text                 |                    |                    | true
+Project            | entity_link          | Project            |                    | true
+Cell_Line          | entity_link          | Cell Line          |                    | false
+Lib_Prep_Kit_Used  | dropdown             |                    | NGS_Lib_Prep_Kits  | true
+Protocol_Version   | dropdown             |                    | Protocol_Versions  | false
+Parent_Sample      | custom_entity_link   | NGS Library Prep   |                    | false
+Concentration      | decimal              |                    |                    | false
+```
+
+**Use Cases:**
+- Understand required vs optional fields before generating samplesheets
+- Discover entity relationships for lineage traversal
+- Identify dropdown fields for valid value lookup
+
+#### get_dropdown_values
+
+Get available values for a Benchling dropdown.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `dropdown_name` | string | Yes | Name of the dropdown |
+
+**Returns:**
+```
+Dropdown "NGS_Lib_Prep_Kits" values:
+
+10X Genomics 3' v2, 10X Genomics 3' v3, 10X Genomics 3' v4, 10X Genomics 5' v2, 
+Smart-seq2, Smart-seq3, Drop-seq, SHARE-seq
+```
+
+**Use Cases:**
+- Validate protocol/kit selections
+- Auto-suggest valid values to users
+- Map sample metadata to pipeline parameters
+
+#### list_projects
+
+List all projects in the Benchling data warehouse.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `filter_pattern` | string | No | Wildcard pattern to filter project names |
+
+**Returns:**
+```
+Available projects:
+
+Smith_RNAseq, Garcia_TimeCourse, Chen_CRISPR_Screen, Johnson_DrugDiscovery,
+Lee_NeuralOrganoids, Kim_TCellEngineering, Park_GenomeEditing, ...
 ```
 
 ### Pipeline Information Tools
@@ -268,67 +544,17 @@ Optional Parameters:
   Default: 10000
 ```
 
-#### get_pipeline_docs
-
-Return progressive-disclosure documentation for a specific pipeline from local
-Markdown data files included in the codebase.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `pipeline` | string | Yes | Pipeline name |
-| `section` | list[string] | No | Section text to return (e.g., "inputs", "parameters", "outputs", "qc"); otherwise, a list of all section names are returned |
-
-**Returns:**
-```
-## nf-core/scrnaseq — Inputs (Overview)
-
-- Required columns: sample, fastq_1, fastq_2
-- Optional columns: expected_cells, chemistry
-- Supported chemistry values: 10XV2, 10XV3, 10XV4
-
-Want more detail on any input or parameter?
-```
-
-**Implementation Notes:**
-- Documentation is stored as Markdown data files in the repo at
-  `backend/data/pipelines/<pipeline>/`.
-- Each pipeline directory must include a top-level `README.md` plus optional
-  section files (e.g., `inputs.md`, `parameters.md`, `outputs.md`, `qc.md`).
-- The tool must load only the requested section (progressive disclosure),
-  and avoid dumping full docs unless the user explicitly asks.
-- The agent must cite these local Markdown sources in its responses and offer
-  to expand into deeper sections on request.
-- Packaging: `backend/pyproject.toml` must include these Markdown files so they
-  are available at runtime (editable installs and wheels). Use one of the
-  following patterns (choose one):
-
-  **Option A (recommended, modern):**
-  ```toml
-  [tool.setuptools.package-data]
-  "backend" = ["data/pipelines/**/*.md"]
-  ```
-
-  **Option B (classic):**
-  ```toml
-  [tool.setuptools]
-  include-package-data = true
-
-  [tool.setuptools.package-data]
-  "backend" = ["data/pipelines/**/*.md"]
-  ```
-
 ### File Generation Tools
 
 #### generate_samplesheet
 
-Generate a samplesheet CSV from Benchling samples.
+Generate a samplesheet CSV from Benchling entity data.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `ngs_run` | string | Yes | NGS run to pull samples from |
-| `sample_filter` | dict | No | Filters (cell_line, organism, etc.) |
+| `entity_names` | string | Yes | Entity names to include (semicolon-delimited) |
+| `schema_name` | string | No | Schema to filter entities |
 | `pipeline` | string | Yes | Target pipeline (for column format) |
 | `additional_columns` | dict | No | Extra column values to add |
 
@@ -338,9 +564,14 @@ Generate a samplesheet CSV from Benchling samples.
   "csv_content": "sample,fastq_1,fastq_2,expected_cells\nLPS-001,gs://...,gs://...,10000\n...",
   "sample_count": 24,
   "columns": ["sample", "fastq_1", "fastq_2", "expected_cells"],
-  "warnings": []
+  "warnings": ["3 samples missing expected_cells, using default 10000"]
 }
 ```
+
+**Implementation Notes:**
+- Uses `get_entity_relationships` internally to find FASTQ paths
+- Maps Benchling metadata to pipeline-specific columns
+- Validates required columns before returning
 
 **Side Effects:**
 - Updates frontend state with generated CSV
@@ -445,11 +676,6 @@ Submit a validated pipeline run to GCP Batch.
 **Human-in-the-Loop:**
 This tool requires explicit user approval before execution.
 
-**HITL Scope Note:**
-Other destructive or cost-incurring tools (run cancellation, file deletion,
-samplesheet clearing, and expensive Benchling searches) must also require
-explicit approval.
-
 **Returns:**
 ```json
 {
@@ -524,6 +750,98 @@ This tool requires explicit user approval before execution.
 }
 ```
 
+### Advanced Tools
+
+#### execute_warehouse_query
+
+Execute a read-only SQL query against the Benchling data warehouse. This is an
+escape hatch for complex queries that cannot be expressed through the standard tools.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `sql` | string | Yes | SQL query (SELECT only) |
+| `params` | dict | No | Query parameters (for parameterized queries) |
+| `limit` | integer | No | Maximum rows to return (default: 100, max: 1000) |
+
+**Human-in-the-Loop:**
+This tool requires explicit user approval for:
+- Queries that may return large result sets (no LIMIT or LIMIT > 500)
+- Queries involving expensive JOINs across multiple tables
+- Any query the agent determines may be resource-intensive
+
+**Returns:**
+```
+Query results (42 rows):
+
+name        | barcode  | schema_name | location_name
+------------|----------|-------------|----------------
+TUBE-001    | BC123456 | Tube        | Freezer-A-Shelf-2
+TUBE-002    | BC123457 | Tube        | Freezer-A-Shelf-2
+...
+```
+
+**Implementation:**
+```python
+@tool
+def execute_warehouse_query(
+    sql: str,
+    params: dict | None = None,
+    limit: int = 100,
+) -> str:
+    """Execute a read-only SQL query against the Benchling data warehouse.
+    
+    Use this for complex queries that cannot be expressed through
+    standard tools. Only SELECT queries are allowed.
+    
+    Args:
+        sql: SQL query (SELECT only)
+        params: Query parameters for parameterized queries
+        limit: Maximum rows to return (default: 100, max: 1000)
+    
+    Returns:
+        Formatted query results
+    """
+    # Validate SELECT only
+    normalized = sql.strip().upper()
+    if not normalized.startswith("SELECT"):
+        raise ValueError("Only SELECT queries are allowed")
+    
+    # Enforce limit
+    effective_limit = min(limit, 1000)
+    if "LIMIT" not in normalized:
+        sql = f"{sql.rstrip(';')} LIMIT {effective_limit}"
+    
+    result = benchling_service.warehouse.query(
+        sql=sql,
+        params=params or {},
+        return_format="dataframe",
+    )
+    
+    return format_query_results(result)
+```
+
+**Common Warehouse Tables:**
+| Table | Description |
+|-------|-------------|
+| `entity$raw` | All registry entities |
+| `entry$raw` | Notebook entries |
+| `schema$raw` | Schema definitions |
+| `schema_field$raw` | Schema field definitions |
+| `project$raw` | Projects |
+| `folder$raw` | Folders |
+| `container$raw` | Sample containers |
+| `box$raw` | Storage boxes |
+| `location$raw` | Storage locations |
+| `dropdown$raw` | Dropdown definitions |
+
+**Schema-Specific Tables:**
+Schema entities have dedicated tables named `{schema_system_name}$raw`:
+- `ngs_library_prep_sample$raw`
+- `ngs_pooled_sample$raw`
+- `ngs_run$raw`
+- `ngs_run_output_v2$raw`
+
 ## Subagents
 
 ### benchling_expert
@@ -541,10 +859,10 @@ Handles complex Benchling queries that require multi-step reasoning.
 User: "Find all my HeLa samples from the last month that haven't been processed yet"
 
 benchling_expert:
-1. Query all runs from last month
-2. Filter to HeLa samples
-3. Cross-reference with existing pipeline runs
-4. Return unprocessed samples
+1. Query library prep samples with Cell_Line = HeLa from last month
+2. For each sample, traverse relationships to find NGS Run Outputs
+3. Cross-reference with existing pipeline runs in Arc Reactor
+4. Return samples without completed pipeline runs
 ```
 
 **Configuration:**
@@ -556,16 +874,22 @@ benchling_expert = {
     
     You have deep knowledge of:
     - NGS workflow: samples → library prep → pooling → sequencing
-    - Benchling schema relationships
+    - Benchling schema relationships and entity link fields
     - Common data quality issues and how to handle them
     
     When given a complex query:
     1. Break it down into simpler sub-queries
-    2. Execute each sub-query
+    2. Use get_entity_relationships for lineage traversal
     3. Combine and reconcile results
     4. Present a clear summary
+    
+    Available schemas in the NGS workflow:
+    - NGS Library Prep Sample: Individual samples prepared for sequencing
+    - NGS Pooled Sample: Pooled samples ready for loading
+    - NGS Run: Sequencing run metadata
+    - NGS Run Output v2: Per-sample outputs with FASTQ paths
     """,
-    "tools": [search_ngs_runs, get_run_samples, get_sample_metadata],
+    "tools": [get_entities, get_entity_relationships, list_entries, get_entry_entities, execute_warehouse_query],
     "model": "google_genai:gemini-3-flash-preview",
 }
 ```
@@ -620,7 +944,7 @@ config_expert = {
     3. Warn about potential issues
     4. Estimate runtime and costs
     """,
-    "tools": [list_pipelines, get_pipeline_schema, get_pipeline_docs],
+    "tools": [list_pipelines, get_pipeline_schema, get_dropdown_values],
     "model": "google_genai:gemini-3-flash-preview",
 }
 ```
@@ -635,41 +959,88 @@ User: I want to run scRNA-seq analysis
 Agent: I'd be happy to help you set up a single-cell RNA-seq analysis! 
 
 To find your samples, I'll need a bit more information:
-- Do you have a specific NGS run in mind?
-- Or would you like me to search by project, date, or submitter?
+- Do you have specific sample names or an NGS run in mind?
+- Or would you like me to search by project, date, or cell type?
 
-User: Search for my runs from last week
+User: Search for my HeLa samples from last week
 
-Agent: [Calls search_ngs_runs with days_back=7 and submitter=current_user]
+Agent: [Calls get_entities with schema="NGS Library Prep Sample" and wildcards]
+[Calls get_entity_relationships to find associated NGS runs]
 
-I found 2 NGS runs from last week:
+I found 24 HeLa samples from 2 NGS runs last week:
 
-1. **NR-2024-0156** (Dec 18) - 48 samples, Project: CellAtlas
-2. **NR-2024-0152** (Dec 16) - 12 samples, Project: DrugScreen
+1. **NR-2024-0156** (Dec 18) - 12 samples, Project: Smith_RNAseq
+2. **NR-2024-0152** (Dec 16) - 12 samples, Project: Garcia_TimeCourse
 
-Which run would you like to analyze?
+All samples have FASTQ files available. Which run would you like to analyze?
 ```
 
 ### Pattern 2: Direct Request
 
 ```
-User: Create a samplesheet for NR-2024-0156 with just the HeLa samples
+User: Create a samplesheet for samples LPS-001 through LPS-024
 
-Agent: [Calls get_run_samples]
-[Calls generate_samplesheet with filter]
+Agent: [Calls get_entities with entity_names and wildcards]
+[Calls get_entity_relationships to find FASTQ paths]
+[Calls generate_samplesheet]
 
-I've created a samplesheet with 24 HeLa samples from NR-2024-0156. 
+I've created a samplesheet with 24 samples:
 
 The samplesheet includes:
 - 24 samples with FASTQ paths
 - Expected cells set to 10,000 (default)
+- All samples from NGS Run NR-2024-0156
 
 You can review and edit the samplesheet in the panel on the right. 
 
 Would you like me to generate the pipeline configuration next?
 ```
 
-### Pattern 3: Error Recovery
+### Pattern 3: Sample Lineage Investigation
+
+```
+User: Show me the full history for sample LPS-001
+
+Agent: [Calls get_entity_relationships with depth=5]
+
+Here's the complete lineage for LPS-001:
+
+**Sample Lineage:**
+```
+Cell Line: HeLa
+  └─ Cell Line Lot: HeLa-Lot-2024-001
+      └─ NGS Library Prep Sample: LPS-001
+          ├─ Protocol: 10X Library Prep Protocol v3
+          ├─ Lib_Prep_Kit: 10X Genomics 3' v3
+          └─ NGS Pooled Sample: Pool-2024-156-A
+              └─ NGS Run: NR-2024-0156
+                  └─ NGS Run Output v2: LPS-001-R1
+                      ├─ fastq_r1: gs://arc-ngs-data/.../LPS-001_R1.fastq.gz
+                      └─ fastq_r2: gs://arc-ngs-data/.../LPS-001_R2.fastq.gz
+```
+
+Would you like me to include this sample in a samplesheet?
+```
+
+### Pattern 4: Protocol Context
+
+```
+User: What protocol was used for these samples?
+
+Agent: [Calls list_entries with project filter]
+[Calls get_entry_content]
+
+These samples were prepared using the **10X Library Prep Protocol v3** (last updated Dec 15, 2024).
+
+Key parameters from the protocol:
+- Target cell viability: >90%
+- Target cell concentration: 700-1200 cells/µL
+- GEM generation: 10,000 cells target
+
+Would you like me to show the full protocol or proceed with configuration?
+```
+
+### Pattern 5: Error Recovery
 
 ```
 User: Submit the run
@@ -687,28 +1058,8 @@ I found 2 issues that need to be fixed before submission:
 
 How would you like to proceed?
 1. Remove LPS-012 from the samplesheet
-2. Check Benchling for the correct file path
+2. Let me check Benchling for the correct file path
 3. I can fix the genome parameter for you
-```
-
-### Pattern 4: Parameter Guidance
-
-```
-User: What aligner should I use?
-
-Agent: [Calls config_expert subagent]
-
-For your 24 10X Genomics v3 HeLa samples, here's my recommendation:
-
-**Recommended: simpleaf** (default)
-
-| Aspect | simpleaf | cellranger | STARsolo |
-|--------|----------|------------|----------|
-| Speed | ⭐⭐⭐ Fast | ⭐ Slow | ⭐⭐ Medium |
-| Memory | ⭐⭐⭐ Low | ⭐ High | ⭐⭐ Medium |
-| Accuracy | ⭐⭐⭐ High | ⭐⭐⭐ High | ⭐⭐⭐ High |
-
-simpleaf is the best choice for most analyses. Would you like me to proceed with simpleaf, or do you have a specific reason to use a different aligner?
 ```
 
 ## State Management
@@ -721,7 +1072,7 @@ Each conversation maintains state through LangChain's checkpointer.
 # State persisted between turns
 state = {
     "messages": [...],              # Full message history
-    "current_ngs_run": "NR-2024-0156",  # Context from tools
+    "current_entities": [...],      # Entities from recent queries
     "generated_files": {
         "samplesheet": "...",
         "config": "...",
@@ -745,9 +1096,10 @@ The agent uses several strategies to manage context:
 | Error Type | Agent Response |
 |------------|----------------|
 | Benchling timeout | "I'm having trouble connecting to Benchling. Let me try again..." |
-| No results found | "I couldn't find any samples matching those criteria. Could you try..." |
+| No results found | "I couldn't find any entities matching those criteria. Could you try..." |
 | Invalid input | "That doesn't look like a valid [X]. The format should be..." |
 | GCS access denied | "I don't have access to that storage location. Please check..." |
+| SQL error | "That query couldn't be executed. The error was: [details]" |
 
 ### Graceful Degradation
 
@@ -764,16 +1116,38 @@ If a tool fails, the agent:
 | Operation | Target | Notes |
 |-----------|--------|-------|
 | First token | < 1s | Streaming starts immediately |
-| Simple query | < 5s | Single tool call |
+| Simple entity query | < 3s | Single get_entities call |
+| Relationship traversal | < 8s | Depth-limited traversal |
 | Complex query | < 15s | Multiple tool calls |
 | File generation | < 10s | Includes GCS validation |
 
 ### Optimization Strategies
 
 1. **Parallel tool calls**: When multiple independent tools are needed
-2. **Caching**: Metadata lookups cached for 5 minutes
+2. **Caching**: Schema and dropdown lookups cached for 5 minutes
 3. **Streaming**: All responses stream token-by-token
 4. **Early validation**: Catch errors before expensive operations
+5. **Result limiting**: Default limits on all queries to prevent overwhelming responses
+
+### Benchling Query Optimization
+
+```python
+# Good: Specific filters reduce warehouse load
+get_entities(
+    entity_names="LPS-%",
+    schema_names="NGS Library Prep Sample",
+    project_names="Smith_RNAseq",
+    use_wildcards=True,
+    limit=100,
+)
+
+# Avoid: Broad queries without filters
+get_entities(
+    entity_names="%",  # Too broad
+    use_wildcards=True,
+    limit=10000,  # Too many results
+)
+```
 
 ## Security Considerations
 
@@ -782,12 +1156,14 @@ If a tool fails, the agent:
 - Agent can only read Benchling data (no writes)
 - Agent can only access GCS buckets user has permission for
 - All actions logged with user identity
+- SQL queries restricted to SELECT statements only
 
 ### Prompt Injection Protection
 
 - User input sanitized before inclusion in prompts
 - Tool parameters validated before execution
 - No arbitrary code execution
+- SQL injection prevented via parameterized queries
 
 ### Human-in-the-Loop
 
@@ -798,12 +1174,12 @@ Critical operations require explicit user approval:
 - Removing samples from a samplesheet (if implemented)
 - Cost-incurring or expensive Benchling queries (large date ranges, wide searches)
 
-**Required HITL tools (examples):**
+**Required HITL tools:**
 - `submit_run`
 - `cancel_run`
 - `delete_file`
 - `clear_samplesheet`
-- `benchling_expert` (when query fan-out or time window exceeds safe limits)
+- `execute_warehouse_query` (when query may be expensive)
 
 **Policy:**
 - Tools that write to external systems or incur significant cost must request approval.
