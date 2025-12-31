@@ -15,16 +15,25 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ## Phase 5.1: GCP Batch Job Management
 
+> **Spec References:**
+> - [07-integration-spec.md#gcp-batch-integration](../spec/07-integration-spec.md) - Complete Batch integration
+> - [07-integration-spec.md#job-submission](../spec/07-integration-spec.md) - Job submission details
+> - [03-backend-spec.md#batchservice](../spec/03-backend-spec.md) - Service interface
+
 ### BatchService Implementation
 
-- [ ] Create `backend/services/batch.py`:
+- [ ] Create `backend/services/batch.py` — *See [03-backend-spec.md#batchservice](../spec/03-backend-spec.md)*:
   - [ ] Import `google.cloud.batch_v1`
   - [ ] Implement `BatchService` class
   - [ ] Initialize BatchServiceClient
 
 ### Job Submission
 
-- [ ] Implement `submit_orchestrator_job()` method:
+> **Spec References:**
+> - [07-integration-spec.md#job-submission](../spec/07-integration-spec.md) - Job specification
+> - [07-integration-spec.md#orchestrator-job-specification](../spec/07-integration-spec.md) - Orchestrator config
+
+- [ ] Implement `submit_orchestrator_job()` method — *See [07-integration-spec.md#job-submission](../spec/07-integration-spec.md)*:
   - [ ] Parameters:
     - [ ] `run_id`: Run identifier
     - [ ] `pipeline`: Pipeline name
@@ -32,8 +41,8 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
     - [ ] `config_gcs_path`: GCS path to config
     - [ ] `params_gcs_path`: GCS path to params
     - [ ] `work_dir`: GCS work directory
-    - [ ] `is_recovery`: Boolean for resume mode
-  - [ ] Build TaskSpec:
+    - [ ] `is_recovery`: Boolean for resume mode — *See [12-recovery-spec.md#orchestrator-behavior](../spec/12-recovery-spec.md)*
+  - [ ] Build TaskSpec — *See [07-integration-spec.md#orchestrator-job-specification](../spec/07-integration-spec.md)*:
     - [ ] Container image: orchestrator image from settings
     - [ ] Environment variables:
       - [ ] `RUN_ID`
@@ -42,7 +51,7 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
       - [ ] `CONFIG_GCS_PATH`
       - [ ] `PARAMS_GCS_PATH`
       - [ ] `WORK_DIR`
-      - [ ] `DATABASE_URL` (Cloud SQL private IP)
+      - [ ] `DATABASE_URL` (Cloud SQL private IP) — *See [07-integration-spec.md#batch-to-cloud-sql](../spec/07-integration-spec.md)*
       - [ ] `IS_RECOVERY` (for -resume flag)
     - [ ] Compute resources:
       - [ ] CPU: 2000 milli (2 vCPU)
@@ -52,11 +61,11 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
   - [ ] Build TaskGroup with single task
   - [ ] Build AllocationPolicy:
     - [ ] Machine type: `e2-standard-2`
-    - [ ] Provisioning model: SPOT
-    - [ ] Service account: orchestrator service account
+    - [ ] Provisioning model: SPOT — *See [09-deployment-spec.md#cost-optimization](../spec/09-deployment-spec.md)*
+    - [ ] Service account: orchestrator service account — *See [08-security-spec.md#batch-orchestrator-service-account](../spec/08-security-spec.md)*
   - [ ] Build LogsPolicy:
     - [ ] Destination: CLOUD_LOGGING
-  - [ ] Build Job with labels:
+  - [ ] Build Job with labels — *See [07-integration-spec.md#required-labels-on-batch-jobs](../spec/07-integration-spec.md)*:
     - [ ] `run-id`: run identifier
     - [ ] `app`: "arc-reactor"
   - [ ] Create job request:
@@ -66,14 +75,17 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Job Status Monitoring
 
-- [ ] Implement `get_job_status()` method:
+> **Spec References:**
+> - [07-integration-spec.md#status-monitoring](../spec/07-integration-spec.md) - Status polling
+
+- [ ] Implement `get_job_status()` method — *See [07-integration-spec.md#status-monitoring](../spec/07-integration-spec.md)*:
   - [ ] Parameters:
     - [ ] `job_name`: Full job resource name
   - [ ] Fetch job from Batch API
   - [ ] Extract status information:
     - [ ] State (QUEUED, SCHEDULED, RUNNING, SUCCEEDED, FAILED, etc.)
     - [ ] Status events with type and description
-  - [ ] Map Batch states to run status:
+  - [ ] Map Batch states to run status — *See [06-data-model-spec.md#run-status-values](../spec/06-data-model-spec.md)*:
     - [ ] QUEUED/SCHEDULED → submitted
     - [ ] RUNNING → running
     - [ ] SUCCEEDED → completed
@@ -87,7 +99,10 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Job Cancellation
 
-- [ ] Implement `cancel_job()` method:
+> **Spec References:**
+> - [07-integration-spec.md#job-cancellation](../spec/07-integration-spec.md) - Cancellation process
+
+- [ ] Implement `cancel_job()` method — *See [07-integration-spec.md#job-cancellation](../spec/07-integration-spec.md)*:
   - [ ] Parameters:
     - [ ] `job_name`: Full job resource name
   - [ ] Create DeleteJobRequest
@@ -97,17 +112,23 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Job Label Strategy
 
-- [ ] Define standard labels for all Batch jobs:
+> **Spec References:**
+> - [07-integration-spec.md#required-labels-on-batch-jobs](../spec/07-integration-spec.md) - Label requirements
+
+- [ ] Define standard labels for all Batch jobs — *See [07-integration-spec.md#required-labels-on-batch-jobs](../spec/07-integration-spec.md)*:
   - [ ] `run-id`: Arc Reactor run identifier
   - [ ] `app`: "arc-reactor"
   - [ ] `pipeline`: Pipeline name
   - [ ] `user-email`: Submitting user (sanitized)
 - [ ] Document label format in code comments
-- [ ] Use labels for Cloud Logging queries
+- [ ] Use labels for Cloud Logging queries — *See [07-integration-spec.md#query-patterns](../spec/07-integration-spec.md)*
 
 ### BatchService Error Handling
 
-- [ ] Implement error handling for common failures:
+> **Spec References:**
+> - [07-integration-spec.md#error-handling-matrix](../spec/07-integration-spec.md) - Error types and handling
+
+- [ ] Implement error handling for common failures — *See [07-integration-spec.md#error-handling-matrix](../spec/07-integration-spec.md)*:
   - [ ] Quota exceeded: Raise appropriate exception
   - [ ] Permission denied: Log and raise
   - [ ] Job creation failed: Retry with backoff
@@ -130,6 +151,11 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ## Phase 5.2: Nextflow Orchestrator Container
 
+> **Spec References:**
+> - [09-deployment-spec.md#nextflow-orchestrator-dockerfile](../spec/09-deployment-spec.md) - Dockerfile specification
+> - [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md) - Status update process
+> - [12-recovery-spec.md#orchestrator-behavior](../spec/12-recovery-spec.md) - Resume support
+
 ### Orchestrator Directory Structure
 
 - [ ] Create `orchestrator/` directory:
@@ -140,7 +166,10 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Orchestrator Dockerfile
 
-- [ ] Create `orchestrator/Dockerfile.orchestrator`:
+> **Spec References:**
+> - [09-deployment-spec.md#nextflow-orchestrator-dockerfile](../spec/09-deployment-spec.md) - Complete Dockerfile
+
+- [ ] Create `orchestrator/Dockerfile.orchestrator` — *See [09-deployment-spec.md#nextflow-orchestrator-dockerfile](../spec/09-deployment-spec.md)*:
   - [ ] Base image: `nextflow/nextflow:24.04.4`
   - [ ] Install system dependencies:
     - [ ] curl
@@ -159,6 +188,10 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Entrypoint Script
 
+> **Spec References:**
+> - [07-integration-spec.md#orchestrator-job-specification](../spec/07-integration-spec.md) - Environment variables
+> - [12-recovery-spec.md#orchestrator-behavior](../spec/12-recovery-spec.md) - Resume flag handling
+
 - [ ] Create `orchestrator/entrypoint.sh`:
   - [ ] Parse environment variables:
     - [ ] `RUN_ID`
@@ -167,7 +200,7 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
     - [ ] `CONFIG_GCS_PATH`
     - [ ] `PARAMS_GCS_PATH`
     - [ ] `WORK_DIR`
-    - [ ] `IS_RECOVERY`
+    - [ ] `IS_RECOVERY` — *See [12-recovery-spec.md#orchestrator-behavior](../spec/12-recovery-spec.md)*
   - [ ] Log startup information
   - [ ] Create local work directory
   - [ ] Download config and params from GCS:
@@ -182,10 +215,10 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
     - [ ] `-with-trace`
     - [ ] `-with-timeline`
     - [ ] `-with-report`
-    - [ ] Add `-resume` if `IS_RECOVERY=true`
+    - [ ] Add `-resume` if `IS_RECOVERY=true` — *See [12-recovery-spec.md#nextflow-resume](../spec/12-recovery-spec.md)*
   - [ ] Execute Nextflow
   - [ ] Capture exit code
-  - [ ] Upload logs to GCS:
+  - [ ] Upload logs to GCS — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
     - [ ] `.nextflow.log` → `logs/nextflow.log`
     - [ ] `trace.txt` → `logs/trace.txt`
     - [ ] `timeline.html` → `logs/timeline.html`
@@ -194,7 +227,11 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Status Update Script
 
-- [ ] Create `orchestrator/update_status.py`:
+> **Spec References:**
+> - [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md) - Update process
+> - [07-integration-spec.md#orchestrator-status-updates](../spec/07-integration-spec.md) - Implementation details
+
+- [ ] Create `orchestrator/update_status.py` — *See [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md)*:
   - [ ] Parse command line arguments:
     - [ ] `run_id` (positional)
     - [ ] `status` (positional)
@@ -205,21 +242,24 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
     - [ ] `--error_task` (optional)
     - [ ] `--exit_code` (optional)
     - [ ] `--metrics` (optional, JSON string)
-  - [ ] Read DATABASE_URL from environment
+  - [ ] Read DATABASE_URL from environment — *See [07-integration-spec.md#batch-to-cloud-sql](../spec/07-integration-spec.md)*
   - [ ] Connect to PostgreSQL (sync connection)
   - [ ] Build UPDATE query:
     - [ ] Update `status` column
     - [ ] Update `updated_at` to NOW()
     - [ ] Update timestamp columns based on status
-    - [ ] Update error fields if provided
-    - [ ] Update metrics if provided
-  - [ ] Execute query with parameterized values
+    - [ ] Update error fields if provided — *See [06-data-model-spec.md#error-fields](../spec/06-data-model-spec.md)*
+    - [ ] Update metrics if provided — *See [06-data-model-spec.md#metrics-jsonb](../spec/06-data-model-spec.md)*
+  - [ ] Execute query with parameterized values — *See [08-security-spec.md#sql-injection-prevention](../spec/08-security-spec.md)*
   - [ ] Log success/failure
   - [ ] Exit with appropriate code
 
 ### Nextflow Hooks Configuration
 
-- [ ] Create `orchestrator/nextflow.config.template`:
+> **Spec References:**
+> - [07-integration-spec.md#orchestrator-status-updates](../spec/07-integration-spec.md) - Hook implementation
+
+- [ ] Create `orchestrator/nextflow.config.template` — *See [07-integration-spec.md#orchestrator-status-updates](../spec/07-integration-spec.md)*:
   - [ ] Include workflow hooks:
     ```groovy
     workflow.onStart {
@@ -246,7 +286,10 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Nextflow GCP Batch Executor Configuration
 
-- [ ] Document Nextflow executor configuration:
+> **Spec References:**
+> - [07-integration-spec.md#nextflow-gcp-batch-executor](../spec/07-integration-spec.md) - Executor configuration
+
+- [ ] Document Nextflow executor configuration — *See [07-integration-spec.md#nextflow-gcp-batch-executor](../spec/07-integration-spec.md)*:
   - [ ] Process block:
     ```groovy
     process {
@@ -273,13 +316,16 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Build and Push Orchestrator Image
 
-- [ ] Create build script `scripts/build-orchestrator.sh`:
+> **Spec References:**
+> - [09-deployment-spec.md#container-build](../spec/09-deployment-spec.md) - Build process
+
+- [ ] Create build script `scripts/build-orchestrator.sh` — *See [09-deployment-spec.md#container-build](../spec/09-deployment-spec.md)*:
   - [ ] Build Docker image:
     - [ ] `docker build -f orchestrator/Dockerfile.orchestrator -t ${IMAGE_NAME}:${VERSION} .`
     - [ ] Use `--platform linux/amd64`
   - [ ] Tag with version and latest
   - [ ] Push to Artifact Registry or GCR
-- [ ] Add orchestrator build to CI/CD pipeline
+- [ ] Add orchestrator build to CI/CD pipeline — *See [09-deployment-spec.md#github-actions-workflow](../spec/09-deployment-spec.md)*
 
 ### Orchestrator Integration Tests
 
@@ -293,13 +339,21 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ## Phase 5.3: End-to-End Pipeline Flow
 
+> **Spec References:**
+> - [02-architecture-overview.md#run-submission-flow](../spec/02-architecture-overview.md) - Complete data flow
+> - [02-architecture-overview.md#run-monitoring-flow](../spec/02-architecture-overview.md) - Status updates
+> - [12-recovery-spec.md](../spec/12-recovery-spec.md) - Recovery workflow
+
 ### Run Submission Integration
+
+> **Spec References:**
+> - [02-architecture-overview.md#run-submission-flow](../spec/02-architecture-overview.md) - Submission sequence
 
 - [ ] Update `backend/services/runs.py`:
   - [ ] Add `submit_run()` method:
     - [ ] Input: RunCreateRequest
     - [ ] Create run record with status "pending"
-    - [ ] Upload files to GCS:
+    - [ ] Upload files to GCS — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
       - [ ] samplesheet.csv → inputs/samplesheet.csv
       - [ ] nextflow.config → inputs/nextflow.config
       - [ ] params.yaml → inputs/params.yaml
@@ -309,10 +363,10 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
     - [ ] Return run_id
 
 - [ ] Update `backend/services/runs.py`:
-  - [ ] Add `submit_recovery_run()` method:
+  - [ ] Add `submit_recovery_run()` method — *See [12-recovery-spec.md#backend-workflow](../spec/12-recovery-spec.md)*:
     - [ ] Input: parent_run_id, optional overrides
-    - [ ] Verify parent run in terminal state
-    - [ ] Verify work directory exists
+    - [ ] Verify parent run in terminal state — *See [12-recovery-spec.md#recovery-preconditions](../spec/12-recovery-spec.md)*
+    - [ ] Verify work directory exists — *See [12-recovery-spec.md#work-directory-reuse](../spec/12-recovery-spec.md)*
     - [ ] Create new run record with parent_run_id
     - [ ] Copy or override config/params
     - [ ] Submit with IS_RECOVERY=true
@@ -320,21 +374,28 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Status Update Flow
 
-- [ ] Document complete status flow:
+> **Spec References:**
+> - [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md) - Status flow
+> - [06-data-model-spec.md#status-transitions](../spec/06-data-model-spec.md) - Valid transitions
+
+- [ ] Document complete status flow — *See [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md)*:
   1. Backend creates run: `pending`
   2. Backend submits Batch job: `submitted`
   3. Orchestrator workflow.onStart hook: `running`
   4. Orchestrator workflow.onComplete hook: `completed` or `failed`
   5. Orchestrator workflow.onError hook: `failed`
 
-- [ ] Implement status transition validation:
+- [ ] Implement status transition validation — *See [06-data-model-spec.md#status-transitions](../spec/06-data-model-spec.md)*:
   - [ ] Define valid transitions
   - [ ] Reject invalid transitions
   - [ ] Log all status changes
 
 ### SSE Status Propagation
 
-- [ ] Update run event service for complete flow:
+> **Spec References:**
+> - [07-integration-spec.md#sse-integration](../spec/07-integration-spec.md) - SSE implementation
+
+- [ ] Update run event service for complete flow — *See [07-integration-spec.md#sse-integration](../spec/07-integration-spec.md)*:
   - [ ] Poll database for status changes
   - [ ] Emit events with:
     - [ ] Current status
@@ -344,13 +405,17 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### GCS File Lifecycle
 
-- [ ] Document complete file lifecycle:
+> **Spec References:**
+> - [06-data-model-spec.md#file-lifecycle](../spec/06-data-model-spec.md) - Retention policies
+> - [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md) - Directory structure
+
+- [ ] Document complete file lifecycle — *See [06-data-model-spec.md#file-lifecycle](../spec/06-data-model-spec.md)*:
   1. Run created:
      - [ ] `inputs/samplesheet.csv` (permanent)
      - [ ] `inputs/nextflow.config` (permanent)
      - [ ] `inputs/params.yaml` (permanent)
   2. Run executing:
-     - [ ] `work/` directory (30-day retention)
+     - [ ] `work/` directory (30-day retention) — *See [06-data-model-spec.md#file-lifecycle](../spec/06-data-model-spec.md)*
   3. Run completed:
      - [ ] `results/` directory (permanent)
      - [ ] `logs/nextflow.log` (permanent)
@@ -358,13 +423,16 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
      - [ ] `logs/timeline.html` (permanent)
      - [ ] `logs/report.html` (permanent)
 
-- [ ] Verify lifecycle policy is applied:
+- [ ] Verify lifecycle policy is applied — *See [07-integration-spec.md#lifecycle-policies](../spec/07-integration-spec.md)*:
   - [ ] Check work/ deletion after 30 days
   - [ ] Ensure results/ not affected
 
 ### nf-core/scrnaseq Pipeline Testing
 
-- [ ] Create test fixtures for scrnaseq:
+> **Spec References:**
+> - [01-project-overview.md#mvp-scope](../spec/01-project-overview.md) - MVP pipeline
+
+- [ ] Create test fixtures for scrnaseq — *See [01-project-overview.md#mvp-scope](../spec/01-project-overview.md)*:
   - [ ] Sample samplesheet with test data paths
   - [ ] Sample config with minimal settings
   - [ ] Sample params.yaml
@@ -376,7 +444,7 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
   - [ ] Monitor status transitions
   - [ ] Verify logs accessible
 
-- [ ] Test recovery flow:
+- [ ] Test recovery flow — *See [12-recovery-spec.md](../spec/12-recovery-spec.md)*:
   - [ ] Create run that partially completes
   - [ ] Trigger recovery via API
   - [ ] Verify -resume flag used
@@ -384,7 +452,10 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Error Handling
 
-- [ ] Implement comprehensive error handling:
+> **Spec References:**
+> - [07-integration-spec.md#error-handling-matrix](../spec/07-integration-spec.md) - Error categories
+
+- [ ] Implement comprehensive error handling — *See [07-integration-spec.md#error-handling-matrix](../spec/07-integration-spec.md)*:
   - [ ] Batch job creation failure:
     - [ ] Update run status to "failed"
     - [ ] Store error message
@@ -400,12 +471,15 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Cleanup and Monitoring
 
+> **Spec References:**
+> - [08-security-spec.md#audit-logging](../spec/08-security-spec.md) - Logging requirements
+
 - [ ] Implement stale run detection:
   - [ ] Find runs stuck in "submitted" or "running"
   - [ ] Check corresponding Batch job status
   - [ ] Reconcile status if job completed
 
-- [ ] Add monitoring hooks:
+- [ ] Add monitoring hooks — *See [08-security-spec.md#audit-logging](../spec/08-security-spec.md)*:
   - [ ] Log run submission events
   - [ ] Log status transitions
   - [ ] Log error events with details

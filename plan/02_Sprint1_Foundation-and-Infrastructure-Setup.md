@@ -25,32 +25,32 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 
 ### Repository Structure
 
-- [ ] Create monorepo root with appropriate `.gitignore`
-- [ ] Initialize `backend/` directory structure:
-  - [ ] Create `backend/__init__.py`
-  - [ ] Create `backend/main.py` - Application factory with lifespan management — *See [03-backend-spec.md#application-factory](../spec/03-backend-spec.md)*
-  - [ ] Create `backend/config.py` - Dynaconf settings loader — *See [03-backend-spec.md#configuration-management](../spec/03-backend-spec.md)*
-  - [ ] Create `backend/settings.yaml` - Environment configuration file — *See [03-backend-spec.md#environment-variables](../spec/03-backend-spec.md)*
-  - [ ] Create `backend/dependencies.py` - FastAPI dependency injection
-  - [ ] Create `backend/context.py` - Shared context for agents
-  - [ ] Create `backend/api/` directory with `__init__.py`
-  - [ ] Create `backend/api/routes/` directory with `__init__.py`
-  - [ ] Create `backend/models/` directory with `__init__.py`
-  - [ ] Create `backend/services/` directory with `__init__.py` — *See [03-backend-spec.md#services](../spec/03-backend-spec.md)*
-  - [ ] Create `backend/agents/` directory with `__init__.py` — *See [05-agentic-features-spec.md](../spec/05-agentic-features-spec.md)*
-  - [ ] Create `backend/agents/tools/` directory with `__init__.py`
-  - [ ] Create `backend/agents/subagents/` directory with `__init__.py`
-  - [ ] Create `backend/utils/` directory with `__init__.py`
-  - [ ] Create `backend/tests/` directory with `__init__.py` and `conftest.py`
-- [ ] Initialize `frontend/` directory structure:
-  - [ ] Create `frontend/app/` directory for App Router pages — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*
-  - [ ] Create `frontend/components/` directory — *See [04-frontend-spec.md#components](../spec/04-frontend-spec.md)*
-  - [ ] Create `frontend/hooks/` directory — *See [04-frontend-spec.md#custom-hooks](../spec/04-frontend-spec.md)*
-  - [ ] Create `frontend/lib/` directory
-  - [ ] Create `frontend/stores/` directory — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*
-  - [ ] Create `frontend/types/` directory
-  - [ ] Create `frontend/styles/` directory
-  - [ ] Create `frontend/public/` directory
+- [x] Create monorepo root with appropriate `.gitignore`
+- [x] Initialize `backend/` directory structure:
+  - [x] Create `backend/__init__.py`
+  - [x] Create `backend/main.py` - Application factory with lifespan management — *See [03-backend-spec.md#application-factory](../spec/03-backend-spec.md)*
+  - [x] Create `backend/config.py` - Dynaconf settings loader — *See [03-backend-spec.md#configuration-management](../spec/03-backend-spec.md)*
+  - [x] Create `backend/settings.yaml` - Environment configuration file — *See [03-backend-spec.md#environment-variables](../spec/03-backend-spec.md)*
+  - [x] Create `backend/dependencies.py` - FastAPI dependency injection
+  - [x] Create `backend/context.py` - Shared context for agents
+  - [x] Create `backend/api/` directory with `__init__.py`
+  - [x] Create `backend/api/routes/` directory with `__init__.py`
+  - [x] Create `backend/models/` directory with `__init__.py`
+  - [x] Create `backend/services/` directory with `__init__.py` — *See [03-backend-spec.md#services](../spec/03-backend-spec.md)*
+  - [x] Create `backend/agents/` directory with `__init__.py` — *See [05-agentic-features-spec.md](../spec/05-agentic-features-spec.md)*
+  - [x] Create `backend/agents/tools/` directory with `__init__.py`
+  - [x] Create `backend/agents/subagents/` directory with `__init__.py`
+  - [x] Create `backend/utils/` directory with `__init__.py`
+  - [x] Create `backend/tests/` directory with `__init__.py` and `conftest.py`
+- [x] Initialize `frontend/` directory structure:
+  - [x] Create `frontend/app/` directory for App Router pages — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*
+  - [x] Create `frontend/components/` directory — *See [04-frontend-spec.md#components](../spec/04-frontend-spec.md)*
+  - [x] Create `frontend/hooks/` directory — *See [04-frontend-spec.md#custom-hooks](../spec/04-frontend-spec.md)*
+  - [x] Create `frontend/lib/` directory
+  - [x] Create `frontend/stores/` directory — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*
+  - [x] Create `frontend/types/` directory
+  - [x] Create `frontend/styles/` directory
+  - [x] Create `frontend/public/` directory
 
 ### Backend Setup (FastAPI)
 
@@ -59,42 +59,42 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [03-backend-spec.md#configuration-management](../spec/03-backend-spec.md) - Dynaconf setup
 > - [11-conf-spec.md](../spec/11-conf-spec.md) - Configuration values
 
-- [ ] Create `backend/pyproject.toml` with dependencies:
-  - [ ] FastAPI and Uvicorn
-  - [ ] Pydantic v2 for validation
-  - [ ] Dynaconf for configuration — *See [03-backend-spec.md#configuration-management](../spec/03-backend-spec.md)*
-  - [ ] SQLAlchemy with asyncpg — *See [07-integration-spec.md#cloud-sql-postgresql-integration](../spec/07-integration-spec.md)*
-  - [ ] google-cloud-batch — *See [07-integration-spec.md#gcp-batch-integration](../spec/07-integration-spec.md)*
-  - [ ] google-cloud-storage — *See [07-integration-spec.md#google-cloud-storage-integration](../spec/07-integration-spec.md)*
-  - [ ] google-cloud-secret-manager — *See [08-security-spec.md#secret-management](../spec/08-security-spec.md)*
-  - [ ] langchain and langchain-google-genai — *See [05-agentic-features-spec.md#agent-configuration](../spec/05-agentic-features-spec.md)*
-  - [ ] benchling-py from git
-  - [ ] circuitbreaker for resilience — *See [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md)*
-  - [ ] Dev dependencies: pytest, pytest-asyncio, ruff, mypy, black
-- [ ] Configure Dynaconf in `backend/config.py`:
-  - [ ] Load settings from `settings.yaml`
-  - [ ] Support environment variable overrides — *See [03-backend-spec.md#environment-variables](../spec/03-backend-spec.md)*
-  - [ ] Define settings for `default`, `development`, and `production` environments
-- [ ] Populate `backend/settings.yaml` with default configuration — *See [11-conf-spec.md](../spec/11-conf-spec.md)*:
-  - [ ] `app_name`: "Arc Reactor"
-  - [ ] `gcp_project`: GCP project ID
-  - [ ] `gcp_region`: "us-west1"
-  - [ ] `nextflow_bucket`: Bucket name for runs — *See [06-data-model-spec.md#google-cloud-storage](../spec/06-data-model-spec.md)*
-  - [ ] `nextflow_service_account`: Service account email — *See [08-security-spec.md#service-account-permissions](../spec/08-security-spec.md)*
-  - [ ] `orchestrator_image`: Container image URI
-  - [ ] `benchling_warehouse_host`: Benchling DB host — *See [07-integration-spec.md#benchling-integration](../spec/07-integration-spec.md)*
-  - [ ] `benchling_warehouse_db`: Database name
-  - [ ] `gemini_model`: "gemini-3-flash-preview" — *See [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md)*
-  - [ ] `gemini_thinking_level`: "low" — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
-  - [ ] `frontend_out_dir`: Path to static frontend build
-  - [ ] `cors_allowed_origins`: List of allowed origins — *See [03-backend-spec.md#cors-configuration](../spec/03-backend-spec.md)*
-  - [ ] Circuit breaker thresholds for Benchling and Gemini — *See [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md)*
-- [ ] Implement basic FastAPI application in `backend/main.py`:
-  - [ ] Create FastAPI app instance with metadata
-  - [ ] Configure CORS middleware with settings — *See [03-backend-spec.md#cors-configuration](../spec/03-backend-spec.md)*
-  - [ ] Add lifespan context manager for startup/shutdown
-  - [ ] Mount API routers (placeholder)
-  - [ ] Configure static file serving for frontend — *See [03-backend-spec.md#frontend-integration](../spec/03-backend-spec.md)*
+- [x] Create `backend/pyproject.toml` with dependencies:
+  - [x] FastAPI and Uvicorn
+  - [x] Pydantic v2 for validation
+  - [x] Dynaconf for configuration — *See [03-backend-spec.md#configuration-management](../spec/03-backend-spec.md)*
+  - [x] SQLAlchemy with asyncpg — *See [07-integration-spec.md#cloud-sql-postgresql-integration](../spec/07-integration-spec.md)*
+  - [x] google-cloud-batch — *See [07-integration-spec.md#gcp-batch-integration](../spec/07-integration-spec.md)*
+  - [x] google-cloud-storage — *See [07-integration-spec.md#google-cloud-storage-integration](../spec/07-integration-spec.md)*
+  - [x] google-cloud-secret-manager — *See [08-security-spec.md#secret-management](../spec/08-security-spec.md)*
+  - [x] langchain and langchain-google-genai — *See [05-agentic-features-spec.md#agent-configuration](../spec/05-agentic-features-spec.md)*
+  - [x] benchling-py from git
+  - [x] circuitbreaker for resilience — *See [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md)*
+  - [x] Dev dependencies: pytest, pytest-asyncio, ruff, mypy, black
+- [x] Configure Dynaconf in `backend/config.py`:
+  - [x] Load settings from `settings.yaml`
+  - [x] Support environment variable overrides — *See [03-backend-spec.md#environment-variables](../spec/03-backend-spec.md)*
+  - [x] Define settings for `default`, `development`, and `production` environments
+- [x] Populate `backend/settings.yaml` with default configuration — *See [11-conf-spec.md](../spec/11-conf-spec.md)*:
+  - [x] `app_name`: "Arc Reactor"
+  - [x] `gcp_project`: GCP project ID
+  - [x] `gcp_region`: "us-west1"
+  - [x] `nextflow_bucket`: Bucket name for runs — *See [06-data-model-spec.md#google-cloud-storage](../spec/06-data-model-spec.md)*
+  - [x] `nextflow_service_account`: Service account email — *See [08-security-spec.md#service-account-permissions](../spec/08-security-spec.md)*
+  - [x] `orchestrator_image`: Container image URI
+  - [x] `benchling_warehouse_host`: Benchling DB host — *See [07-integration-spec.md#benchling-integration](../spec/07-integration-spec.md)*
+  - [x] `benchling_warehouse_db`: Database name
+  - [x] `gemini_model`: "gemini-3-flash-preview" — *See [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md)*
+  - [x] `gemini_thinking_level`: "low" — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
+  - [x] `frontend_out_dir`: Path to static frontend build
+  - [x] `cors_allowed_origins`: List of allowed origins — *See [03-backend-spec.md#cors-configuration](../spec/03-backend-spec.md)*
+  - [x] Circuit breaker thresholds for Benchling and Gemini — *See [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md)*
+- [x] Implement basic FastAPI application in `backend/main.py`:
+  - [x] Create FastAPI app instance with metadata
+  - [x] Configure CORS middleware with settings — *See [03-backend-spec.md#cors-configuration](../spec/03-backend-spec.md)*
+  - [x] Add lifespan context manager for startup/shutdown
+  - [x] Mount API routers (placeholder)
+  - [x] Configure static file serving for frontend — *See [03-backend-spec.md#frontend-integration](../spec/03-backend-spec.md)*
 
 ### Frontend Setup (Next.js)
 
@@ -103,56 +103,56 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [04-frontend-spec.md#static-export](../spec/04-frontend-spec.md) - Static export configuration
 > - [04-frontend-spec.md#styling](../spec/04-frontend-spec.md) - Tailwind CSS and HeroUI
 
-- [ ] Initialize Next.js 14 project with TypeScript in `frontend/`
-- [ ] Configure `next.config.js`:
-  - [ ] Enable static export (`output: 'export'`) — *See [04-frontend-spec.md#static-export](../spec/04-frontend-spec.md)*
-  - [ ] Configure base path if needed
-  - [ ] Set image optimization settings
-- [ ] Install and configure Tailwind CSS — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*:
-  - [ ] Create `tailwind.config.js` with Arc brand colors
-  - [ ] Configure content paths for purging
-  - [ ] Add Tailwind plugins: `@tailwindcss/forms`, `@tailwindcss/typography`
-  - [ ] Create `globals.css` with Tailwind directives and base styles
-- [ ] Install HeroUI component library — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*
-- [ ] Install additional dependencies:
-  - [ ] `@tanstack/react-query` for server state — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*
-  - [ ] `zustand` for client state — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*
-  - [ ] `axios` for HTTP requests — *See [04-frontend-spec.md#api-client](../spec/04-frontend-spec.md)*
-  - [ ] `ai` (Vercel AI SDK) for chat interface — *See [04-frontend-spec.md#useagentchat-hook](../spec/04-frontend-spec.md)*
-  - [ ] `handsontable` and `@handsontable/react` for spreadsheet — *See [04-frontend-spec.md#samplesheeteditor](../spec/04-frontend-spec.md)*
-  - [ ] `@monaco-editor/react` for code editor — *See [04-frontend-spec.md#configeditor](../spec/04-frontend-spec.md)*
-- [ ] Create root layout (`app/layout.tsx`) — *See [04-frontend-spec.md#root-layout](../spec/04-frontend-spec.md)*:
-  - [ ] Set up HTML document structure
-  - [ ] Add global providers (query client, theme)
-  - [ ] Configure metadata (title, description)
-- [ ] Create placeholder pages — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*:
-  - [ ] `app/page.tsx` - Home/redirect
-  - [ ] `app/workspace/page.tsx` - Main workspace
-  - [ ] `app/runs/page.tsx` - Run history
-  - [ ] `app/runs/[id]/page.tsx` - Run detail
-  - [ ] `app/not-found.tsx` - 404 page
+- [x] Initialize Next.js 14 project with TypeScript in `frontend/`
+- [x] Configure `next.config.js`:
+  - [x] Enable static export (`output: 'export'`) — *See [04-frontend-spec.md#static-export](../spec/04-frontend-spec.md)*
+  - [x] Configure base path if needed
+  - [x] Set image optimization settings
+- [x] Install and configure Tailwind CSS — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*:
+  - [x] Create `tailwind.config.js` with Arc brand colors
+  - [x] Configure content paths for purging
+  - [x] Add Tailwind plugins: `@tailwindcss/forms`, `@tailwindcss/typography`
+  - [x] Create `globals.css` with Tailwind directives and base styles
+- [x] Install HeroUI component library — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*
+- [x] Install additional dependencies:
+  - [x] `@tanstack/react-query` for server state — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*
+  - [x] `zustand` for client state — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*
+  - [x] `axios` for HTTP requests — *See [04-frontend-spec.md#api-client](../spec/04-frontend-spec.md)*
+  - [x] `ai` (Vercel AI SDK) for chat interface — *See [04-frontend-spec.md#useagentchat-hook](../spec/04-frontend-spec.md)*
+  - [x] `handsontable` and `@handsontable/react` for spreadsheet — *See [04-frontend-spec.md#samplesheeteditor](../spec/04-frontend-spec.md)*
+  - [x] `@monaco-editor/react` for code editor — *See [04-frontend-spec.md#configeditor](../spec/04-frontend-spec.md)*
+- [x] Create root layout (`app/layout.tsx`) — *See [04-frontend-spec.md#root-layout](../spec/04-frontend-spec.md)*:
+  - [x] Set up HTML document structure
+  - [x] Add global providers (query client, theme)
+  - [x] Configure metadata (title, description)
+- [x] Create placeholder pages — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*:
+  - [x] `app/page.tsx` - Home/redirect
+  - [x] `app/workspace/page.tsx` - Main workspace
+  - [x] `app/runs/page.tsx` - Run history
+  - [x] `app/runs/[id]/page.tsx` - Run detail
+  - [x] `app/not-found.tsx` - 404 page
 
 ### Development Tooling
 
-- [ ] Configure Python linting with Ruff:
-  - [ ] Create `ruff.toml` or `pyproject.toml` section
-  - [ ] Enable `E`, `F`, `I` rule sets
-  - [ ] Set line length to 100
-- [ ] Configure Python formatting with Black:
-  - [ ] Set line length to 100 in `pyproject.toml`
-- [ ] Configure Python type checking with mypy:
-  - [ ] Create `mypy.ini` or `pyproject.toml` section
-  - [ ] Enable strict mode for new code
-- [ ] Configure ESLint for frontend:
-  - [ ] Use Next.js recommended config
-  - [ ] Add TypeScript rules
-  - [ ] Configure import ordering
-- [ ] Configure Prettier for frontend:
-  - [ ] Create `.prettierrc` with Tailwind plugin
-  - [ ] Set consistent quote and semicolon styles
-- [ ] Create pre-commit hooks configuration:
-  - [ ] Run Ruff and Black on Python files
-  - [ ] Run ESLint and Prettier on TypeScript files
+- [x] Configure Python linting with Ruff:
+  - [x] Create `ruff.toml` or `pyproject.toml` section
+  - [x] Enable `E`, `F`, `I` rule sets
+  - [x] Set line length to 100
+- [x] Configure Python formatting with Black:
+  - [x] Set line length to 100 in `pyproject.toml`
+- [x] Configure Python type checking with mypy:
+  - [x] Create `mypy.ini` or `pyproject.toml` section
+  - [x] Enable strict mode for new code
+- [x] Configure ESLint for frontend:
+  - [x] Use Next.js recommended config
+  - [x] Add TypeScript rules
+  - [x] Configure import ordering
+- [x] Configure Prettier for frontend:
+  - [x] Create `.prettierrc` with Tailwind plugin
+  - [x] Set consistent quote and semicolon styles
+- [x] Create pre-commit hooks configuration:
+  - [x] Run Ruff and Black on Python files
+  - [x] Run ESLint and Prettier on TypeScript files
 
 ### Docker Development Environment
 
@@ -160,34 +160,34 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [09-deployment-spec.md#dockerfile](../spec/09-deployment-spec.md) - Production Dockerfile
 > - [09-deployment-spec.md#container-build](../spec/09-deployment-spec.md) - Multi-stage build
 
-- [ ] Create `Dockerfile` for production build — *See [09-deployment-spec.md#dockerfile](../spec/09-deployment-spec.md)*:
-  - [ ] Stage 1: Build frontend with Node.js
-  - [ ] Stage 2: Python runtime with backend
-  - [ ] Copy built frontend to backend serving directory
-  - [ ] Configure health check
-  - [ ] Set entrypoint for Uvicorn
-- [ ] Create `Dockerfile.dev` for local development:
-  - [ ] Support hot reloading for backend
-  - [ ] Mount source directories
-- [ ] Create `docker-compose.yml` for local development:
-  - [ ] Backend service with volume mounts
-  - [ ] Frontend service for development
-  - [ ] PostgreSQL service for local database
-  - [ ] Environment variable configuration
-- [ ] Create `.dockerignore` to exclude unnecessary files
+- [x] Create `Dockerfile` for production build — *See [09-deployment-spec.md#dockerfile](../spec/09-deployment-spec.md)*:
+  - [x] Stage 1: Build frontend with Node.js
+  - [x] Stage 2: Python runtime with backend
+  - [x] Copy built frontend to backend serving directory
+  - [x] Configure health check
+  - [x] Set entrypoint for Uvicorn
+- [x] Create `Dockerfile.dev` for local development:
+  - [x] Support hot reloading for backend
+  - [x] Mount source directories
+- [x] Create `docker-compose.yml` for local development:
+  - [x] Backend service with volume mounts
+  - [x] Frontend service for development
+  - [x] PostgreSQL service for local database
+  - [x] Environment variable configuration
+- [x] Create `.dockerignore` to exclude unnecessary files
 
 ### Repository Guidelines
 
-- [ ] Create or update root `GEMINI.md` with repository guidelines:
-  - [ ] Project structure documentation
-  - [ ] Build and test commands
-  - [ ] Coding style conventions
-  - [ ] Testing guidelines
-  - [ ] Commit message format
-- [ ] Create `backend/GEMINI.md` with backend-specific guidelines
-- [ ] Create `frontend/GEMINI.md` with frontend-specific guidelines
-- [ ] Create `AGENTS.md` if not present
-- [ ] Update `.gitignore` for both Python and Node.js artifacts
+- [x] Create or update root `GEMINI.md` with repository guidelines:
+  - [x] Project structure documentation
+  - [x] Build and test commands
+  - [x] Coding style conventions
+  - [x] Testing guidelines
+  - [x] Commit message format
+- [x] Create `backend/GEMINI.md` with backend-specific guidelines
+- [x] Create `frontend/GEMINI.md` with frontend-specific guidelines
+- [x] Create `AGENTS.md` if not present
+- [x] Update `.gitignore` for both Python and Node.js artifacts
 
 ---
 

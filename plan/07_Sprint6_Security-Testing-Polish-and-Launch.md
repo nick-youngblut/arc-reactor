@@ -14,20 +14,29 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ## Phase 6.1: Security Hardening
 
+> **Spec References:**
+> - [08-security-spec.md#authentication](../spec/08-security-spec.md) - Authentication requirements
+> - [08-security-spec.md#authorization](../spec/08-security-spec.md) - Authorization rules
+> - [07-integration-spec.md#gcp-iap-integration](../spec/07-integration-spec.md) - IAP implementation
+
 ### IAP Integration
 
-- [ ] Update `backend/utils/auth.py`:
+> **Spec References:**
+> - [07-integration-spec.md#jwt-verification](../spec/07-integration-spec.md) - JWT verification process
+> - [08-security-spec.md#jwt-token-handling](../spec/08-security-spec.md) - Token validation rules
+
+- [ ] Update `backend/utils/auth.py` — *See [07-integration-spec.md#jwt-verification](../spec/07-integration-spec.md)*:
   - [ ] Implement complete JWT verification:
     - [ ] Fetch Google's public keys
     - [ ] Verify JWT signature
     - [ ] Check `iss` claim is `https://cloud.google.com/iap`
     - [ ] Verify `aud` matches expected audience
     - [ ] Check `exp` is in the future
-    - [ ] Confirm `hd` (hosted domain) is `arcinstitute.org`
+    - [ ] Confirm `hd` (hosted domain) is `arcinstitute.org` — *See [08-security-spec.md#jwt-token-handling](../spec/08-security-spec.md)*
   - [ ] Cache public keys with expiration
   - [ ] Handle key rotation gracefully
 
-- [ ] Implement user context extraction:
+- [ ] Implement user context extraction — *See [07-integration-spec.md#user-context](../spec/07-integration-spec.md)*:
   - [ ] Extract `email` from JWT claims
   - [ ] Extract `name` from JWT claims (or default to email)
   - [ ] Create User object with extracted claims
@@ -44,13 +53,18 @@ This sprint implements security hardening, comprehensive testing, performance op
   - [ ] Check `settings.debug` flag
   - [ ] Allow bypass when debug=True
   - [ ] Use configurable dev user email
-  - [ ] Log bypass usage for awareness
+  - [ ] Log bypass usage for awareness — *See [08-security-spec.md#audit-logging](../spec/08-security-spec.md)*
   - [ ] Document security implications
 
 ### Authorization Rules
 
-- [ ] Create `backend/utils/authorization.py`:
-  - [ ] Implement `authorize_run_access()`:
+> **Spec References:**
+> - [08-security-spec.md#role-based-access-control](../spec/08-security-spec.md) - RBAC roles
+> - [08-security-spec.md#resource-level-access](../spec/08-security-spec.md) - Resource permissions
+> - [03-backend-spec.md#authorization](../spec/03-backend-spec.md) - API access rules
+
+- [ ] Create `backend/utils/authorization.py` — *See [08-security-spec.md#authorization](../spec/08-security-spec.md)*:
+  - [ ] Implement `authorize_run_access()` — *See [08-security-spec.md#resource-level-access](../spec/08-security-spec.md)*:
     - [ ] Owner: Full access to run
     - [ ] Admin: Full access to all runs
     - [ ] Other: Read status only, no files/logs
@@ -58,7 +72,7 @@ This sprint implements security hardening, comprehensive testing, performance op
     - [ ] Check group membership or config
     - [ ] Cache admin status per session
 
-- [ ] Apply authorization to run endpoints:
+- [ ] Apply authorization to run endpoints — *See [03-backend-spec.md#authorization](../spec/03-backend-spec.md)*:
   - [ ] `GET /api/runs/{id}`: Owner or status-only
   - [ ] `GET /api/runs/{id}/files`: Owner or admin only
   - [ ] `GET /api/runs/{id}/logs`: Owner or admin only
@@ -67,11 +81,15 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 - [ ] Apply authorization to file downloads:
   - [ ] Verify run ownership before generating signed URLs
-  - [ ] Log access attempts for audit
+  - [ ] Log access attempts for audit — *See [08-security-spec.md#audit-logging](../spec/08-security-spec.md)*
 
 ### Prompt Injection Protection
 
-- [ ] Create `backend/utils/sanitization.py`:
+> **Spec References:**
+> - [08-security-spec.md#prompt-injection-protection](../spec/08-security-spec.md) - Sanitization rules
+> - [05-agentic-features-spec.md#security](../spec/05-agentic-features-spec.md) - AI security
+
+- [ ] Create `backend/utils/sanitization.py` — *See [08-security-spec.md#prompt-injection-protection](../spec/08-security-spec.md)*:
   - [ ] Implement `sanitize_user_input()`:
     - [ ] Remove dangerous patterns:
       - [ ] "ignore previous instructions"
@@ -84,13 +102,17 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 - [ ] Apply sanitization to chat input:
   - [ ] Sanitize before passing to agent
-  - [ ] Sanitize tool parameters before execution
+  - [ ] Sanitize tool parameters before execution — *See [08-security-spec.md#tool-execution-safety](../spec/08-security-spec.md)*
   - [ ] Log sanitized content for security review
 
 ### Audit Logging
 
-- [ ] Create `backend/utils/audit.py`:
-  - [ ] Define `AuditEvent` model:
+> **Spec References:**
+> - [08-security-spec.md#audit-logging](../spec/08-security-spec.md) - Complete audit requirements
+> - [08-security-spec.md#log-format](../spec/08-security-spec.md) - Structured log format
+
+- [ ] Create `backend/utils/audit.py` — *See [08-security-spec.md#audit-logging](../spec/08-security-spec.md)*:
+  - [ ] Define `AuditEvent` model — *See [08-security-spec.md#log-format](../spec/08-security-spec.md)*:
     - [ ] `timestamp`
     - [ ] `severity`
     - [ ] `service`
@@ -106,7 +128,7 @@ This sprint implements security hardening, comprehensive testing, performance op
     - [ ] Write to Cloud Logging
     - [ ] Include request context
 
-- [ ] Define auditable events:
+- [ ] Define auditable events — *See [08-security-spec.md#auditable-events](../spec/08-security-spec.md)*:
   - [ ] `user.login` - User authenticated
   - [ ] `run.create` - Run created
   - [ ] `run.submit` - Run submitted
@@ -126,17 +148,22 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ### VPC and Firewall Configuration
 
-- [ ] Verify VPC configuration:
+> **Spec References:**
+> - [08-security-spec.md#network-security](../spec/08-security-spec.md) - VPC configuration
+> - [08-security-spec.md#firewall-rules](../spec/08-security-spec.md) - Firewall rules
+> - [08-security-spec.md#egress-controls](../spec/08-security-spec.md) - Egress destinations
+
+- [ ] Verify VPC configuration — *See [08-security-spec.md#network-security](../spec/08-security-spec.md)*:
   - [ ] Cloud Run uses VPC connector
   - [ ] All egress through Cloud NAT
   - [ ] Private Google Access enabled
 
-- [ ] Verify firewall rules:
+- [ ] Verify firewall rules — *See [08-security-spec.md#firewall-rules](../spec/08-security-spec.md)*:
   - [ ] Allow IAP ranges to Cloud Run
   - [ ] Allow internal VPC traffic
   - [ ] Default deny all other ingress
 
-- [ ] Verify egress controls:
+- [ ] Verify egress controls — *See [08-security-spec.md#egress-controls](../spec/08-security-spec.md)*:
   - [ ] Allow `*.googleapis.com`
   - [ ] Allow `generativelanguage.googleapis.com`
   - [ ] Allow `aiplatform.googleapis.com`
@@ -146,10 +173,13 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ### Security Review
 
-- [ ] Conduct code security review:
-  - [ ] Check for SQL injection vulnerabilities
-  - [ ] Check for XSS vulnerabilities
-  - [ ] Check for CSRF vulnerabilities
+> **Spec References:**
+> - [08-security-spec.md#application-security](../spec/08-security-spec.md) - Security checklist
+
+- [ ] Conduct code security review — *See [08-security-spec.md#application-security](../spec/08-security-spec.md)*:
+  - [ ] Check for SQL injection vulnerabilities — *See [08-security-spec.md#sql-injection-prevention](../spec/08-security-spec.md)*
+  - [ ] Check for XSS vulnerabilities — *See [08-security-spec.md#xss-prevention](../spec/08-security-spec.md)*
+  - [ ] Check for CSRF vulnerabilities — *See [08-security-spec.md#csrf-prevention](../spec/08-security-spec.md)*
   - [ ] Check for path traversal issues
   - [ ] Check for secret exposure
 
@@ -167,66 +197,70 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ## Phase 6.2: Testing & Quality Assurance
 
+> **Spec References:**
+> - [03-backend-spec.md#testing](../spec/03-backend-spec.md) - Backend testing approach
+> - [04-frontend-spec.md#testing](../spec/04-frontend-spec.md) - Frontend testing approach
+
 ### Backend Unit Tests
 
 - [ ] Create `backend/tests/test_routes/`:
-  - [ ] `test_runs.py`:
+  - [ ] `test_runs.py` — *See [03-backend-spec.md#run-management-endpoints](../spec/03-backend-spec.md)*:
     - [ ] Test list runs with filters
     - [ ] Test get run by ID
     - [ ] Test create run
     - [ ] Test cancel run
     - [ ] Test recover run
     - [ ] Test authorization enforcement
-  - [ ] `test_pipelines.py`:
+  - [ ] `test_pipelines.py` — *See [03-backend-spec.md#pipeline-endpoints](../spec/03-backend-spec.md)*:
     - [ ] Test list pipelines
     - [ ] Test get pipeline schema
-  - [ ] `test_logs.py`:
+  - [ ] `test_logs.py` — *See [03-backend-spec.md#log-endpoints](../spec/03-backend-spec.md)*:
     - [ ] Test get workflow log
     - [ ] Test get task list
     - [ ] Test get task logs
-  - [ ] `test_health.py`:
+  - [ ] `test_health.py` — *See [03-backend-spec.md#health-endpoints](../spec/03-backend-spec.md)*:
     - [ ] Test health endpoint
     - [ ] Test readiness endpoint
     - [ ] Test degraded mode
 
 - [ ] Create `backend/tests/test_services/`:
-  - [ ] `test_runs_service.py`:
+  - [ ] `test_runs_service.py` — *See [03-backend-spec.md#runstoreservice](../spec/03-backend-spec.md)*:
     - [ ] Test create run
     - [ ] Test update status
     - [ ] Test status transitions
     - [ ] Test recovery run creation
-  - [ ] `test_storage_service.py`:
+  - [ ] `test_storage_service.py` — *See [03-backend-spec.md#storageservice](../spec/03-backend-spec.md)*:
     - [ ] Test file upload
     - [ ] Test file download
     - [ ] Test signed URL generation
     - [ ] Test file existence check
-  - [ ] `test_batch_service.py`:
+  - [ ] `test_batch_service.py` — *See [03-backend-spec.md#batchservice](../spec/03-backend-spec.md)*:
     - [ ] Test job submission
     - [ ] Test status retrieval
     - [ ] Test job cancellation
-  - [ ] `test_log_service.py`:
+  - [ ] `test_log_service.py` — *See [03-backend-spec.md#logservice](../spec/03-backend-spec.md)*:
     - [ ] Test workflow log parsing
     - [ ] Test task list parsing
     - [ ] Test Cloud Logging queries
 
 - [ ] Create `backend/tests/test_tools/`:
-  - [ ] `test_ngs_tools.py`:
+  - [ ] `test_ngs_tools.py` — *See [05-agentic-features-spec.md#ngs-data-discovery-tools](../spec/05-agentic-features-spec.md)*:
     - [ ] Test search_ngs_runs
     - [ ] Test get_ngs_run_samples
     - [ ] Test get_ngs_run_qc
     - [ ] Test get_fastq_paths
-  - [ ] `test_benchling_tools.py`:
+  - [ ] `test_benchling_tools.py` — *See [05-agentic-features-spec.md#benchling-discovery-tools](../spec/05-agentic-features-spec.md)*:
     - [ ] Test get_entities
     - [ ] Test get_entity_relationships
     - [ ] Test list_entries
-  - [ ] `test_pipeline_tools.py`:
+  - [ ] `test_pipeline_tools.py` — *See [05-agentic-features-spec.md#pipeline-info-tools](../spec/05-agentic-features-spec.md)*:
     - [ ] Test list_pipelines
     - [ ] Test get_pipeline_schema
-  - [ ] `test_file_generation.py`:
+  - [ ] `test_file_generation.py` — *See [05-agentic-features-spec.md#file-generation-tools](../spec/05-agentic-features-spec.md)*:
     - [ ] Test generate_samplesheet
     - [ ] Test generate_config
     - [ ] Test validate_inputs
-  - [ ] `test_submission_tools.py`:
+  - [ ] `test_submission_tools.py` — *See [05-agentic-features-spec.md#validation-submission-tools](../spec/05-agentic-features-spec.md)*:
     - [ ] Test submit_run (mock HITL)
     - [ ] Test cancel_run
     - [ ] Test clear_samplesheet
@@ -235,7 +269,7 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 - [ ] Create `backend/tests/integration/`:
   - [ ] `test_agent_workflow.py`:
-    - [ ] Test sample discovery flow
+    - [ ] Test sample discovery flow — *See [10-ux-spec.md#first-time-run](../spec/10-ux-spec.md)*
     - [ ] Test samplesheet generation flow
     - [ ] Test complete submission flow
   - [ ] `test_benchling_integration.py`:
@@ -247,6 +281,9 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ### Frontend Unit Tests
 
+> **Spec References:**
+> - [04-frontend-spec.md#testing](../spec/04-frontend-spec.md) - Jest configuration
+
 - [ ] Create `frontend/__tests__/components/`:
   - [ ] `Header.test.tsx`:
     - [ ] Test navigation links
@@ -255,7 +292,7 @@ This sprint implements security hardening, comprehensive testing, performance op
   - [ ] `Sidebar.test.tsx`:
     - [ ] Test navigation items
     - [ ] Test active state
-  - [ ] `ChatPanel.test.tsx`:
+  - [ ] `ChatPanel.test.tsx` — *See [04-frontend-spec.md#chatpanel](../spec/04-frontend-spec.md)*:
     - [ ] Test message rendering
     - [ ] Test input submission
     - [ ] Test loading state
@@ -263,22 +300,22 @@ This sprint implements security hardening, comprehensive testing, performance op
     - [ ] Test user message styling
     - [ ] Test assistant message styling
     - [ ] Test tool indicator rendering
-  - [ ] `SamplesheetEditor.test.tsx`:
+  - [ ] `SamplesheetEditor.test.tsx` — *See [04-frontend-spec.md#samplesheeteditor](../spec/04-frontend-spec.md)*:
     - [ ] Test column rendering
     - [ ] Test cell editing
     - [ ] Test validation display
-  - [ ] `ConfigEditor.test.tsx`:
+  - [ ] `ConfigEditor.test.tsx` — *See [04-frontend-spec.md#configeditor](../spec/04-frontend-spec.md)*:
     - [ ] Test syntax highlighting
     - [ ] Test content changes
-  - [ ] `RunList.test.tsx`:
+  - [ ] `RunList.test.tsx` — *See [04-frontend-spec.md#runlist](../spec/04-frontend-spec.md)*:
     - [ ] Test run rendering
     - [ ] Test sorting
     - [ ] Test filtering
-  - [ ] `RunDetail.test.tsx`:
+  - [ ] `RunDetail.test.tsx` — *See [04-frontend-spec.md#rundetail](../spec/04-frontend-spec.md)*:
     - [ ] Test tab navigation
     - [ ] Test status display
     - [ ] Test action buttons
-  - [ ] `RecoveryModal.test.tsx`:
+  - [ ] `RecoveryModal.test.tsx` — *See [12-recovery-spec.md#frontend-workflow](../spec/12-recovery-spec.md)*:
     - [ ] Test confirmation flow
     - [ ] Test advanced options
 
@@ -294,8 +331,11 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ### End-to-End Testing
 
-- [ ] Create E2E test suite:
-  - [ ] Test sample discovery workflow:
+> **Spec References:**
+> - [10-ux-spec.md#core-user-flows](../spec/10-ux-spec.md) - User flow testing
+
+- [ ] Create E2E test suite — *See [10-ux-spec.md#core-user-flows](../spec/10-ux-spec.md)*:
+  - [ ] Test sample discovery workflow — *See [10-ux-spec.md#first-time-run](../spec/10-ux-spec.md)*:
     - [ ] Navigate to workspace
     - [ ] Enter sample search query
     - [ ] Verify samples displayed
@@ -310,7 +350,7 @@ This sprint implements security hardening, comprehensive testing, performance op
     - [ ] Navigate to run detail
     - [ ] Verify status updates
     - [ ] View logs
-  - [ ] Test recovery workflow:
+  - [ ] Test recovery workflow — *See [10-ux-spec.md#troubleshooting-failed-run](../spec/10-ux-spec.md)*:
     - [ ] Open failed run
     - [ ] Click recover
     - [ ] Confirm recovery
@@ -318,7 +358,10 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ### Performance Testing
 
-- [ ] Create performance benchmarks:
+> **Spec References:**
+> - [10-ux-spec.md#performance-expectations](../spec/10-ux-spec.md) - Latency targets
+
+- [ ] Create performance benchmarks — *See [10-ux-spec.md#performance-expectations](../spec/10-ux-spec.md)*:
   - [ ] API response time tests
   - [ ] WebSocket message throughput
   - [ ] Database query performance
@@ -327,7 +370,7 @@ This sprint implements security hardening, comprehensive testing, performance op
 - [ ] Identify and address bottlenecks:
   - [ ] Add database indexes if needed
   - [ ] Optimize slow queries
-  - [ ] Add caching where appropriate
+  - [ ] Add caching where appropriate — *See [07-integration-spec.md#caching-strategy](../spec/07-integration-spec.md)*
 
 ### Test Coverage
 
@@ -337,16 +380,25 @@ This sprint implements security hardening, comprehensive testing, performance op
   - [ ] Set minimum coverage thresholds
 
 - [ ] Generate coverage reports:
-  - [ ] Add to CI pipeline
+  - [ ] Add to CI pipeline — *See [09-deployment-spec.md#github-actions-workflow](../spec/09-deployment-spec.md)*
   - [ ] Track coverage over time
 
 ---
 
 ## Phase 6.3: Polish & Production Launch
 
+> **Spec References:**
+> - [10-ux-spec.md#onboarding](../spec/10-ux-spec.md) - Onboarding experience
+> - [10-ux-spec.md#empty-states](../spec/10-ux-spec.md) - Empty state design
+> - [10-ux-spec.md#loading-states](../spec/10-ux-spec.md) - Loading state design
+> - [09-deployment-spec.md#production-deployment](../spec/09-deployment-spec.md) - Deployment process
+
 ### Onboarding Flow
 
-- [ ] Create `frontend/components/onboarding/WelcomeModal.tsx`:
+> **Spec References:**
+> - [10-ux-spec.md#onboarding](../spec/10-ux-spec.md) - Complete onboarding spec
+
+- [ ] Create `frontend/components/onboarding/WelcomeModal.tsx` — *See [10-ux-spec.md#onboarding](../spec/10-ux-spec.md)*:
   - [ ] Display on first visit
   - [ ] Brief intro to platform capabilities
   - [ ] Key feature highlights
@@ -354,7 +406,7 @@ This sprint implements security hardening, comprehensive testing, performance op
   - [ ] "Get Started" button
   - [ ] Dismissible, remember preference
 
-- [ ] Implement guided first run:
+- [ ] Implement guided first run — *See [10-ux-spec.md#guided-first-run](../spec/10-ux-spec.md)*:
   - [ ] Highlight suggested prompts
   - [ ] Tooltips on key UI elements
   - [ ] Step-by-step guidance
@@ -362,7 +414,10 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ### Empty States
 
-- [ ] Create `frontend/components/common/EmptyState.tsx`:
+> **Spec References:**
+> - [10-ux-spec.md#empty-states](../spec/10-ux-spec.md) - Empty state design
+
+- [ ] Create `frontend/components/common/EmptyState.tsx` — *See [10-ux-spec.md#empty-states](../spec/10-ux-spec.md)*:
   - [ ] Generic empty state component
   - [ ] Icon, title, description
   - [ ] Optional action button
@@ -375,7 +430,10 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ### Loading States
 
-- [ ] Create `frontend/components/common/LoadingSkeleton.tsx`:
+> **Spec References:**
+> - [10-ux-spec.md#loading-states](../spec/10-ux-spec.md) - Loading state design
+
+- [ ] Create `frontend/components/common/LoadingSkeleton.tsx` — *See [10-ux-spec.md#loading-states](../spec/10-ux-spec.md)*:
   - [ ] Skeleton loading patterns
   - [ ] Match actual component layouts
 
@@ -387,7 +445,10 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ### Toast Notifications
 
-- [ ] Set up toast notification system:
+> **Spec References:**
+> - [10-ux-spec.md#feedback-mechanisms](../spec/10-ux-spec.md) - Feedback patterns
+
+- [ ] Set up toast notification system — *See [10-ux-spec.md#feedback-mechanisms](../spec/10-ux-spec.md)*:
   - [ ] Use HeroUI toast or react-hot-toast
   - [ ] Configure global toast provider
 
@@ -399,25 +460,32 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ### Feedback Mechanisms
 
-- [ ] Implement success feedback:
+> **Spec References:**
+> - [10-ux-spec.md#feedback-mechanisms](../spec/10-ux-spec.md) - Complete feedback spec
+
+- [ ] Implement success feedback — *See [10-ux-spec.md#success-feedback](../spec/10-ux-spec.md)*:
   - [ ] Toast for quick actions
   - [ ] Modal for major completions
   - [ ] Subtle animation on first run success
 
-- [ ] Implement error feedback:
+- [ ] Implement error feedback — *See [10-ux-spec.md#error-feedback](../spec/10-ux-spec.md)*:
   - [ ] Inline errors appear immediately
   - [ ] Toast for transient errors
   - [ ] Modal for blocking errors
   - [ ] Clear recovery actions
 
-- [ ] Implement progress feedback:
+- [ ] Implement progress feedback — *See [10-ux-spec.md#progress-feedback](../spec/10-ux-spec.md)*:
   - [ ] Loading spinners for short waits (<3s)
   - [ ] Progress bars for long operations
   - [ ] Status text for multi-step processes
 
 ### Accessibility Improvements
 
-- [ ] Conduct accessibility audit:
+> **Spec References:**
+> - [10-ux-spec.md#accessibility](../spec/10-ux-spec.md) - Accessibility requirements
+> - [04-frontend-spec.md#accessibility](../spec/04-frontend-spec.md) - WCAG compliance
+
+- [ ] Conduct accessibility audit — *See [10-ux-spec.md#accessibility](../spec/10-ux-spec.md)*:
   - [ ] Use axe-core or similar tool
   - [ ] Test with screen reader
   - [ ] Test keyboard navigation
@@ -428,28 +496,32 @@ This sprint implements security hardening, comprehensive testing, performance op
   - [ ] Add skip links
   - [ ] Improve color contrast
 
-- [ ] Implement keyboard navigation:
+- [ ] Implement keyboard navigation — *See [10-ux-spec.md#keyboard-navigation](../spec/10-ux-spec.md)*:
   - [ ] Tab between major sections
   - [ ] Arrow keys within lists/tables
   - [ ] Enter to activate buttons/links
   - [ ] Escape to close modals
   - [ ] Ctrl+/ to focus chat input
 
-- [ ] Ensure color independence:
+- [ ] Ensure color independence — *See [10-ux-spec.md#color-independence](../spec/10-ux-spec.md)*:
   - [ ] Status never by color alone
   - [ ] Icons accompany all status indicators
   - [ ] Sufficient contrast ratios (4.5:1+)
 
 ### Monitoring & Alerting
 
-- [ ] Set up Cloud Monitoring dashboards:
+> **Spec References:**
+> - [09-deployment-spec.md#monitoring-alerting](../spec/09-deployment-spec.md) - Monitoring setup
+> - [09-deployment-spec.md#alerting-policies](../spec/09-deployment-spec.md) - Alert configuration
+
+- [ ] Set up Cloud Monitoring dashboards — *See [09-deployment-spec.md#monitoring-alerting](../spec/09-deployment-spec.md)*:
   - [ ] Request rate and latency
   - [ ] Error rate by endpoint
   - [ ] Instance count and CPU/memory
   - [ ] Run submission rate
   - [ ] Run success/failure rate
 
-- [ ] Configure alerting policies:
+- [ ] Configure alerting policies — *See [09-deployment-spec.md#alerting-policies](../spec/09-deployment-spec.md)*:
   - [ ] High error rate (>5% 5xx in 5 min): Critical
   - [ ] High latency (p95 >10s in 5 min): Warning
   - [ ] High instance count (>8): Warning
@@ -468,40 +540,44 @@ This sprint implements security hardening, comprehensive testing, performance op
 ### Documentation
 
 - [ ] Create user documentation:
-  - [ ] Getting started guide
+  - [ ] Getting started guide — *See [10-ux-spec.md#onboarding](../spec/10-ux-spec.md)*
   - [ ] How to discover samples
   - [ ] How to submit a run
   - [ ] How to monitor runs
-  - [ ] How to recover failed runs
+  - [ ] How to recover failed runs — *See [12-recovery-spec.md](../spec/12-recovery-spec.md)*
   - [ ] FAQ and troubleshooting
 
 - [ ] Create API documentation:
-  - [ ] OpenAPI/Swagger spec
+  - [ ] OpenAPI/Swagger spec — *See [03-backend-spec.md#api-endpoints](../spec/03-backend-spec.md)*
   - [ ] Endpoint descriptions
   - [ ] Request/response examples
   - [ ] Authentication guide
 
-- [ ] Create operational runbooks:
+- [ ] Create operational runbooks — *See [09-deployment-spec.md#deployment-procedures](../spec/09-deployment-spec.md)*:
   - [ ] Deployment procedures
-  - [ ] Rollback procedures
-  - [ ] Incident response
+  - [ ] Rollback procedures — *See [09-deployment-spec.md#rollback-procedure](../spec/09-deployment-spec.md)*
+  - [ ] Incident response — *See [08-security-spec.md#incident-response](../spec/08-security-spec.md)*
   - [ ] Common troubleshooting
 
 - [ ] Create developer documentation:
-  - [ ] Architecture overview
+  - [ ] Architecture overview — *See [02-architecture-overview.md](../spec/02-architecture-overview.md)*
   - [ ] Local development setup
   - [ ] Testing guide
   - [ ] Contributing guidelines
 
 ### Production Deployment
 
-- [ ] Prepare production configuration:
+> **Spec References:**
+> - [09-deployment-spec.md#production-deployment](../spec/09-deployment-spec.md) - Deployment process
+> - [09-deployment-spec.md#environment-configuration](../spec/09-deployment-spec.md) - Environment setup
+
+- [ ] Prepare production configuration — *See [09-deployment-spec.md#environment-configuration](../spec/09-deployment-spec.md)*:
   - [ ] Update production settings
   - [ ] Verify secrets in Secret Manager
   - [ ] Verify service account permissions
   - [ ] Verify IAP configuration
 
-- [ ] Deploy to production:
+- [ ] Deploy to production — *See [09-deployment-spec.md#standard-deployment](../spec/09-deployment-spec.md)*:
   - [ ] Run production CI/CD pipeline
   - [ ] Verify deployment successful
   - [ ] Run smoke tests
@@ -515,7 +591,7 @@ This sprint implements security hardening, comprehensive testing, performance op
 ### Gradual Rollout
 
 - [ ] Identify pilot users:
-  - [ ] Select small group of early adopters
+  - [ ] Select small group of early adopters — *See [10-ux-spec.md#user-personas](../spec/10-ux-spec.md)*
   - [ ] Communicate launch timeline
 
 - [ ] Conduct pilot rollout:
