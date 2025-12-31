@@ -380,36 +380,36 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [07-integration-spec.md#connection-pool](../spec/07-integration-spec.md) - Pool configuration
 > - [06-data-model-spec.md#benchling-data-warehouse](../spec/06-data-model-spec.md) - Available tables
 
-- [ ] Create `backend/services/benchling.py` — *See [03-backend-spec.md#benchlingservice](../spec/03-backend-spec.md)*:
-  - [ ] Implement `BenchlingService` class
-  - [ ] Initialize connection pool with async SQLAlchemy — *See [07-integration-spec.md#connection-pool](../spec/07-integration-spec.md)*
-  - [ ] Configure connection parameters from settings
-  - [ ] Set pool size to 5 connections
-  - [ ] Set max overflow to 10
-  - [ ] Set pool timeout to 30 seconds
-  - [ ] Set pool recycle to 1800 seconds (30 minutes)
-  - [ ] Require SSL mode
-- [ ] Implement basic query method:
-  - [ ] Accept SQL query and parameters
-  - [ ] Return results as DataFrame or dict
-  - [ ] Handle connection errors gracefully — *See [07-integration-spec.md#error-handling](../spec/07-integration-spec.md)*
-- [ ] Implement connection health check method
-- [ ] Add unit tests for Benchling service with mocked database
+- [x] Create `backend/services/benchling.py` — *See [03-backend-spec.md#benchlingservice](../spec/03-backend-spec.md)*:
+  - [x] Implement `BenchlingService` class
+  - [x] Initialize connection pool with async SQLAlchemy — *See [07-integration-spec.md#connection-pool](../spec/07-integration-spec.md)*
+  - [x] Configure connection parameters from settings
+  - [x] Set pool size to 5 connections
+  - [x] Set max overflow to 10
+  - [x] Set pool timeout to 30 seconds
+  - [x] Set pool recycle to 1800 seconds (30 minutes)
+  - [x] Require SSL mode
+- [x] Implement basic query method:
+  - [x] Accept SQL query and parameters
+  - [x] Return results as DataFrame or dict
+  - [x] Handle connection errors gracefully — *See [07-integration-spec.md#error-handling](../spec/07-integration-spec.md)*
+- [x] Implement connection health check method
+- [x] Add unit tests for Benchling service with mocked database
 
 ### Cloud SQL (PostgreSQL) Connection
 
 > **Spec References:**
 > - [07-integration-spec.md#cloud-sql-postgresql-integration](../spec/07-integration-spec.md) - Connection configuration
 
-- [ ] Create `backend/services/database.py`:
-  - [ ] Configure async SQLAlchemy engine
-  - [ ] Support Cloud Run Unix socket connection — *See [07-integration-spec.md#cloud-run-unix-socket](../spec/07-integration-spec.md)*
-  - [ ] Support local development with standard connection
-  - [ ] Set appropriate pool configuration — *See [07-integration-spec.md#connection-pool](../spec/07-integration-spec.md)*
-- [ ] Create async session factory
-- [ ] Implement database health check method
-- [ ] Create dependency for injecting database session
-- [ ] Add to application lifespan (connect on startup, disconnect on shutdown)
+- [x] Create `backend/services/database.py`:
+  - [x] Configure async SQLAlchemy engine
+  - [x] Support Cloud Run Unix socket connection — *See [07-integration-spec.md#cloud-run-unix-socket](../spec/07-integration-spec.md)*
+  - [x] Support local development with standard connection
+  - [x] Set appropriate pool configuration — *See [07-integration-spec.md#connection-pool](../spec/07-integration-spec.md)*
+- [x] Create async session factory
+- [x] Implement database health check method
+- [x] Create dependency for injecting database session
+- [x] Add to application lifespan (connect on startup, disconnect on shutdown)
 
 ### GCS Storage Service
 
@@ -418,28 +418,28 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [03-backend-spec.md#storageservice](../spec/03-backend-spec.md) - Service interface
 > - [06-data-model-spec.md#object-metadata](../spec/06-data-model-spec.md) - File metadata
 
-- [ ] Create `backend/services/storage.py` — *See [03-backend-spec.md#storageservice](../spec/03-backend-spec.md)*:
-  - [ ] Implement `StorageService` class
-  - [ ] Initialize Google Cloud Storage client
-- [ ] Implement file upload method — *See [07-integration-spec.md#file-upload](../spec/07-integration-spec.md)*:
-  - [ ] Accept run ID, filename, and content
-  - [ ] Upload to `gs://{bucket}/runs/{run_id}/inputs/{filename}`
-  - [ ] Set custom metadata (run-id, user-email, created-at) — *See [06-data-model-spec.md#object-metadata](../spec/06-data-model-spec.md)*
-  - [ ] Return GCS URI
-- [ ] Implement file download method:
-  - [ ] Accept GCS URI or path components
-  - [ ] Return file content as string or bytes
-- [ ] Implement file listing method:
-  - [ ] List files under a given prefix
-  - [ ] Return file info (name, size, updated time)
-- [ ] Implement file existence check — *See [07-integration-spec.md#file-existence-check](../spec/07-integration-spec.md)*:
-  - [ ] Accept list of GCS paths
-  - [ ] Return dict mapping path to existence boolean
-- [ ] Implement signed URL generation — *See [07-integration-spec.md#signed-url-generation](../spec/07-integration-spec.md)*:
-  - [ ] Generate V4 signed URLs for download
-  - [ ] Configurable expiration (default 60 minutes)
-- [ ] Implement storage health check
-- [ ] Add unit tests for storage service
+- [x] Create `backend/services/storage.py` — *See [03-backend-spec.md#storageservice](../spec/03-backend-spec.md)*:
+  - [x] Implement `StorageService` class
+  - [x] Initialize Google Cloud Storage client
+- [x] Implement file upload method — *See [07-integration-spec.md#file-upload](../spec/07-integration-spec.md)*:
+  - [x] Accept run ID, filename, and content
+  - [x] Upload to `gs://{bucket}/runs/{run_id}/inputs/{filename}`
+  - [x] Set custom metadata (run-id, user-email, created-at) — *See [06-data-model-spec.md#object-metadata](../spec/06-data-model-spec.md)*
+  - [x] Return GCS URI
+- [x] Implement file download method:
+  - [x] Accept GCS URI or path components
+  - [x] Return file content as string or bytes
+- [x] Implement file listing method:
+  - [x] List files under a given prefix
+  - [x] Return file info (name, size, updated time)
+- [x] Implement file existence check — *See [07-integration-spec.md#file-existence-check](../spec/07-integration-spec.md)*:
+  - [x] Accept list of GCS paths
+  - [x] Return dict mapping path to existence boolean
+- [x] Implement signed URL generation — *See [07-integration-spec.md#signed-url-generation](../spec/07-integration-spec.md)*:
+  - [x] Generate V4 signed URLs for download
+  - [x] Configurable expiration (default 60 minutes)
+- [x] Implement storage health check
+- [x] Add unit tests for storage service
 
 ### Google Gemini API Integration
 
@@ -448,34 +448,34 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md) - Model parameters
 > - [05-agentic-features-spec.md#agent-configuration](../spec/05-agentic-features-spec.md) - LangChain setup
 
-- [ ] Create `backend/services/gemini.py`:
-  - [ ] Configure LangChain with init_chat_model — *See [07-integration-spec.md#langchain-integration](../spec/07-integration-spec.md)*
-  - [ ] Use `google_genai:gemini-3-flash-preview` model — *See [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md)*
-  - [ ] Set temperature to 1.0 (required for thinking)
-  - [ ] Set thinking_level from settings — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
-  - [ ] Support both API key and Vertex AI authentication — *See [07-integration-spec.md#authentication](../spec/07-integration-spec.md)*
-- [ ] Implement model initialization function
-- [ ] Implement streaming response method — *See [07-integration-spec.md#streaming](../spec/07-integration-spec.md)*
-- [ ] Implement Gemini health check (simple completion test)
-- [ ] Add error handling for rate limits and API errors — *See [07-integration-spec.md#error-handling](../spec/07-integration-spec.md)*
+- [x] Create `backend/services/gemini.py`:
+  - [x] Configure LangChain with init_chat_model — *See [07-integration-spec.md#langchain-integration](../spec/07-integration-spec.md)*
+  - [x] Use `google_genai:gemini-3-flash-preview` model — *See [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md)*
+  - [x] Set temperature to 1.0 (required for thinking)
+  - [x] Set thinking_level from settings — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
+  - [x] Support both API key and Vertex AI authentication — *See [07-integration-spec.md#authentication](../spec/07-integration-spec.md)*
+- [x] Implement model initialization function
+- [x] Implement streaming response method — *See [07-integration-spec.md#streaming](../spec/07-integration-spec.md)*
+- [x] Implement Gemini health check (simple completion test)
+- [x] Add error handling for rate limits and API errors — *See [07-integration-spec.md#error-handling](../spec/07-integration-spec.md)*
 
 ### Circuit Breakers
 
 > **Spec References:**
 > - [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md) - Circuit breaker configuration
 
-- [ ] Create `backend/utils/circuit_breaker.py`:
-  - [ ] Import circuitbreaker library
-  - [ ] Create circuit breaker decorator for Benchling — *See [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md)*:
-    - [ ] Failure threshold: 5
-    - [ ] Recovery timeout: 30 seconds
-  - [ ] Create circuit breaker decorator for Gemini:
-    - [ ] Failure threshold: 3
-    - [ ] Recovery timeout: 60 seconds
-- [ ] Apply circuit breakers to service methods:
-  - [ ] Wrap Benchling query methods
-  - [ ] Wrap Gemini API calls
-- [ ] Expose circuit breaker state for readiness checks
+- [x] Create `backend/utils/circuit_breaker.py`:
+  - [x] Import circuitbreaker library
+  - [x] Create circuit breaker decorator for Benchling — *See [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md)*:
+    - [x] Failure threshold: 5
+    - [x] Recovery timeout: 30 seconds
+  - [x] Create circuit breaker decorator for Gemini:
+    - [x] Failure threshold: 3
+    - [x] Recovery timeout: 60 seconds
+- [x] Apply circuit breakers to service methods:
+  - [x] Wrap Benchling query methods
+  - [x] Wrap Gemini API calls
+- [x] Expose circuit breaker state for readiness checks
 
 ### Health Check Endpoints
 
@@ -483,53 +483,53 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [03-backend-spec.md#health-endpoints](../spec/03-backend-spec.md) - Endpoint specifications
 > - [07-integration-spec.md#integration-health-checks](../spec/07-integration-spec.md) - Health check implementation
 
-- [ ] Create `backend/api/routes/health.py` — *See [03-backend-spec.md#health-endpoints](../spec/03-backend-spec.md)*:
-  - [ ] Implement `GET /health` endpoint:
-    - [ ] Return basic health status
-    - [ ] Include service name and version
-  - [ ] Implement `GET /ready` endpoint — *See [07-integration-spec.md#readiness-check](../spec/07-integration-spec.md)*:
-    - [ ] Check Benchling connection (non-critical)
-    - [ ] Check PostgreSQL connection (critical)
-    - [ ] Check GCS connection (critical)
-    - [ ] Check Batch API access (critical)
-    - [ ] Check Gemini API (non-critical)
-    - [ ] Return 200 if all critical checks pass
-    - [ ] Return 503 if any critical check fails
-    - [ ] Include degraded status if non-critical checks fail
-    - [ ] Return detailed check results in response body
-- [ ] Register health routes in main application
-- [ ] Add tests for health check endpoints
+- [x] Create `backend/api/routes/health.py` — *See [03-backend-spec.md#health-endpoints](../spec/03-backend-spec.md)*:
+  - [x] Implement `GET /health` endpoint:
+    - [x] Return basic health status
+    - [x] Include service name and version
+  - [x] Implement `GET /ready` endpoint — *See [07-integration-spec.md#readiness-check](../spec/07-integration-spec.md)*:
+    - [x] Check Benchling connection (non-critical)
+    - [x] Check PostgreSQL connection (critical)
+    - [x] Check GCS connection (critical)
+    - [x] Check Batch API access (critical)
+    - [x] Check Gemini API (non-critical)
+    - [x] Return 200 if all critical checks pass
+    - [x] Return 503 if any critical check fails
+    - [x] Include degraded status if non-critical checks fail
+    - [x] Return detailed check results in response body
+- [x] Register health routes in main application
+- [x] Add tests for health check endpoints
 
 ### Application Lifespan Management
 
-- [ ] Update `backend/main.py` lifespan context manager:
-  - [ ] Initialize Benchling service on startup
-  - [ ] Initialize database engine and session factory on startup
-  - [ ] Initialize Storage service on startup
-  - [ ] Initialize Gemini client on startup
-  - [ ] Handle graceful shutdown of connections
-  - [ ] Log startup and shutdown events
-- [ ] Create FastAPI dependencies for injecting services:
-  - [ ] `get_benchling_service()`
-  - [ ] `get_db_session()`
-  - [ ] `get_storage_service()`
-  - [ ] `get_gemini_client()`
+- [x] Update `backend/main.py` lifespan context manager:
+  - [x] Initialize Benchling service on startup
+  - [x] Initialize database engine and session factory on startup
+  - [x] Initialize Storage service on startup
+  - [x] Initialize Gemini client on startup
+  - [x] Handle graceful shutdown of connections
+  - [x] Log startup and shutdown events
+- [x] Create FastAPI dependencies for injecting services:
+  - [x] `get_benchling_service()`
+  - [x] `get_db_session()`
+  - [x] `get_storage_service()`
+  - [x] `get_gemini_client()`
 
 ### Verification & Smoke Tests
 
-- [ ] Create smoke test script for verifying deployments:
-  - [ ] Check health endpoint
-  - [ ] Check readiness endpoint
-  - [ ] Verify all service connections
-- [ ] Add basic integration tests:
-  - [ ] Test Benchling connection with simple query
-  - [ ] Test PostgreSQL connection with simple query
-  - [ ] Test GCS with file upload/download
-  - [ ] Test Gemini with simple completion
-- [ ] Document local development setup:
-  - [ ] Environment variable requirements
-  - [ ] Docker compose usage
-  - [ ] Service mocking for offline development
+- [x] Create smoke test script for verifying deployments:
+  - [x] Check health endpoint
+  - [x] Check readiness endpoint
+  - [x] Verify all service connections
+- [x] Add basic integration tests:
+  - [x] Test Benchling connection with simple query
+  - [x] Test PostgreSQL connection with simple query
+  - [x] Test GCS with file upload/download
+  - [x] Test Gemini with simple completion
+- [x] Document local development setup:
+  - [x] Environment variable requirements
+  - [x] Docker compose usage
+  - [x] Service mocking for offline development
 
 ---
 

@@ -1,7 +1,14 @@
 from __future__ import annotations
 
+from fastapi import Depends, Request
+
 from .config import settings
 from .context import AppContext
+from .services.benchling import BenchlingService
+from .services.database import DatabaseService
+from .services.gemini import DisabledGeminiService, GeminiService
+from .services.storage import StorageService
+from .utils.circuit_breaker import Breakers
 
 
 def get_settings() -> object:
@@ -10,3 +17,30 @@ def get_settings() -> object:
 
 def get_context() -> AppContext:
     return AppContext(settings=settings)
+
+
+def get_breakers(request: Request) -> Breakers:
+    return request.app.state.breakers
+
+
+def get_benchling_service(request: Request) -> BenchlingService:
+    return request.app.state.benchling_service
+
+
+def get_database_service(request: Request) -> DatabaseService:
+    return request.app.state.database_service
+
+
+def get_storage_service(request: Request) -> StorageService:
+    return request.app.state.storage_service
+
+
+def get_gemini_service(request: Request) -> GeminiService | DisabledGeminiService:
+    return request.app.state.gemini_service
+
+
+async def get_db_session(
+    database: DatabaseService = Depends(get_database_service),
+):
+    async for session in database.get_session():
+        yield session

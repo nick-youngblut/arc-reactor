@@ -11,6 +11,13 @@ default:
 
   benchling_warehouse_host: "benchling-warehouse.arcinstitute.org"
   benchling_warehouse_db: "benchling"
+  benchling_warehouse_user: "benchling_reader"
+
+  db_name: "arc_reactor"
+  db_user: "arc_reactor"
+  db_host: "127.0.0.1"
+  db_port: 5432
+  cloudsql_connection_name: ""
 
   gemini_model: "gemini-3-flash-preview"
   gemini_thinking_level: "low"
