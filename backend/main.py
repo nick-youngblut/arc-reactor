@@ -22,6 +22,7 @@ from .utils.errors import register_exception_handlers
 
 logger = logging.getLogger(__name__)
 
+
 def _mount_static_assets(app: FastAPI, dist_dir: Path) -> None:
     if not dist_dir.exists():
         return

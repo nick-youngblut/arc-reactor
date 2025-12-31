@@ -1,10 +1,11 @@
 """initial_schema
 
 Revision ID: 0001_initial_schema
-Revises: 
+Revises:
 Create Date: 2025-12-31
 
 """
+
 from __future__ import annotations
 
 from alembic import op
@@ -111,7 +112,7 @@ def upgrade() -> None:
             "stats",
             postgresql.JSONB(astext_type=sa.Text()),
             server_default=sa.text(
-                "'{\"total_runs\": 0, \"successful_runs\": 0, \"total_samples_processed\": 0}'"
+                '\'{"total_runs": 0, "successful_runs": 0, "total_samples_processed": 0}\''
             ),
             nullable=False,
         ),
