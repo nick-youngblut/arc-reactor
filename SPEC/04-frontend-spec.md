@@ -2,7 +2,9 @@
 
 ## Overview
 
-The frontend is a Next.js 14 application using the App Router with static export. It provides a conversational interface for pipeline configuration combined with direct editing capabilities for generated files. The UI is designed for wet lab scientists who may have limited computational experience.
+The frontend is a Next.js 14 application using the App Router with static export (`output: 'export'`). It provides a conversational interface for pipeline configuration combined with direct editing capabilities for generated files. The UI is designed for wet lab scientists who may have limited computational experience.
+
+**Deployment Note:** As a static export, the frontend relies on the backend to implement the "SPA Fallback" pattern (serving `index.html` for 404s) to support deep linking to dynamic routes like `/runs/[id]`.
 
 ## Project Structure
 

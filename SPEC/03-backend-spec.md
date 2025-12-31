@@ -214,6 +214,36 @@ recovery eligibility rules.
 | `GET /api/benchling/runs/{name}/samples` | GET | Get samples for run | Required |
 | `GET /api/benchling/metadata` | GET | Get metadata options | Required |
 
+## Frontend Integration
+
+The backend is responsible for serving the compiled frontend application. Because the frontend uses client-side routing (Next.js App Router with static export), the backend must handle deep links to dynamic routes (e.g., `/runs/abc123`) by serving the entry point.
+
+### Static Asset Serving
+
+The backend mounts the static build output (default: `frontend/out`) to the root path.
+
+1. **Assets**: `/next/`, `/assets/`, and root files (favicon, logo) are served directly.
+2. **SPA Fallback**: Any request that does not match an API route (`/api/*`) or a static file must return `index.html`. This allows the client-side router to handle the URL.
+
+```python
+# Backend implementation pattern for SPA Routing
+from fastapi.staticfiles import StaticFiles
+
+# 1. Mount static assets (exclude root to avoid capturing everything)
+app.mount("/_next", StaticFiles(directory=f"{dist_dir}/_next"), name="next")
+
+# 2. Catch-all route for SPA fallback
+@app.get("/{full_path:path}")
+async def serve_spa_app(full_path: str):
+    # Check if file exists in static dir
+    file_path = dist_dir / full_path
+    if file_path.is_file():
+        return FileResponse(file_path)
+    
+    # Otherwise serve index.html for client-side routing
+    return FileResponse(dist_dir / "index.html")
+```
+
 ## Request/Response Models
 
 ### Run Models
