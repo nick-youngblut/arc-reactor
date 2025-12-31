@@ -40,6 +40,9 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 │  │  Validation & Submission:   │  │                                     │   │
 │  │  • validate_inputs          │  │                                     │   │
 │  │  • submit_run (HITL)        │  │                                     │   │
+│  │  • cancel_run (HITL)        │  │                                     │   │
+│  │  • delete_file (HITL)       │  │                                     │   │
+│  │  • clear_samplesheet (HITL) │  │                                     │   │
 │  └─────────────────────────────┘  └─────────────────────────────────────┘   │
 │                                                                             │
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
@@ -48,7 +51,7 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 │  │  • TodoListMiddleware - Task planning and tracking                    │  │
 │  │  • FilesystemMiddleware - Context offloading (for large results)      │  │
 │  │  • SummarizationMiddleware - Auto-summarize at 85% context            │  │
-│  │  • HumanInTheLoopMiddleware - Approval for submit_run                 │  │
+│  │  • HumanInTheLoopMiddleware - Approval for destructive/costly tools   │  │
 │  └───────────────────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -369,6 +372,11 @@ Submit a validated pipeline run to GCP Batch.
 **Human-in-the-Loop:**
 This tool requires explicit user approval before execution.
 
+**HITL Scope Note:**
+Other destructive or cost-incurring tools (run cancellation, file deletion,
+samplesheet clearing, and expensive Benchling searches) must also require
+explicit approval.
+
 **Returns:**
 ```json
 {
@@ -377,6 +385,69 @@ This tool requires explicit user approval before execution.
   "gcs_path": "gs://arc-reactor-runs/runs/run-abc123",
   "estimated_runtime": "4-6 hours",
   "message": "Pipeline run submitted successfully. You can track progress in the Runs tab."
+}
+```
+
+#### cancel_run
+
+Cancel a running pipeline job.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `run_id` | string | Yes | Run identifier |
+
+**Human-in-the-Loop:**
+This tool requires explicit user approval before execution.
+
+**Returns:**
+```json
+{
+  "run_id": "run-abc123",
+  "status": "cancelled",
+  "message": "Run cancellation requested. It may take a few minutes to stop all tasks."
+}
+```
+
+#### delete_file
+
+Delete a run file from GCS (dangerous operation).
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `run_id` | string | Yes | Run identifier |
+| `file_path` | string | Yes | Path relative to the run root (e.g., `inputs/samplesheet.csv`) |
+
+**Human-in-the-Loop:**
+This tool requires explicit user approval before execution.
+
+**Returns:**
+```json
+{
+  "run_id": "run-abc123",
+  "deleted": "inputs/samplesheet.csv",
+  "message": "File deleted successfully."
+}
+```
+
+#### clear_samplesheet
+
+Remove all rows from the current samplesheet.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `confirm` | boolean | Yes | Must be true to proceed |
+
+**Human-in-the-Loop:**
+This tool requires explicit user approval before execution.
+
+**Returns:**
+```json
+{
+  "cleared": true,
+  "message": "Samplesheet cleared. You can undo by regenerating from Benchling."
 }
 ```
 
@@ -649,5 +720,18 @@ If a tool fails, the agent:
 
 Critical operations require explicit user approval:
 - Pipeline submission (always)
-- File deletion (if implemented)
-- Cost-incurring operations
+- Run cancellation
+- Any tool that modifies or deletes GCS files (samplesheet/config/params)
+- Removing samples from a samplesheet (if implemented)
+- Cost-incurring or expensive Benchling queries (large date ranges, wide searches)
+
+**Required HITL tools (examples):**
+- `submit_run`
+- `cancel_run`
+- `delete_file`
+- `clear_samplesheet`
+- `benchling_expert` (when query fan-out or time window exceeds safe limits)
+
+**Policy:**
+- Tools that write to external systems or incur significant cost must request approval.
+- The agent must summarize the impact and ask for confirmation before execution.

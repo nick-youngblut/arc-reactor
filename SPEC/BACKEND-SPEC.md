@@ -111,6 +111,9 @@ default:
   
   # Frontend
   frontend_out_dir: "/app/frontend/out"
+  cors_allowed_origins:
+    - "https://arc-reactor.arcinstitute.org"
+    - "http://localhost:3000"
 
 development:
   debug: true
@@ -128,6 +131,24 @@ production:
 | `ANTHROPIC_API_KEY` | Claude API key | Yes |
 | `BENCHLING_WAREHOUSE_PASSWORD` | Benchling warehouse credentials | Yes |
 | `GCP_PROJECT` | GCP project ID (override) | No |
+
+## CORS Configuration
+
+The backend must allow the frontend origin(s) explicitly to support local
+development and production deployments.
+
+```python
+# main.py
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
 
 ## API Endpoints
 
