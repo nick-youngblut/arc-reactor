@@ -181,7 +181,7 @@ logs_policy:
 | `PIPELINE_VERSION` | Pipeline version |
 | `CONFIG_GCS_PATH` | GCS path to config file |
 | `PARAMS_GCS_PATH` | GCS path to params file |
-| `WORK_DIR` | GCS work directory |
+| `WORK_DIR` | GCS work directory (original for recovery) |
 | `DATABASE_URL` | Cloud SQL connection string for run status updates |
 
 ### Run Status Updates (Orchestrator)
@@ -229,6 +229,11 @@ google {
     }
 }
 ```
+
+### Run Recovery (`-resume`)
+
+Recovery submissions reuse the original work directory and add `-resume`.
+See `SPEC/RECOVERY-SPEC.md` for eligibility and workflow details.
 
 ## Cloud Logging Integration
 

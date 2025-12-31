@@ -51,6 +51,12 @@ interface Run {
   // Benchling context
   source_ngs_runs?: string[];        // NGS run IDs used as input
   source_project?: string;           // Project name
+
+  // Recovery
+  parent_run_id?: string;            // Original run ID if recovered
+  is_recovery?: boolean;             // True if created via -resume recovery
+  recovery_notes?: string;           // User-provided notes
+  reused_work_dir?: string;          // GCS work dir reused for -resume
   
   // Error info (if failed)
   exit_code?: number;                // Nextflow exit code
@@ -98,6 +104,10 @@ CREATE TABLE runs (
     sample_count INTEGER NOT NULL,
     source_ngs_runs TEXT[],
     source_project TEXT,
+    parent_run_id VARCHAR(50),
+    is_recovery BOOLEAN DEFAULT FALSE,
+    recovery_notes TEXT,
+    reused_work_dir TEXT,
     exit_code INTEGER,
     error_message TEXT,
     error_task TEXT,
@@ -131,9 +141,16 @@ CREATE INDEX idx_runs_created_at ON runs(created_at DESC);
   },
   "sample_count": 24,
   "source_ngs_runs": ["NR-2024-0156"],
-  "source_project": "CellAtlas"
+  "source_project": "CellAtlas",
+  "parent_run_id": null,
+  "is_recovery": false,
+  "recovery_notes": null,
+  "reused_work_dir": null
 }
 ```
+
+Recovery behavior and `-resume` semantics are defined in
+`SPEC/RECOVERY-SPEC.md`.
 
 ### Table: `checkpoints`
 

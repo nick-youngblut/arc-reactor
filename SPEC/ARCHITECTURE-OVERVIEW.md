@@ -258,6 +258,20 @@ Submit Button → Frontend → REST API → Validation → GCS Upload → Batch 
 User Feedback ← Frontend ← REST Response ← Job Created Confirmation
 ```
 
+### Pattern 3b: Run Recovery Flow (`-resume`)
+
+```
+Recover Action → Frontend → POST /api/runs/{id}/recover → Validate work dir
+                                                              ↓
+                                                     Batch Submit (-resume)
+                                                              ↓
+                                                      PostgreSQL Write
+                                                              ↓
+User Feedback ← Frontend ← REST Response ← Recovery Run Created
+```
+
+See `SPEC/RECOVERY-SPEC.md` for recovery eligibility rules and parameters.
+
 ### Pattern 4: Run Monitoring Flow
 
 ```

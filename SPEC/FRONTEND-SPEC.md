@@ -183,13 +183,17 @@ Detailed view of a specific run with logs and files.
 │                │  │                                                     │   │
 │                │  └─────────────────────────────────────────────────────┘   │
 │                │                                                            │
-│                │  [Cancel Run]  [Re-run with Changes]                       │
+│                │  [Cancel Run]  [Re-run with Changes]  [Recover Run]         │
 └────────────────┴────────────────────────────────────────────────────────────┘
 ```
 
 **Status Updates:**
 - Primary: SSE stream from `GET /api/runs/{id}/events` for real-time status changes
 - Fallback: Poll `GET /api/runs/{id}` every 5-30 seconds if SSE is unavailable
+
+**Recovery (Nextflow `-resume`):**
+- Show **Recover Run** action for `failed` or `cancelled` runs
+- Recovery flow is defined in `SPEC/RECOVERY-SPEC.md`
 
 **Log Viewing:**
 - Workflow logs stream in real time while a run is `running` via `GET /api/runs/{id}/logs/stream?source=workflow`

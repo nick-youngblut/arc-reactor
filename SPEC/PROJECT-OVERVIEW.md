@@ -183,6 +183,7 @@ Users can track their pipeline runs through:
 - Advanced scheduling/queuing
 - Cost estimation and budgeting
 - Automated re-runs on failure
+- Manual recovery with Nextflow `-resume` (see `SPEC/RECOVERY-SPEC.md`)
 - Slack/email notifications
 - Custom pipeline uploads
 - Result visualization

@@ -135,8 +135,10 @@ Make it easy to recover from mistakes.
    └── AI explains issue and suggests fixes
 
 4. User chooses resolution
-   └── Remove samples, fix in Benchling, or retry
+   └── Remove samples, fix in Benchling, retry, or recover with `-resume`
 ```
+
+Recovery UX details are defined in `SPEC/RECOVERY-SPEC.md`.
 
 ## Interface Components
 

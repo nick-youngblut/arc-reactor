@@ -167,8 +167,12 @@ app.add_middleware(
 | `GET /api/runs/{id}` | GET | Get run details | Required |
 | `POST /api/runs` | POST | Submit new run | Required |
 | `DELETE /api/runs/{id}` | DELETE | Cancel run | Required |
+| `POST /api/runs/{id}/recover` | POST | Recover run using `-resume` | Required |
 | `GET /api/runs/{id}/files` | GET | List run files | Required |
 | `GET /api/runs/{id}/events` | GET (SSE) | Stream run status updates | Required |
+
+**Run Recovery:** See `SPEC/RECOVERY-SPEC.md` for the `-resume` workflow and
+recovery eligibility rules.
 
 ### Log Endpoints
 
@@ -237,6 +241,10 @@ class RunResponse(BaseModel):
     gcs_path: str
     sample_count: int
     params: dict[str, Any]
+    parent_run_id: str | None
+    is_recovery: bool
+    recovery_notes: str | None
+    reused_work_dir: str | None
 
 class RunListResponse(BaseModel):
     runs: list[RunResponse]
@@ -357,6 +365,7 @@ Manages GCP Batch job submission and monitoring.
 | `submit_run()` | Submit a new pipeline run | RunResponse |
 | `get_run_status()` | Get current run status | RunStatus |
 | `cancel_run()` | Cancel a running job | bool |
+| `recover_run()` | Submit recovery run with `-resume` | RunResponse |
 | `list_runs()` | List runs with filters | list[RunResponse] |
 | `get_run_logs()` | Get Batch job log entries | list[LogEntry] |
 
@@ -411,6 +420,7 @@ Manages run persistence in Cloud SQL PostgreSQL.
 | `update_run_status()` | Update run status | bool |
 | `get_run()` | Get run record | RunRecord |
 | `list_runs()` | Query runs with filters | list[RunRecord] |
+| `create_recovery_run()` | Create run record linked to parent | str (run_id) |
 
 ### RunEventService
 
