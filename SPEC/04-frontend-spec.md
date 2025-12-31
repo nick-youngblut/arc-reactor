@@ -233,7 +233,7 @@ The AI conversation interface.
 
 **Features:**
 - Streaming message display
-- Tool execution indicators
+- Tool execution indicators (collapsible)
 - Suggested prompts for new users
 - Message history persistence (per session)
 
@@ -255,6 +255,101 @@ interface ToolInvocation {
   args: Record<string, unknown>;
   state: "pending" | "result";
   result?: string;
+}
+```
+
+#### AI Response Element Rendering
+
+The chat interface handles different types of AI response content with specific UX patterns
+to keep the interface clean while providing transparency into agent actions.
+
+| Element Type | Visibility | Rendering |
+|--------------|------------|-----------|
+| **Text content** | Visible | Rendered as markdown in message bubble |
+| **Reasoning/Thinking blocks** | Hidden | Not shown to user (internal model reasoning) |
+| **Tool calls** | Visible (collapsed) | Collapsible accordion showing tool name and status |
+
+**Reasoning Blocks:**
+- Gemini's "thinking" mode outputs internal reasoning steps as `reasoning` content blocks
+- These are **filtered out** during stream processing and **not displayed** to the user
+- Reasoning blocks are purely for model performance and do not add value to the user experience
+- Backend may optionally log reasoning blocks for debugging purposes
+
+**Tool Call Display (Collapsible Accordions):**
+
+Similar to ChatGPT and Claude.ai, tool invocations are displayed as collapsible blocks:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ I'll look up the samples from that NGS run for you.    │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │ ▶ get_entities                          ✓ Done  │   │
+│  └─────────────────────────────────────────────────┘   │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │ ▼ generate_samplesheet                  ✓ Done  │   │
+│  ├─────────────────────────────────────────────────┤   │
+│  │ Args: { "ngs_run": "NR-2024-0156" }             │   │
+│  │ Result: Generated 24 samples                    │   │
+│  └─────────────────────────────────────────────────┘   │
+│                                                         │
+│ I've generated a samplesheet with 24 samples...        │
+└─────────────────────────────────────────────────────────┘
+```
+
+**ToolIndicator Component States:**
+
+| State | Icon | Label | Expanded Content |
+|-------|------|-------|------------------|
+| `pending` | Spinner | "Running..." | None (disabled) |
+| `result` | Checkmark | "Done" | Args + truncated result |
+| `error` | X icon | "Failed" | Error message |
+
+**Implementation Notes:**
+```typescript
+// Stream processing filters out reasoning blocks
+async function processStreamChunk(chunk: StreamChunk) {
+  for (const block of chunk.content_blocks ?? []) {
+    if (block.type === "reasoning") {
+      // Skip reasoning blocks - not shown to user
+      continue;
+    }
+    if (block.type === "text") {
+      appendToMessage(block.text);
+    }
+  }
+  
+  // Tool calls are handled separately via toolInvocations
+  if (chunk.tool_calls) {
+    updateToolInvocations(chunk.tool_calls);
+  }
+}
+```
+
+```typescript
+// ToolIndicator component (collapsed by default)
+function ToolIndicator({ invocation }: { invocation: ToolInvocation }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  return (
+    <div className="tool-indicator">
+      <button 
+        onClick={() => setIsExpanded(!isExpanded)}
+        disabled={invocation.state === "pending"}
+      >
+        {isExpanded ? "▼" : "▶"} {invocation.toolName}
+        <StatusBadge state={invocation.state} />
+      </button>
+      
+      {isExpanded && invocation.state === "result" && (
+        <div className="tool-details">
+          <pre>Args: {JSON.stringify(invocation.args, null, 2)}</pre>
+          <pre>Result: {truncate(invocation.result, 200)}</pre>
+        </div>
+      )}
+    </div>
+  );
 }
 ```
 

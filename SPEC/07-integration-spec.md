@@ -456,16 +456,27 @@ async def stream_response(messages: list) -> AsyncIterator[str]:
 
 ### Thinking Output
 
-Gemini 3 Flash supports exposing reasoning steps:
+Gemini 3 Flash supports exposing reasoning steps via the `thinking_level` parameter.
+However, **reasoning blocks are not displayed to users** and should be filtered during
+stream processing. Only `text` content blocks are forwarded to the frontend.
 
 ```python
 async for chunk in model.astream(messages):
     for block in chunk.content_blocks:
         if block["type"] == "reasoning":
-            print(f"Thinking: {block.get('reasoning', '')}")
+            # Filter out reasoning blocks - not shown to users
+            # Optionally log for debugging:
+            # logger.debug(f"Reasoning: {block.get('reasoning', '')}")
+            continue
         elif block["type"] == "text":
-            print(block["text"])
+            # Stream text content to frontend
+            yield format_ai_sdk_chunk(block["text"])
 ```
+
+**Design Decision:** Reasoning blocks are internal model reasoning that improves response
+quality but adds no value to the user experience. Showing raw Chain-of-Thought output
+would clutter the interface. Tool calls, however, ARE shown to users in collapsed
+accordion blocks (see `04-frontend-spec.md` ChatPanel section).
 
 ### Error Handling
 

@@ -22,6 +22,10 @@ specifications and implementation examples must reference the values here.
 | `medium` | Complex reasoning, multi-step tool use | Medium |
 | `high` | Deep analysis, research tasks | Highest |
 
+> **Note:** Regardless of thinking level, reasoning blocks are **not displayed to users**.
+> They are filtered during stream processing. See `04-frontend-spec.md` (ChatPanel section)
+> for details on AI response element rendering.
+
 ### Environment Variables
 
 | Variable | Description | Required |
