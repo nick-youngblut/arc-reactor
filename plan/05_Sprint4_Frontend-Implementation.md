@@ -6,20 +6,25 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ## References
 
-- [04-frontend-spec.md](../SPEC/04-frontend-spec.md) - Frontend components and state
-- [10-ux-spec.md](../SPEC/10-ux-spec.md) - UX patterns and interaction design
-- [12-recovery-spec.md](../SPEC/12-recovery-spec.md) - Recovery UI requirements
+- [04-frontend-spec.md](../spec/04-frontend-spec.md) - Frontend components and state
+- [10-ux-spec.md](../spec/10-ux-spec.md) - UX patterns and interaction design
+- [12-recovery-spec.md](../spec/12-recovery-spec.md) - Recovery UI requirements
 
 ---
 
 ## Phase 4.1: Layout & Core Components
 
+> **Spec References:**
+> - [04-frontend-spec.md#root-layout](../spec/04-frontend-spec.md) - Layout structure
+> - [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md) - Zustand and TanStack Query
+> - [04-frontend-spec.md#styling](../spec/04-frontend-spec.md) - Tailwind CSS and HeroUI
+
 ### Root Layout & Providers
 
-- [ ] Update `frontend/app/layout.tsx`:
+- [ ] Update `frontend/app/layout.tsx` — *See [04-frontend-spec.md#root-layout](../spec/04-frontend-spec.md)*:
   - [ ] Configure HTML structure with proper lang attribute
   - [ ] Add metadata (title, description, favicon)
-  - [ ] Wrap with QueryClientProvider (TanStack Query)
+  - [ ] Wrap with QueryClientProvider (TanStack Query) — *See [04-frontend-spec.md#tanstack-query](../spec/04-frontend-spec.md)*
   - [ ] Wrap with HeroUI provider
   - [ ] Add ThemeProvider for dark/light mode
   - [ ] Add global error boundary
@@ -32,6 +37,9 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
   - [ ] Export QueryClientProvider setup
 
 ### Header Component
+
+> **Spec References:**
+> - [10-ux-spec.md#interface-components](../spec/10-ux-spec.md) - Component layout
 
 - [ ] Create `frontend/components/Header.tsx`:
   - [ ] Display Arc Reactor logo and title
@@ -50,22 +58,28 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
     - [ ] Workspace (chat + editors)
     - [ ] Runs (run history)
   - [ ] Active state highlighting
-  - [ ] Collapsible on smaller screens
+  - [ ] Collapsible on smaller screens — *See [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md)*
   - [ ] Arc Institute branding at bottom
 
 ### Main Layout Component
 
-- [ ] Create `frontend/components/MainLayout.tsx`:
+> **Spec References:**
+> - [10-ux-spec.md#workspace-layout](../spec/10-ux-spec.md) - Layout structure
+
+- [ ] Create `frontend/components/MainLayout.tsx` — *See [10-ux-spec.md#workspace-layout](../spec/10-ux-spec.md)*:
   - [ ] Integrate Header and Sidebar
   - [ ] Main content area with routing
-  - [ ] Responsive grid layout:
+  - [ ] Responsive grid layout — *See [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md)*:
     - [ ] Desktop: Sidebar + main content
     - [ ] Tablet: Collapsible sidebar
     - [ ] Mobile: Bottom navigation
 
 ### Tailwind CSS Configuration
 
-- [ ] Update `tailwind.config.js`:
+> **Spec References:**
+> - [04-frontend-spec.md#styling](../spec/04-frontend-spec.md) - CSS configuration
+
+- [ ] Update `tailwind.config.js` — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*:
   - [ ] Define Arc brand colors:
     - [ ] Primary (arc-blue)
     - [ ] Secondary
@@ -90,7 +104,11 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Zustand Stores
 
-- [ ] Create `frontend/stores/workspaceStore.ts`:
+> **Spec References:**
+> - [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md) - Store definitions
+> - [04-frontend-spec.md#workspace-store](../spec/04-frontend-spec.md) - Workspace state
+
+- [ ] Create `frontend/stores/workspaceStore.ts` — *See [04-frontend-spec.md#workspace-store](../spec/04-frontend-spec.md)*:
   - [ ] State:
     - [ ] `selectedPipeline`: Pipeline name
     - [ ] `selectedVersion`: Pipeline version
@@ -105,7 +123,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
     - [ ] `clearWorkspace()`
     - [ ] `setValidationResult()`
 
-- [ ] Create `frontend/stores/chatStore.ts`:
+- [ ] Create `frontend/stores/chatStore.ts` — *See [04-frontend-spec.md#chat-store](../spec/04-frontend-spec.md)*:
   - [ ] State:
     - [ ] `messages`: Chat message array
     - [ ] `isLoading`: Agent responding flag
@@ -129,9 +147,13 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### TanStack Query Setup
 
-- [ ] Create `frontend/lib/api.ts`:
+> **Spec References:**
+> - [04-frontend-spec.md#api-client](../spec/04-frontend-spec.md) - API client configuration
+> - [04-frontend-spec.md#relative-paths](../spec/04-frontend-spec.md) - Relative path requirement
+
+- [ ] Create `frontend/lib/api.ts` — *See [04-frontend-spec.md#api-client](../spec/04-frontend-spec.md)*:
   - [ ] Configure Axios instance:
-    - [ ] Base URL: relative paths (e.g., `/api`)
+    - [ ] Base URL: relative paths (e.g., `/api`) — *See [04-frontend-spec.md#relative-paths](../spec/04-frontend-spec.md)*
     - [ ] Request interceptors for auth
     - [ ] Response interceptors for errors
   - [ ] Export typed API functions:
@@ -139,7 +161,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
     - [ ] `fetchRun(id)`
     - [ ] `createRun()`
     - [ ] `cancelRun(id)`
-    - [ ] `recoverRun(id, options)`
+    - [ ] `recoverRun(id, options)` — *See [12-recovery-spec.md#frontend-workflow](../spec/12-recovery-spec.md)*
     - [ ] `fetchPipelines()`
     - [ ] `fetchPipeline(name)`
 
@@ -147,10 +169,15 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ## Phase 4.2: Pipeline Workspace - Chat Panel
 
+> **Spec References:**
+> - [04-frontend-spec.md#pipelineworkspace](../spec/04-frontend-spec.md) - Workspace container
+> - [04-frontend-spec.md#chatpanel](../spec/04-frontend-spec.md) - Chat component
+> - [10-ux-spec.md#chat-panel-states](../spec/10-ux-spec.md) - Chat UX states
+
 ### PipelineWorkspace Container
 
-- [ ] Create `frontend/components/workspace/PipelineWorkspace.tsx`:
-  - [ ] Two-column layout:
+- [ ] Create `frontend/components/workspace/PipelineWorkspace.tsx` — *See [04-frontend-spec.md#pipelineworkspace](../spec/04-frontend-spec.md)*:
+  - [ ] Two-column layout — *See [10-ux-spec.md#workspace-layout](../spec/10-ux-spec.md)*:
     - [ ] Left: ChatPanel (40% width)
     - [ ] Right: FileEditorPanel (60% width)
   - [ ] Pipeline selector in header:
@@ -163,11 +190,15 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Chat Panel Component
 
-- [ ] Create `frontend/components/chat/ChatPanel.tsx`:
+> **Spec References:**
+> - [04-frontend-spec.md#chatpanel](../spec/04-frontend-spec.md) - Complete chat specification
+> - [10-ux-spec.md#chat-panel-states](../spec/10-ux-spec.md) - Chat states
+
+- [ ] Create `frontend/components/chat/ChatPanel.tsx` — *See [04-frontend-spec.md#chatpanel](../spec/04-frontend-spec.md)*:
   - [ ] Panel header with title and clear button
   - [ ] MessageList component
   - [ ] ChatInput at bottom
-  - [ ] Loading state indicator
+  - [ ] Loading state indicator — *See [10-ux-spec.md#loading-states](../spec/10-ux-spec.md)*
 
 ### Message List Component
 
@@ -175,22 +206,30 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
   - [ ] Scrollable message container
   - [ ] Auto-scroll to bottom on new messages
   - [ ] Map messages to MessageBubble components
-  - [ ] Handle empty state with welcome message
+  - [ ] Handle empty state with welcome message — *See [10-ux-spec.md#empty-states](../spec/10-ux-spec.md)*
 
 ### Message Bubble Component
 
-- [ ] Create `frontend/components/chat/MessageBubble.tsx`:
+> **Spec References:**
+> - [04-frontend-spec.md#messagebubble](../spec/04-frontend-spec.md) - Message rendering
+> - [04-frontend-spec.md#tool-indicator](../spec/04-frontend-spec.md) - Tool call display
+
+- [ ] Create `frontend/components/chat/MessageBubble.tsx` — *See [04-frontend-spec.md#messagebubble](../spec/04-frontend-spec.md)*:
   - [ ] Differentiate user vs assistant messages:
     - [ ] User: Right-aligned, primary color
     - [ ] Assistant: Left-aligned, secondary color
   - [ ] Render markdown content
   - [ ] Support streaming text display
-  - [ ] Render tool calls as ToolIndicator
+  - [ ] Render tool calls as ToolIndicator — *See [04-frontend-spec.md#tool-indicator](../spec/04-frontend-spec.md)*
   - [ ] Display message timestamp
 
 ### Tool Indicator Component
 
-- [ ] Create `frontend/components/chat/ToolIndicator.tsx`:
+> **Spec References:**
+> - [04-frontend-spec.md#toolindicator](../spec/04-frontend-spec.md) - Tool call display
+> - [05-agentic-features-spec.md#tool-output-handling](../spec/05-agentic-features-spec.md) - Tool output format
+
+- [ ] Create `frontend/components/chat/ToolIndicator.tsx` — *See [04-frontend-spec.md#toolindicator](../spec/04-frontend-spec.md)*:
   - [ ] Collapsible accordion for tool calls
   - [ ] Tool name badge with icon
   - [ ] Status indicator (pending, running, completed, error)
@@ -209,7 +248,10 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Suggested Prompts Component
 
-- [ ] Create `frontend/components/chat/SuggestedPrompts.tsx`:
+> **Spec References:**
+> - [10-ux-spec.md#onboarding](../spec/10-ux-spec.md) - First-time user experience
+
+- [ ] Create `frontend/components/chat/SuggestedPrompts.tsx` — *See [10-ux-spec.md#onboarding](../spec/10-ux-spec.md)*:
   - [ ] Display when chat is empty
   - [ ] Predefined prompt suggestions:
     - [ ] "Find my samples from last week"
@@ -221,10 +263,13 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Chat Input Component
 
-- [ ] Create `frontend/components/chat/ChatInput.tsx`:
+> **Spec References:**
+> - [10-ux-spec.md#chat-interaction](../spec/10-ux-spec.md) - Chat input behavior
+
+- [ ] Create `frontend/components/chat/ChatInput.tsx` — *See [10-ux-spec.md#chat-interaction](../spec/10-ux-spec.md)*:
   - [ ] Textarea with auto-resize
   - [ ] Submit button
-  - [ ] Keyboard handling:
+  - [ ] Keyboard handling — *See [10-ux-spec.md#keyboard-navigation](../spec/10-ux-spec.md)*:
     - [ ] Enter to send
     - [ ] Shift+Enter for newline
   - [ ] Disabled state while loading
@@ -232,13 +277,17 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### useAgentChat Hook
 
-- [ ] Create `frontend/hooks/useAgentChat.ts`:
+> **Spec References:**
+> - [04-frontend-spec.md#useagentchat](../spec/04-frontend-spec.md) - Chat hook specification
+> - [04-frontend-spec.md#ai-sdk-protocol](../spec/04-frontend-spec.md) - Streaming protocol
+
+- [ ] Create `frontend/hooks/useAgentChat.ts` — *See [04-frontend-spec.md#useagentchat](../spec/04-frontend-spec.md)*:
   - [ ] Integrate with Vercel AI SDK `useChat` or custom implementation
   - [ ] WebSocket connection management:
     - [ ] Connect on mount
     - [ ] Reconnect on disconnect
     - [ ] Handle connection errors
-  - [ ] Message handling:
+  - [ ] Message handling — *See [04-frontend-spec.md#ai-sdk-protocol](../spec/04-frontend-spec.md)*:
     - [ ] Parse AI SDK streaming format
     - [ ] Handle text chunks (type 0)
     - [ ] Handle tool calls (type 9)
@@ -258,10 +307,15 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ## Phase 4.3: Pipeline Workspace - File Editors
 
+> **Spec References:**
+> - [04-frontend-spec.md#samplesheeteditor](../spec/04-frontend-spec.md) - Handsontable editor
+> - [04-frontend-spec.md#configeditor](../spec/04-frontend-spec.md) - Monaco editor
+> - [10-ux-spec.md#file-editor-states](../spec/10-ux-spec.md) - Editor states
+
 ### File Editor Panel Component
 
 - [ ] Create `frontend/components/editors/FileEditorPanel.tsx`:
-  - [ ] Tabbed interface:
+  - [ ] Tabbed interface — *See [10-ux-spec.md#file-editor-states](../spec/10-ux-spec.md)*:
     - [ ] Samplesheet tab
     - [ ] Config tab
   - [ ] Tab badges:
@@ -273,19 +327,23 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Samplesheet Editor Component
 
-- [ ] Create `frontend/components/editors/SamplesheetEditor.tsx`:
+> **Spec References:**
+> - [04-frontend-spec.md#samplesheeteditor](../spec/04-frontend-spec.md) - Handsontable configuration
+> - [10-ux-spec.md#file-editing](../spec/10-ux-spec.md) - Editing patterns
+
+- [ ] Create `frontend/components/editors/SamplesheetEditor.tsx` — *See [04-frontend-spec.md#samplesheeteditor](../spec/04-frontend-spec.md)*:
   - [ ] Handsontable integration
   - [ ] Configuration:
     - [ ] Column headers from pipeline schema
     - [ ] Column types (text, dropdown, numeric)
     - [ ] Required column indicators
-  - [ ] Features:
+  - [ ] Features — *See [10-ux-spec.md#file-editing](../spec/10-ux-spec.md)*:
     - [ ] Cell editing with validation
     - [ ] Copy/paste support
     - [ ] Row add/remove
     - [ ] Column resize
     - [ ] Context menu
-  - [ ] Validation:
+  - [ ] Validation — *See [10-ux-spec.md#validation](../spec/10-ux-spec.md)*:
     - [ ] Required fields not empty
     - [ ] GCS path format validation
     - [ ] Highlight invalid cells (red border)
@@ -294,7 +352,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 - [ ] Create `frontend/lib/handsontable/columnConfig.ts`:
   - [ ] Define column configurations per pipeline
-  - [ ] nf-core/scrnaseq columns:
+  - [ ] nf-core/scrnaseq columns — *See [03-backend-spec.md#pipelineregistry](../spec/03-backend-spec.md)*:
     - [ ] `sample` (text, required)
     - [ ] `fastq_1` (text, required, GCS path)
     - [ ] `fastq_2` (text, required, GCS path)
@@ -307,7 +365,10 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Config Editor Component
 
-- [ ] Create `frontend/components/editors/ConfigEditor.tsx`:
+> **Spec References:**
+> - [04-frontend-spec.md#configeditor](../spec/04-frontend-spec.md) - Monaco configuration
+
+- [ ] Create `frontend/components/editors/ConfigEditor.tsx` — *See [04-frontend-spec.md#configeditor](../spec/04-frontend-spec.md)*:
   - [ ] Monaco Editor integration
   - [ ] Configuration:
     - [ ] Language: "groovy" or custom Nextflow mode
@@ -331,7 +392,10 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Submit Panel Component
 
-- [ ] Create `frontend/components/workspace/SubmitPanel.tsx`:
+> **Spec References:**
+> - [10-ux-spec.md#validation](../spec/10-ux-spec.md) - Validation display
+
+- [ ] Create `frontend/components/workspace/SubmitPanel.tsx` — *See [10-ux-spec.md#validation](../spec/10-ux-spec.md)*:
   - [ ] Validation status display:
     - [ ] Green checkmark if valid
     - [ ] Error count if invalid
@@ -348,7 +412,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 - [ ] Create `frontend/components/workspace/ValidationDisplay.tsx`:
   - [ ] Summarize validation results
-  - [ ] List errors with details:
+  - [ ] List errors with details — *See [10-ux-spec.md#error-handling-ux](../spec/10-ux-spec.md)*:
     - [ ] Icon for error type
     - [ ] Description
     - [ ] Location (sample, field)
@@ -360,16 +424,24 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ## Phase 4.4: Run Management Pages
 
+> **Spec References:**
+> - [04-frontend-spec.md#runlist](../spec/04-frontend-spec.md) - Run list component
+> - [04-frontend-spec.md#rundetail](../spec/04-frontend-spec.md) - Run detail component
+> - [10-ux-spec.md#run-status-indicators](../spec/10-ux-spec.md) - Status display
+
 ### Runs Page
 
-- [ ] Create `frontend/app/runs/page.tsx`:
+- [ ] Create `frontend/app/runs/page.tsx` — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*:
   - [ ] Page title and description
   - [ ] RunList component
-  - [ ] Empty state when no runs
+  - [ ] Empty state when no runs — *See [10-ux-spec.md#empty-states](../spec/10-ux-spec.md)*
 
 ### Run List Component
 
-- [ ] Create `frontend/components/runs/RunList.tsx`:
+> **Spec References:**
+> - [04-frontend-spec.md#runlist](../spec/04-frontend-spec.md) - RunList specification
+
+- [ ] Create `frontend/components/runs/RunList.tsx` — *See [04-frontend-spec.md#runlist](../spec/04-frontend-spec.md)*:
   - [ ] Fetch runs with TanStack Query
   - [ ] Sortable table columns:
     - [ ] Run ID
@@ -400,7 +472,10 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Run Status Badge Component
 
-- [ ] Create `frontend/components/runs/RunStatusBadge.tsx`:
+> **Spec References:**
+> - [10-ux-spec.md#run-status-indicators](../spec/10-ux-spec.md) - Status badge design
+
+- [ ] Create `frontend/components/runs/RunStatusBadge.tsx` — *See [10-ux-spec.md#run-status-indicators](../spec/10-ux-spec.md)*:
   - [ ] Status-specific styling:
     - [ ] Pending: Gray, circle icon
     - [ ] Submitted: Blue, half-filled icon
@@ -412,7 +487,10 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### useRuns Hook
 
-- [ ] Create `frontend/hooks/useRuns.ts`:
+> **Spec References:**
+> - [04-frontend-spec.md#useruns](../spec/04-frontend-spec.md) - Hook specification
+
+- [ ] Create `frontend/hooks/useRuns.ts` — *See [04-frontend-spec.md#useruns](../spec/04-frontend-spec.md)*:
   - [ ] TanStack Query wrapper for runs
   - [ ] Pagination state management
   - [ ] Filter state management
@@ -427,15 +505,18 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Run Detail Page
 
-- [ ] Create `frontend/app/runs/[id]/page.tsx`:
+- [ ] Create `frontend/app/runs/[id]/page.tsx` — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*:
   - [ ] Fetch run by ID
   - [ ] Error handling for not found
-  - [ ] Loading skeleton
+  - [ ] Loading skeleton — *See [10-ux-spec.md#loading-states](../spec/10-ux-spec.md)*
   - [ ] RunDetail component
 
 ### Run Detail Component
 
-- [ ] Create `frontend/components/runs/RunDetail.tsx`:
+> **Spec References:**
+> - [04-frontend-spec.md#rundetail](../spec/04-frontend-spec.md) - RunDetail specification
+
+- [ ] Create `frontend/components/runs/RunDetail.tsx` — *See [04-frontend-spec.md#rundetail](../spec/04-frontend-spec.md)*:
   - [ ] Header section:
     - [ ] Run ID with copy button
     - [ ] Status badge
@@ -458,7 +539,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
   - [ ] Source information:
     - [ ] NGS runs
     - [ ] Project
-  - [ ] Error information (if failed):
+  - [ ] Error information (if failed) — *See [10-ux-spec.md#error-handling-ux](../spec/10-ux-spec.md)*:
     - [ ] Error message
     - [ ] Failed task
     - [ ] Exit code
@@ -470,7 +551,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 ### Run Files Tab
 
 - [ ] Create `frontend/components/runs/RunFiles.tsx`:
-  - [ ] File browser tree:
+  - [ ] File browser tree — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
     - [ ] inputs/ directory
     - [ ] results/ directory (if completed)
     - [ ] logs/ directory
@@ -479,7 +560,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
     - [ ] Size
     - [ ] Last modified
     - [ ] Download button
-  - [ ] Generate signed URLs for download
+  - [ ] Generate signed URLs for download — *See [07-integration-spec.md#signed-url-generation](../spec/07-integration-spec.md)*
 
 ### Run Parameters Tab
 
@@ -491,9 +572,13 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### SSE Integration for Real-time Updates
 
-- [ ] Create `frontend/hooks/useRunEvents.ts`:
+> **Spec References:**
+> - [04-frontend-spec.md#userunevents](../spec/04-frontend-spec.md) - SSE hook
+> - [07-integration-spec.md#sse-integration](../spec/07-integration-spec.md) - SSE implementation
+
+- [ ] Create `frontend/hooks/useRunEvents.ts` — *See [04-frontend-spec.md#userunevents](../spec/04-frontend-spec.md)*:
   - [ ] EventSource connection to `/api/runs/{id}/events`
-  - [ ] Handle SSE events:
+  - [ ] Handle SSE events — *See [07-integration-spec.md#sse-integration](../spec/07-integration-spec.md)*:
     - [ ] "status" event: Update run status
     - [ ] "done" event: Close connection
   - [ ] Reconnection logic
@@ -501,7 +586,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
     - [ ] `status`: Current status
     - [ ] `isConnected`: Connection state
 
-- [ ] Create `frontend/hooks/useRunStatus.ts`:
+- [ ] Create `frontend/hooks/useRunStatus.ts` — *See [04-frontend-spec.md#userunstatus](../spec/04-frontend-spec.md)*:
   - [ ] Polling fallback for run status
   - [ ] Poll every 10 seconds for active runs
   - [ ] Stop polling on terminal states
@@ -511,9 +596,14 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ## Phase 4.5: Log Viewer & Run Recovery UI
 
+> **Spec References:**
+> - [04-frontend-spec.md#runlogs](../spec/04-frontend-spec.md) - Log viewer component
+> - [10-ux-spec.md#log-viewer](../spec/10-ux-spec.md) - Log viewer UX
+> - [12-recovery-spec.md#frontend-workflow](../spec/12-recovery-spec.md) - Recovery UI
+
 ### Run Logs Tab Component
 
-- [ ] Create `frontend/components/runs/RunLogs.tsx`:
+- [ ] Create `frontend/components/runs/RunLogs.tsx` — *See [04-frontend-spec.md#runlogs](../spec/04-frontend-spec.md)*:
   - [ ] Tab navigation:
     - [ ] Workflow Log
     - [ ] Task Logs
@@ -521,10 +611,13 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Workflow Log Viewer Component
 
-- [ ] Create `frontend/components/logs/WorkflowLogViewer.tsx`:
+> **Spec References:**
+> - [10-ux-spec.md#log-viewer](../spec/10-ux-spec.md) - Log viewer design
+
+- [ ] Create `frontend/components/logs/WorkflowLogViewer.tsx` — *See [10-ux-spec.md#log-viewer](../spec/10-ux-spec.md)*:
   - [ ] Virtualized log display (react-window)
   - [ ] Auto-scroll to bottom option
-  - [ ] Search/filter functionality:
+  - [ ] Search/filter functionality — *See [10-ux-spec.md#log-viewer](../spec/10-ux-spec.md)*:
     - [ ] Text search input
     - [ ] Severity filter (INFO, WARN, ERROR)
   - [ ] LogLine component for each entry
@@ -543,7 +636,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 ### Task List Sidebar
 
 - [ ] Create `frontend/components/logs/TaskList.tsx`:
-  - [ ] List of tasks from trace.txt
+  - [ ] List of tasks from trace.txt — *See [03-backend-spec.md#task-list](../spec/03-backend-spec.md)*
   - [ ] Task item display:
     - [ ] Task name
     - [ ] Process name
@@ -577,7 +670,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 - [ ] Create `frontend/components/logs/LogDownload.tsx`:
   - [ ] Download all logs as ZIP
   - [ ] Progress indicator
-  - [ ] Include:
+  - [ ] Include — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
     - [ ] nextflow.log
     - [ ] trace.txt
     - [ ] timeline.html
@@ -585,12 +678,16 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Recovery Modal Component
 
-- [ ] Create `frontend/components/runs/RecoveryModal.tsx`:
+> **Spec References:**
+> - [12-recovery-spec.md#frontend-workflow](../spec/12-recovery-spec.md) - Complete recovery UI spec
+> - [12-recovery-spec.md#recovery-confirmation](../spec/12-recovery-spec.md) - Confirmation requirements
+
+- [ ] Create `frontend/components/runs/RecoveryModal.tsx` — *See [12-recovery-spec.md#frontend-workflow](../spec/12-recovery-spec.md)*:
   - [ ] Modal dialog for recovery confirmation
   - [ ] Header: "Recover run with `-resume`"
   - [ ] Explanation text:
     - [ ] "This will re-run the workflow and reuse completed tasks from the previous work directory."
-  - [ ] Confirmation checkbox
+  - [ ] Confirmation checkbox — *See [12-recovery-spec.md#recovery-confirmation](../spec/12-recovery-spec.md)*
   - [ ] Optional fields:
     - [ ] Notes textarea
     - [ ] Override parameters (advanced toggle)
@@ -608,7 +705,10 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### usePipelines Hook
 
-- [ ] Create `frontend/hooks/usePipelines.ts`:
+> **Spec References:**
+> - [04-frontend-spec.md#usepipelines](../spec/04-frontend-spec.md) - Hook specification
+
+- [ ] Create `frontend/hooks/usePipelines.ts` — *See [04-frontend-spec.md#usepipelines](../spec/04-frontend-spec.md)*:
   - [ ] TanStack Query wrapper for pipelines
   - [ ] Cache pipeline schema
   - [ ] Return:
@@ -619,7 +719,10 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Responsive Design Implementation
 
-- [ ] Implement responsive layouts:
+> **Spec References:**
+> - [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md) - Responsive breakpoints
+
+- [ ] Implement responsive layouts — *See [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md)*:
   - [ ] Desktop (1200px+):
     - [ ] Full two-panel workspace
     - [ ] Sidebar always visible

@@ -6,48 +6,48 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 
 ## References
 
-- [01-project-overview.md](../SPEC/01-project-overview.md) - Project scope and goals
-- [02-architecture-overview.md](../SPEC/02-architecture-overview.md) - System architecture
-- [03-backend-spec.md](../SPEC/03-backend-spec.md) - Backend configuration
-- [07-integration-spec.md](../SPEC/07-integration-spec.md) - Service integrations
-- [08-security-spec.md](../SPEC/08-security-spec.md) - Security requirements
-- [09-deployment-spec.md](../SPEC/09-deployment-spec.md) - Deployment procedures
+- [01-project-overview.md](../spec/01-project-overview.md) - Project scope and goals
+- [02-architecture-overview.md](../spec/02-architecture-overview.md) - System architecture
+- [03-backend-spec.md](../spec/03-backend-spec.md) - Backend configuration
+- [07-integration-spec.md](../spec/07-integration-spec.md) - Service integrations
+- [08-security-spec.md](../spec/08-security-spec.md) - Security requirements
+- [09-deployment-spec.md](../spec/09-deployment-spec.md) - Deployment procedures
 
 ---
 
 ## Phase 1.1: Project Scaffolding & Development Environment
 
 > **Spec References:**
-> - [02-architecture-overview.md#deployment-architecture](../SPEC/02-architecture-overview.md) - Single container architecture
-> - [03-backend-spec.md#project-structure](../SPEC/03-backend-spec.md) - Backend directory layout
-> - [04-frontend-spec.md#project-structure](../SPEC/04-frontend-spec.md) - Frontend directory layout
-> - [09-deployment-spec.md#container-build](../SPEC/09-deployment-spec.md) - Dockerfile specifications
+> - [02-architecture-overview.md#deployment-architecture](../spec/02-architecture-overview.md) - Single container architecture
+> - [03-backend-spec.md#project-structure](../spec/03-backend-spec.md) - Backend directory layout
+> - [04-frontend-spec.md#project-structure](../spec/04-frontend-spec.md) - Frontend directory layout
+> - [09-deployment-spec.md#container-build](../spec/09-deployment-spec.md) - Dockerfile specifications
 
 ### Repository Structure
 
 - [ ] Create monorepo root with appropriate `.gitignore`
 - [ ] Initialize `backend/` directory structure:
   - [ ] Create `backend/__init__.py`
-  - [ ] Create `backend/main.py` - Application factory with lifespan management — *See [03-backend-spec.md#application-factory](../SPEC/03-backend-spec.md)*
-  - [ ] Create `backend/config.py` - Dynaconf settings loader — *See [03-backend-spec.md#configuration-management](../SPEC/03-backend-spec.md)*
-  - [ ] Create `backend/settings.yaml` - Environment configuration file — *See [03-backend-spec.md#environment-variables](../SPEC/03-backend-spec.md)*
+  - [ ] Create `backend/main.py` - Application factory with lifespan management — *See [03-backend-spec.md#application-factory](../spec/03-backend-spec.md)*
+  - [ ] Create `backend/config.py` - Dynaconf settings loader — *See [03-backend-spec.md#configuration-management](../spec/03-backend-spec.md)*
+  - [ ] Create `backend/settings.yaml` - Environment configuration file — *See [03-backend-spec.md#environment-variables](../spec/03-backend-spec.md)*
   - [ ] Create `backend/dependencies.py` - FastAPI dependency injection
   - [ ] Create `backend/context.py` - Shared context for agents
   - [ ] Create `backend/api/` directory with `__init__.py`
   - [ ] Create `backend/api/routes/` directory with `__init__.py`
   - [ ] Create `backend/models/` directory with `__init__.py`
-  - [ ] Create `backend/services/` directory with `__init__.py` — *See [03-backend-spec.md#services](../SPEC/03-backend-spec.md)*
-  - [ ] Create `backend/agents/` directory with `__init__.py` — *See [05-agentic-features-spec.md](../SPEC/05-agentic-features-spec.md)*
+  - [ ] Create `backend/services/` directory with `__init__.py` — *See [03-backend-spec.md#services](../spec/03-backend-spec.md)*
+  - [ ] Create `backend/agents/` directory with `__init__.py` — *See [05-agentic-features-spec.md](../spec/05-agentic-features-spec.md)*
   - [ ] Create `backend/agents/tools/` directory with `__init__.py`
   - [ ] Create `backend/agents/subagents/` directory with `__init__.py`
   - [ ] Create `backend/utils/` directory with `__init__.py`
   - [ ] Create `backend/tests/` directory with `__init__.py` and `conftest.py`
 - [ ] Initialize `frontend/` directory structure:
-  - [ ] Create `frontend/app/` directory for App Router pages — *See [04-frontend-spec.md#page-structure](../SPEC/04-frontend-spec.md)*
-  - [ ] Create `frontend/components/` directory — *See [04-frontend-spec.md#components](../SPEC/04-frontend-spec.md)*
-  - [ ] Create `frontend/hooks/` directory — *See [04-frontend-spec.md#custom-hooks](../SPEC/04-frontend-spec.md)*
+  - [ ] Create `frontend/app/` directory for App Router pages — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*
+  - [ ] Create `frontend/components/` directory — *See [04-frontend-spec.md#components](../spec/04-frontend-spec.md)*
+  - [ ] Create `frontend/hooks/` directory — *See [04-frontend-spec.md#custom-hooks](../spec/04-frontend-spec.md)*
   - [ ] Create `frontend/lib/` directory
-  - [ ] Create `frontend/stores/` directory — *See [04-frontend-spec.md#state-management](../SPEC/04-frontend-spec.md)*
+  - [ ] Create `frontend/stores/` directory — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*
   - [ ] Create `frontend/types/` directory
   - [ ] Create `frontend/styles/` directory
   - [ ] Create `frontend/public/` directory
@@ -55,77 +55,77 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### Backend Setup (FastAPI)
 
 > **Spec References:**
-> - [03-backend-spec.md#dependencies](../SPEC/03-backend-spec.md) - Required Python packages
-> - [03-backend-spec.md#configuration-management](../SPEC/03-backend-spec.md) - Dynaconf setup
-> - [11-conf-spec.md](../SPEC/11-conf-spec.md) - Configuration values
+> - [03-backend-spec.md#dependencies](../spec/03-backend-spec.md) - Required Python packages
+> - [03-backend-spec.md#configuration-management](../spec/03-backend-spec.md) - Dynaconf setup
+> - [11-conf-spec.md](../spec/11-conf-spec.md) - Configuration values
 
 - [ ] Create `backend/pyproject.toml` with dependencies:
   - [ ] FastAPI and Uvicorn
   - [ ] Pydantic v2 for validation
-  - [ ] Dynaconf for configuration — *See [03-backend-spec.md#configuration-management](../SPEC/03-backend-spec.md)*
-  - [ ] SQLAlchemy with asyncpg — *See [07-integration-spec.md#cloud-sql-postgresql-integration](../SPEC/07-integration-spec.md)*
-  - [ ] google-cloud-batch — *See [07-integration-spec.md#gcp-batch-integration](../SPEC/07-integration-spec.md)*
-  - [ ] google-cloud-storage — *See [07-integration-spec.md#google-cloud-storage-integration](../SPEC/07-integration-spec.md)*
-  - [ ] google-cloud-secret-manager — *See [08-security-spec.md#secret-management](../SPEC/08-security-spec.md)*
-  - [ ] langchain and langchain-google-genai — *See [05-agentic-features-spec.md#agent-configuration](../SPEC/05-agentic-features-spec.md)*
+  - [ ] Dynaconf for configuration — *See [03-backend-spec.md#configuration-management](../spec/03-backend-spec.md)*
+  - [ ] SQLAlchemy with asyncpg — *See [07-integration-spec.md#cloud-sql-postgresql-integration](../spec/07-integration-spec.md)*
+  - [ ] google-cloud-batch — *See [07-integration-spec.md#gcp-batch-integration](../spec/07-integration-spec.md)*
+  - [ ] google-cloud-storage — *See [07-integration-spec.md#google-cloud-storage-integration](../spec/07-integration-spec.md)*
+  - [ ] google-cloud-secret-manager — *See [08-security-spec.md#secret-management](../spec/08-security-spec.md)*
+  - [ ] langchain and langchain-google-genai — *See [05-agentic-features-spec.md#agent-configuration](../spec/05-agentic-features-spec.md)*
   - [ ] benchling-py from git
-  - [ ] circuitbreaker for resilience — *See [07-integration-spec.md#circuit-breakers](../SPEC/07-integration-spec.md)*
+  - [ ] circuitbreaker for resilience — *See [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md)*
   - [ ] Dev dependencies: pytest, pytest-asyncio, ruff, mypy, black
 - [ ] Configure Dynaconf in `backend/config.py`:
   - [ ] Load settings from `settings.yaml`
-  - [ ] Support environment variable overrides — *See [03-backend-spec.md#environment-variables](../SPEC/03-backend-spec.md)*
+  - [ ] Support environment variable overrides — *See [03-backend-spec.md#environment-variables](../spec/03-backend-spec.md)*
   - [ ] Define settings for `default`, `development`, and `production` environments
-- [ ] Populate `backend/settings.yaml` with default configuration — *See [11-conf-spec.md](../SPEC/11-conf-spec.md)*:
+- [ ] Populate `backend/settings.yaml` with default configuration — *See [11-conf-spec.md](../spec/11-conf-spec.md)*:
   - [ ] `app_name`: "Arc Reactor"
   - [ ] `gcp_project`: GCP project ID
   - [ ] `gcp_region`: "us-west1"
-  - [ ] `nextflow_bucket`: Bucket name for runs — *See [06-data-model-spec.md#google-cloud-storage](../SPEC/06-data-model-spec.md)*
-  - [ ] `nextflow_service_account`: Service account email — *See [08-security-spec.md#service-account-permissions](../SPEC/08-security-spec.md)*
+  - [ ] `nextflow_bucket`: Bucket name for runs — *See [06-data-model-spec.md#google-cloud-storage](../spec/06-data-model-spec.md)*
+  - [ ] `nextflow_service_account`: Service account email — *See [08-security-spec.md#service-account-permissions](../spec/08-security-spec.md)*
   - [ ] `orchestrator_image`: Container image URI
-  - [ ] `benchling_warehouse_host`: Benchling DB host — *See [07-integration-spec.md#benchling-integration](../SPEC/07-integration-spec.md)*
+  - [ ] `benchling_warehouse_host`: Benchling DB host — *See [07-integration-spec.md#benchling-integration](../spec/07-integration-spec.md)*
   - [ ] `benchling_warehouse_db`: Database name
-  - [ ] `gemini_model`: "gemini-3-flash-preview" — *See [11-conf-spec.md#ai-model-configuration](../SPEC/11-conf-spec.md)*
-  - [ ] `gemini_thinking_level`: "low" — *See [11-conf-spec.md#thinking-level-options](../SPEC/11-conf-spec.md)*
+  - [ ] `gemini_model`: "gemini-3-flash-preview" — *See [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md)*
+  - [ ] `gemini_thinking_level`: "low" — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
   - [ ] `frontend_out_dir`: Path to static frontend build
-  - [ ] `cors_allowed_origins`: List of allowed origins — *See [03-backend-spec.md#cors-configuration](../SPEC/03-backend-spec.md)*
-  - [ ] Circuit breaker thresholds for Benchling and Gemini — *See [07-integration-spec.md#circuit-breakers](../SPEC/07-integration-spec.md)*
+  - [ ] `cors_allowed_origins`: List of allowed origins — *See [03-backend-spec.md#cors-configuration](../spec/03-backend-spec.md)*
+  - [ ] Circuit breaker thresholds for Benchling and Gemini — *See [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md)*
 - [ ] Implement basic FastAPI application in `backend/main.py`:
   - [ ] Create FastAPI app instance with metadata
-  - [ ] Configure CORS middleware with settings — *See [03-backend-spec.md#cors-configuration](../SPEC/03-backend-spec.md)*
+  - [ ] Configure CORS middleware with settings — *See [03-backend-spec.md#cors-configuration](../spec/03-backend-spec.md)*
   - [ ] Add lifespan context manager for startup/shutdown
   - [ ] Mount API routers (placeholder)
-  - [ ] Configure static file serving for frontend — *See [03-backend-spec.md#frontend-integration](../SPEC/03-backend-spec.md)*
+  - [ ] Configure static file serving for frontend — *See [03-backend-spec.md#frontend-integration](../spec/03-backend-spec.md)*
 
 ### Frontend Setup (Next.js)
 
 > **Spec References:**
-> - [04-frontend-spec.md#framework](../SPEC/04-frontend-spec.md) - Next.js 14 with App Router
-> - [04-frontend-spec.md#static-export](../SPEC/04-frontend-spec.md) - Static export configuration
-> - [04-frontend-spec.md#styling](../SPEC/04-frontend-spec.md) - Tailwind CSS and HeroUI
+> - [04-frontend-spec.md#framework](../spec/04-frontend-spec.md) - Next.js 14 with App Router
+> - [04-frontend-spec.md#static-export](../spec/04-frontend-spec.md) - Static export configuration
+> - [04-frontend-spec.md#styling](../spec/04-frontend-spec.md) - Tailwind CSS and HeroUI
 
 - [ ] Initialize Next.js 14 project with TypeScript in `frontend/`
 - [ ] Configure `next.config.js`:
-  - [ ] Enable static export (`output: 'export'`) — *See [04-frontend-spec.md#static-export](../SPEC/04-frontend-spec.md)*
+  - [ ] Enable static export (`output: 'export'`) — *See [04-frontend-spec.md#static-export](../spec/04-frontend-spec.md)*
   - [ ] Configure base path if needed
   - [ ] Set image optimization settings
-- [ ] Install and configure Tailwind CSS — *See [04-frontend-spec.md#styling](../SPEC/04-frontend-spec.md)*:
+- [ ] Install and configure Tailwind CSS — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*:
   - [ ] Create `tailwind.config.js` with Arc brand colors
   - [ ] Configure content paths for purging
   - [ ] Add Tailwind plugins: `@tailwindcss/forms`, `@tailwindcss/typography`
   - [ ] Create `globals.css` with Tailwind directives and base styles
-- [ ] Install HeroUI component library — *See [04-frontend-spec.md#styling](../SPEC/04-frontend-spec.md)*
+- [ ] Install HeroUI component library — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*
 - [ ] Install additional dependencies:
-  - [ ] `@tanstack/react-query` for server state — *See [04-frontend-spec.md#state-management](../SPEC/04-frontend-spec.md)*
-  - [ ] `zustand` for client state — *See [04-frontend-spec.md#state-management](../SPEC/04-frontend-spec.md)*
-  - [ ] `axios` for HTTP requests — *See [04-frontend-spec.md#api-client](../SPEC/04-frontend-spec.md)*
-  - [ ] `ai` (Vercel AI SDK) for chat interface — *See [04-frontend-spec.md#useagentchat-hook](../SPEC/04-frontend-spec.md)*
-  - [ ] `handsontable` and `@handsontable/react` for spreadsheet — *See [04-frontend-spec.md#samplesheeteditor](../SPEC/04-frontend-spec.md)*
-  - [ ] `@monaco-editor/react` for code editor — *See [04-frontend-spec.md#configeditor](../SPEC/04-frontend-spec.md)*
-- [ ] Create root layout (`app/layout.tsx`) — *See [04-frontend-spec.md#root-layout](../SPEC/04-frontend-spec.md)*:
+  - [ ] `@tanstack/react-query` for server state — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*
+  - [ ] `zustand` for client state — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*
+  - [ ] `axios` for HTTP requests — *See [04-frontend-spec.md#api-client](../spec/04-frontend-spec.md)*
+  - [ ] `ai` (Vercel AI SDK) for chat interface — *See [04-frontend-spec.md#useagentchat-hook](../spec/04-frontend-spec.md)*
+  - [ ] `handsontable` and `@handsontable/react` for spreadsheet — *See [04-frontend-spec.md#samplesheeteditor](../spec/04-frontend-spec.md)*
+  - [ ] `@monaco-editor/react` for code editor — *See [04-frontend-spec.md#configeditor](../spec/04-frontend-spec.md)*
+- [ ] Create root layout (`app/layout.tsx`) — *See [04-frontend-spec.md#root-layout](../spec/04-frontend-spec.md)*:
   - [ ] Set up HTML document structure
   - [ ] Add global providers (query client, theme)
   - [ ] Configure metadata (title, description)
-- [ ] Create placeholder pages — *See [04-frontend-spec.md#page-structure](../SPEC/04-frontend-spec.md)*:
+- [ ] Create placeholder pages — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*:
   - [ ] `app/page.tsx` - Home/redirect
   - [ ] `app/workspace/page.tsx` - Main workspace
   - [ ] `app/runs/page.tsx` - Run history
@@ -157,10 +157,10 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### Docker Development Environment
 
 > **Spec References:**
-> - [09-deployment-spec.md#dockerfile](../SPEC/09-deployment-spec.md) - Production Dockerfile
-> - [09-deployment-spec.md#container-build](../SPEC/09-deployment-spec.md) - Multi-stage build
+> - [09-deployment-spec.md#dockerfile](../spec/09-deployment-spec.md) - Production Dockerfile
+> - [09-deployment-spec.md#container-build](../spec/09-deployment-spec.md) - Multi-stage build
 
-- [ ] Create `Dockerfile` for production build — *See [09-deployment-spec.md#dockerfile](../SPEC/09-deployment-spec.md)*:
+- [ ] Create `Dockerfile` for production build — *See [09-deployment-spec.md#dockerfile](../spec/09-deployment-spec.md)*:
   - [ ] Stage 1: Build frontend with Node.js
   - [ ] Stage 2: Python runtime with backend
   - [ ] Copy built frontend to backend serving directory
@@ -194,43 +194,43 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ## Phase 1.2: GCP Infrastructure & CI/CD
 
 > **Spec References:**
-> - [02-architecture-overview.md#cloud-native-serverless](../SPEC/02-architecture-overview.md) - Cloud architecture
-> - [08-security-spec.md#service-account-permissions](../SPEC/08-security-spec.md) - IAM configuration
-> - [09-deployment-spec.md#infrastructure-components](../SPEC/09-deployment-spec.md) - GCP resources
-> - [09-deployment-spec.md#github-actions-cicd](../SPEC/09-deployment-spec.md) - CI/CD pipeline
+> - [02-architecture-overview.md#cloud-native-serverless](../spec/02-architecture-overview.md) - Cloud architecture
+> - [08-security-spec.md#service-account-permissions](../spec/08-security-spec.md) - IAM configuration
+> - [09-deployment-spec.md#infrastructure-components](../spec/09-deployment-spec.md) - GCP resources
+> - [09-deployment-spec.md#github-actions-cicd](../spec/09-deployment-spec.md) - CI/CD pipeline
 
 ### GCP Project Resources
 
 - [ ] Create or configure GCP project for Arc Reactor
 - [ ] Enable required GCP APIs:
-  - [ ] Cloud Run API — *See [02-architecture-overview.md#web-application-layer](../SPEC/02-architecture-overview.md)*
-  - [ ] Cloud SQL Admin API — *See [02-architecture-overview.md#data-layer](../SPEC/02-architecture-overview.md)*
-  - [ ] Cloud Storage API — *See [02-architecture-overview.md#data-layer](../SPEC/02-architecture-overview.md)*
-  - [ ] Cloud Batch API — *See [02-architecture-overview.md#compute-layer](../SPEC/02-architecture-overview.md)*
-  - [ ] Secret Manager API — *See [08-security-spec.md#secret-management](../SPEC/08-security-spec.md)*
+  - [ ] Cloud Run API — *See [02-architecture-overview.md#web-application-layer](../spec/02-architecture-overview.md)*
+  - [ ] Cloud SQL Admin API — *See [02-architecture-overview.md#data-layer](../spec/02-architecture-overview.md)*
+  - [ ] Cloud Storage API — *See [02-architecture-overview.md#data-layer](../spec/02-architecture-overview.md)*
+  - [ ] Cloud Batch API — *See [02-architecture-overview.md#compute-layer](../spec/02-architecture-overview.md)*
+  - [ ] Secret Manager API — *See [08-security-spec.md#secret-management](../spec/08-security-spec.md)*
   - [ ] Cloud Logging API
-  - [ ] Identity-Aware Proxy API — *See [08-security-spec.md#identity-aware-proxy-iap](../SPEC/08-security-spec.md)*
+  - [ ] Identity-Aware Proxy API — *See [08-security-spec.md#identity-aware-proxy-iap](../spec/08-security-spec.md)*
   - [ ] Artifact Registry API (for container images)
 
 ### Service Accounts & IAM
 
 > **Spec References:**
-> - [08-security-spec.md#service-account-permissions](../SPEC/08-security-spec.md) - Complete IAM roles
+> - [08-security-spec.md#service-account-permissions](../spec/08-security-spec.md) - Complete IAM roles
 
-- [ ] Create Cloud Run service account (`arc-reactor@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#cloud-run-service-account](../SPEC/08-security-spec.md)*:
+- [ ] Create Cloud Run service account (`arc-reactor@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#cloud-run-service-account](../spec/08-security-spec.md)*:
   - [ ] Grant `roles/cloudsql.client`
   - [ ] Grant `roles/storage.objectAdmin` for pipeline bucket
   - [ ] Grant `roles/storage.objectViewer` for NGS data bucket
   - [ ] Grant `roles/batch.jobsEditor`
   - [ ] Grant `roles/logging.logWriter`
   - [ ] Grant `roles/secretmanager.secretAccessor`
-- [ ] Create Batch orchestrator service account (`nextflow-orchestrator@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#batch-orchestrator-service-account](../SPEC/08-security-spec.md)*:
+- [ ] Create Batch orchestrator service account (`nextflow-orchestrator@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#batch-orchestrator-service-account](../spec/08-security-spec.md)*:
   - [ ] Grant `roles/cloudsql.client`
   - [ ] Grant `roles/storage.objectAdmin` for pipeline bucket
   - [ ] Grant `roles/storage.objectViewer` for NGS data bucket
   - [ ] Grant `roles/batch.jobsEditor`
   - [ ] Grant `roles/logging.logWriter`
-- [ ] Create Nextflow tasks service account (`nextflow-tasks@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#nextflow-tasks-service-account](../SPEC/08-security-spec.md)*:
+- [ ] Create Nextflow tasks service account (`nextflow-tasks@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#nextflow-tasks-service-account](../spec/08-security-spec.md)*:
   - [ ] Grant `roles/storage.objectAdmin` for work directory
   - [ ] Grant `roles/storage.objectViewer` for NGS data bucket
   - [ ] Grant `roles/logging.logWriter`
@@ -238,17 +238,17 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### Cloud SQL (PostgreSQL)
 
 > **Spec References:**
-> - [06-data-model-spec.md#cloud-sql-postgresql](../SPEC/06-data-model-spec.md) - Database schema
-> - [07-integration-spec.md#cloud-sql-postgresql-integration](../SPEC/07-integration-spec.md) - Connection configuration
-> - [09-deployment-spec.md#cloud-sql-postgresql](../SPEC/09-deployment-spec.md) - Instance settings
+> - [06-data-model-spec.md#cloud-sql-postgresql](../spec/06-data-model-spec.md) - Database schema
+> - [07-integration-spec.md#cloud-sql-postgresql-integration](../spec/07-integration-spec.md) - Connection configuration
+> - [09-deployment-spec.md#cloud-sql-postgresql](../spec/09-deployment-spec.md) - Instance settings
 
 - [ ] Create Cloud SQL PostgreSQL instance for dev environment:
   - [ ] Instance name: `arc-reactor-db-dev`
   - [ ] PostgreSQL version: 15
   - [ ] Region: `us-west1`
   - [ ] Machine type: `db-f1-micro` for dev
-  - [ ] Enable private IP — *See [07-integration-spec.md#connection-configuration](../SPEC/07-integration-spec.md)*
-  - [ ] Configure automated backups — *See [06-data-model-spec.md#backup-and-recovery](../SPEC/06-data-model-spec.md)*
+  - [ ] Enable private IP — *See [07-integration-spec.md#connection-configuration](../spec/07-integration-spec.md)*
+  - [ ] Configure automated backups — *See [06-data-model-spec.md#backup-and-recovery](../spec/06-data-model-spec.md)*
 - [ ] Create Cloud SQL PostgreSQL instance for prod environment:
   - [ ] Instance name: `arc-reactor-db`
   - [ ] Same configuration as dev but larger machine type
@@ -258,15 +258,15 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### GCS Buckets
 
 > **Spec References:**
-> - [06-data-model-spec.md#google-cloud-storage](../SPEC/06-data-model-spec.md) - Bucket structure and lifecycle
-> - [07-integration-spec.md#google-cloud-storage-integration](../SPEC/07-integration-spec.md) - GCS operations
+> - [06-data-model-spec.md#google-cloud-storage](../spec/06-data-model-spec.md) - Bucket structure and lifecycle
+> - [07-integration-spec.md#google-cloud-storage-integration](../spec/07-integration-spec.md) - GCS operations
 
-- [ ] Create dev runs bucket (`arc-reactor-runs-dev`) — *See [06-data-model-spec.md#bucket-structure](../SPEC/06-data-model-spec.md)*:
+- [ ] Create dev runs bucket (`arc-reactor-runs-dev`) — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
   - [ ] Region: `us-west1`
   - [ ] Uniform bucket-level access enabled
-  - [ ] Configure lifecycle policy for `runs/*/work/` (30-day deletion) — *See [06-data-model-spec.md#file-lifecycle](../SPEC/06-data-model-spec.md)*
+  - [ ] Configure lifecycle policy for `runs/*/work/` (30-day deletion) — *See [06-data-model-spec.md#file-lifecycle](../spec/06-data-model-spec.md)*
   - [ ] Enable versioning for `inputs/` and `results/` paths
-  - [ ] Configure soft delete with 7-day recovery — *See [06-data-model-spec.md#backup-and-recovery](../SPEC/06-data-model-spec.md)*
+  - [ ] Configure soft delete with 7-day recovery — *See [06-data-model-spec.md#backup-and-recovery](../spec/06-data-model-spec.md)*
 - [ ] Create prod runs bucket (`arc-reactor-runs`):
   - [ ] Same configuration as dev bucket
 - [ ] Configure IAM bindings for service accounts
@@ -274,12 +274,12 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### Secret Manager
 
 > **Spec References:**
-> - [08-security-spec.md#secret-management](../SPEC/08-security-spec.md) - Secret storage
+> - [08-security-spec.md#secret-management](../spec/08-security-spec.md) - Secret storage
 
 - [ ] Create secret for Benchling warehouse password:
   - [ ] Secret name: `benchling-warehouse-password`
   - [ ] Add secret version with actual password
-- [ ] Create secret for Google API key — *See [11-conf-spec.md#environment-variables](../SPEC/11-conf-spec.md)*:
+- [ ] Create secret for Google API key — *See [11-conf-spec.md#environment-variables](../spec/11-conf-spec.md)*:
   - [ ] Secret name: `google-api-key`
   - [ ] Add secret version with Gemini API key
 - [ ] Grant secret accessor role to Cloud Run service account
@@ -287,15 +287,15 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### VPC & Networking
 
 > **Spec References:**
-> - [08-security-spec.md#network-security](../SPEC/08-security-spec.md) - VPC configuration
-> - [08-security-spec.md#egress-controls](../SPEC/08-security-spec.md) - Allowed destinations
+> - [08-security-spec.md#network-security](../spec/08-security-spec.md) - VPC configuration
+> - [08-security-spec.md#egress-controls](../spec/08-security-spec.md) - Allowed destinations
 
 - [ ] Create or configure VPC network for Arc Reactor
 - [ ] Create Serverless VPC Connector for Cloud Run:
   - [ ] Region: `us-west1`
   - [ ] Configure IP range
 - [ ] Configure Cloud NAT for egress traffic
-- [ ] Configure firewall rules — *See [08-security-spec.md#firewall-rules](../SPEC/08-security-spec.md)*:
+- [ ] Configure firewall rules — *See [08-security-spec.md#firewall-rules](../spec/08-security-spec.md)*:
   - [ ] Allow IAP ranges to Cloud Run
   - [ ] Allow internal VPC traffic
   - [ ] Default deny all other ingress
@@ -303,13 +303,13 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### IAP Configuration
 
 > **Spec References:**
-> - [07-integration-spec.md#gcp-iap-integration](../SPEC/07-integration-spec.md) - IAP authentication flow
-> - [08-security-spec.md#identity-aware-proxy-iap](../SPEC/08-security-spec.md) - IAP settings
+> - [07-integration-spec.md#gcp-iap-integration](../spec/07-integration-spec.md) - IAP authentication flow
+> - [08-security-spec.md#identity-aware-proxy-iap](../spec/08-security-spec.md) - IAP settings
 
 - [ ] Configure Cloud Run backend service for IAP:
   - [ ] Enable IAP on the backend service
   - [ ] Configure OAuth consent screen
-- [ ] Create IAP access policy — *See [08-security-spec.md#authorized-groups](../SPEC/08-security-spec.md)*:
+- [ ] Create IAP access policy — *See [08-security-spec.md#authorized-groups](../spec/08-security-spec.md)*:
   - [ ] Create Google Group for users (`arc-reactor-users@arcinstitute.org`)
   - [ ] Create Google Group for admins (`arc-reactor-admins@arcinstitute.org`)
   - [ ] Grant `roles/iap.httpsResourceAccessor` to user group
@@ -317,7 +317,7 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### GitHub Actions CI/CD
 
 > **Spec References:**
-> - [09-deployment-spec.md#github-actions-workflow](../SPEC/09-deployment-spec.md) - Complete workflow YAML
+> - [09-deployment-spec.md#github-actions-workflow](../spec/09-deployment-spec.md) - Complete workflow YAML
 
 - [ ] Create `.github/workflows/ci.yml` for pull request checks:
   - [ ] Checkout code
@@ -331,7 +331,7 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
   - [ ] Run ESLint
   - [ ] Run TypeScript type checking
   - [ ] Run frontend tests
-- [ ] Create `.github/workflows/deploy.yml` for deployment — *See [09-deployment-spec.md#github-actions-workflow](../SPEC/09-deployment-spec.md)*:
+- [ ] Create `.github/workflows/deploy.yml` for deployment — *See [09-deployment-spec.md#github-actions-workflow](../spec/09-deployment-spec.md)*:
   - [ ] Trigger on push to `main` and `develop` branches
   - [ ] Authenticate to GCP using service account key
   - [ ] Determine environment from branch (main=prod, develop=dev)
@@ -346,7 +346,7 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### Terraform Infrastructure as Code
 
 > **Spec References:**
-> - [09-deployment-spec.md#terraform-resources](../SPEC/09-deployment-spec.md) - Terraform examples
+> - [09-deployment-spec.md#terraform-resources](../spec/09-deployment-spec.md) - Terraform examples
 
 - [ ] Create `terraform/` directory structure:
   - [ ] `terraform/main.tf` - Main resources
@@ -354,7 +354,7 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
   - [ ] `terraform/outputs.tf` - Output values
   - [ ] `terraform/environments/dev.tfvars`
   - [ ] `terraform/environments/prod.tfvars`
-- [ ] Define Terraform resources — *See [09-deployment-spec.md#terraform-resources](../SPEC/09-deployment-spec.md)*:
+- [ ] Define Terraform resources — *See [09-deployment-spec.md#terraform-resources](../spec/09-deployment-spec.md)*:
   - [ ] Cloud Run service
   - [ ] Cloud SQL instance
   - [ ] GCS buckets
@@ -370,19 +370,19 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ## Phase 1.3: Core Service Integrations
 
 > **Spec References:**
-> - [07-integration-spec.md](../SPEC/07-integration-spec.md) - All external integrations
-> - [03-backend-spec.md#services](../SPEC/03-backend-spec.md) - Service layer design
+> - [07-integration-spec.md](../spec/07-integration-spec.md) - All external integrations
+> - [03-backend-spec.md#services](../spec/03-backend-spec.md) - Service layer design
 
 ### Benchling Data Warehouse Connection
 
 > **Spec References:**
-> - [07-integration-spec.md#benchling-integration](../SPEC/07-integration-spec.md) - Connection details
-> - [07-integration-spec.md#connection-pool](../SPEC/07-integration-spec.md) - Pool configuration
-> - [06-data-model-spec.md#benchling-data-warehouse](../SPEC/06-data-model-spec.md) - Available tables
+> - [07-integration-spec.md#benchling-integration](../spec/07-integration-spec.md) - Connection details
+> - [07-integration-spec.md#connection-pool](../spec/07-integration-spec.md) - Pool configuration
+> - [06-data-model-spec.md#benchling-data-warehouse](../spec/06-data-model-spec.md) - Available tables
 
-- [ ] Create `backend/services/benchling.py` — *See [03-backend-spec.md#benchlingservice](../SPEC/03-backend-spec.md)*:
+- [ ] Create `backend/services/benchling.py` — *See [03-backend-spec.md#benchlingservice](../spec/03-backend-spec.md)*:
   - [ ] Implement `BenchlingService` class
-  - [ ] Initialize connection pool with async SQLAlchemy — *See [07-integration-spec.md#connection-pool](../SPEC/07-integration-spec.md)*
+  - [ ] Initialize connection pool with async SQLAlchemy — *See [07-integration-spec.md#connection-pool](../spec/07-integration-spec.md)*
   - [ ] Configure connection parameters from settings
   - [ ] Set pool size to 5 connections
   - [ ] Set max overflow to 10
@@ -392,20 +392,20 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 - [ ] Implement basic query method:
   - [ ] Accept SQL query and parameters
   - [ ] Return results as DataFrame or dict
-  - [ ] Handle connection errors gracefully — *See [07-integration-spec.md#error-handling](../SPEC/07-integration-spec.md)*
+  - [ ] Handle connection errors gracefully — *See [07-integration-spec.md#error-handling](../spec/07-integration-spec.md)*
 - [ ] Implement connection health check method
 - [ ] Add unit tests for Benchling service with mocked database
 
 ### Cloud SQL (PostgreSQL) Connection
 
 > **Spec References:**
-> - [07-integration-spec.md#cloud-sql-postgresql-integration](../SPEC/07-integration-spec.md) - Connection configuration
+> - [07-integration-spec.md#cloud-sql-postgresql-integration](../spec/07-integration-spec.md) - Connection configuration
 
 - [ ] Create `backend/services/database.py`:
   - [ ] Configure async SQLAlchemy engine
-  - [ ] Support Cloud Run Unix socket connection — *See [07-integration-spec.md#cloud-run-unix-socket](../SPEC/07-integration-spec.md)*
+  - [ ] Support Cloud Run Unix socket connection — *See [07-integration-spec.md#cloud-run-unix-socket](../spec/07-integration-spec.md)*
   - [ ] Support local development with standard connection
-  - [ ] Set appropriate pool configuration — *See [07-integration-spec.md#connection-pool](../SPEC/07-integration-spec.md)*
+  - [ ] Set appropriate pool configuration — *See [07-integration-spec.md#connection-pool](../spec/07-integration-spec.md)*
 - [ ] Create async session factory
 - [ ] Implement database health check method
 - [ ] Create dependency for injecting database session
@@ -414,17 +414,17 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### GCS Storage Service
 
 > **Spec References:**
-> - [07-integration-spec.md#google-cloud-storage-integration](../SPEC/07-integration-spec.md) - GCS operations
-> - [03-backend-spec.md#storageservice](../SPEC/03-backend-spec.md) - Service interface
-> - [06-data-model-spec.md#object-metadata](../SPEC/06-data-model-spec.md) - File metadata
+> - [07-integration-spec.md#google-cloud-storage-integration](../spec/07-integration-spec.md) - GCS operations
+> - [03-backend-spec.md#storageservice](../spec/03-backend-spec.md) - Service interface
+> - [06-data-model-spec.md#object-metadata](../spec/06-data-model-spec.md) - File metadata
 
-- [ ] Create `backend/services/storage.py` — *See [03-backend-spec.md#storageservice](../SPEC/03-backend-spec.md)*:
+- [ ] Create `backend/services/storage.py` — *See [03-backend-spec.md#storageservice](../spec/03-backend-spec.md)*:
   - [ ] Implement `StorageService` class
   - [ ] Initialize Google Cloud Storage client
-- [ ] Implement file upload method — *See [07-integration-spec.md#file-upload](../SPEC/07-integration-spec.md)*:
+- [ ] Implement file upload method — *See [07-integration-spec.md#file-upload](../spec/07-integration-spec.md)*:
   - [ ] Accept run ID, filename, and content
   - [ ] Upload to `gs://{bucket}/runs/{run_id}/inputs/{filename}`
-  - [ ] Set custom metadata (run-id, user-email, created-at) — *See [06-data-model-spec.md#object-metadata](../SPEC/06-data-model-spec.md)*
+  - [ ] Set custom metadata (run-id, user-email, created-at) — *See [06-data-model-spec.md#object-metadata](../spec/06-data-model-spec.md)*
   - [ ] Return GCS URI
 - [ ] Implement file download method:
   - [ ] Accept GCS URI or path components
@@ -432,10 +432,10 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 - [ ] Implement file listing method:
   - [ ] List files under a given prefix
   - [ ] Return file info (name, size, updated time)
-- [ ] Implement file existence check — *See [07-integration-spec.md#file-existence-check](../SPEC/07-integration-spec.md)*:
+- [ ] Implement file existence check — *See [07-integration-spec.md#file-existence-check](../spec/07-integration-spec.md)*:
   - [ ] Accept list of GCS paths
   - [ ] Return dict mapping path to existence boolean
-- [ ] Implement signed URL generation — *See [07-integration-spec.md#signed-url-generation](../SPEC/07-integration-spec.md)*:
+- [ ] Implement signed URL generation — *See [07-integration-spec.md#signed-url-generation](../spec/07-integration-spec.md)*:
   - [ ] Generate V4 signed URLs for download
   - [ ] Configurable expiration (default 60 minutes)
 - [ ] Implement storage health check
@@ -444,29 +444,29 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### Google Gemini API Integration
 
 > **Spec References:**
-> - [07-integration-spec.md#google-gemini-api-integration](../SPEC/07-integration-spec.md) - API configuration
-> - [11-conf-spec.md#ai-model-configuration](../SPEC/11-conf-spec.md) - Model parameters
-> - [05-agentic-features-spec.md#agent-configuration](../SPEC/05-agentic-features-spec.md) - LangChain setup
+> - [07-integration-spec.md#google-gemini-api-integration](../spec/07-integration-spec.md) - API configuration
+> - [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md) - Model parameters
+> - [05-agentic-features-spec.md#agent-configuration](../spec/05-agentic-features-spec.md) - LangChain setup
 
 - [ ] Create `backend/services/gemini.py`:
-  - [ ] Configure LangChain with init_chat_model — *See [07-integration-spec.md#langchain-integration](../SPEC/07-integration-spec.md)*
-  - [ ] Use `google_genai:gemini-3-flash-preview` model — *See [11-conf-spec.md#ai-model-configuration](../SPEC/11-conf-spec.md)*
+  - [ ] Configure LangChain with init_chat_model — *See [07-integration-spec.md#langchain-integration](../spec/07-integration-spec.md)*
+  - [ ] Use `google_genai:gemini-3-flash-preview` model — *See [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md)*
   - [ ] Set temperature to 1.0 (required for thinking)
-  - [ ] Set thinking_level from settings — *See [11-conf-spec.md#thinking-level-options](../SPEC/11-conf-spec.md)*
-  - [ ] Support both API key and Vertex AI authentication — *See [07-integration-spec.md#authentication](../SPEC/07-integration-spec.md)*
+  - [ ] Set thinking_level from settings — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
+  - [ ] Support both API key and Vertex AI authentication — *See [07-integration-spec.md#authentication](../spec/07-integration-spec.md)*
 - [ ] Implement model initialization function
-- [ ] Implement streaming response method — *See [07-integration-spec.md#streaming](../SPEC/07-integration-spec.md)*
+- [ ] Implement streaming response method — *See [07-integration-spec.md#streaming](../spec/07-integration-spec.md)*
 - [ ] Implement Gemini health check (simple completion test)
-- [ ] Add error handling for rate limits and API errors — *See [07-integration-spec.md#error-handling](../SPEC/07-integration-spec.md)*
+- [ ] Add error handling for rate limits and API errors — *See [07-integration-spec.md#error-handling](../spec/07-integration-spec.md)*
 
 ### Circuit Breakers
 
 > **Spec References:**
-> - [07-integration-spec.md#circuit-breakers](../SPEC/07-integration-spec.md) - Circuit breaker configuration
+> - [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md) - Circuit breaker configuration
 
 - [ ] Create `backend/utils/circuit_breaker.py`:
   - [ ] Import circuitbreaker library
-  - [ ] Create circuit breaker decorator for Benchling — *See [07-integration-spec.md#circuit-breakers](../SPEC/07-integration-spec.md)*:
+  - [ ] Create circuit breaker decorator for Benchling — *See [07-integration-spec.md#circuit-breakers](../spec/07-integration-spec.md)*:
     - [ ] Failure threshold: 5
     - [ ] Recovery timeout: 30 seconds
   - [ ] Create circuit breaker decorator for Gemini:
@@ -480,14 +480,14 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 ### Health Check Endpoints
 
 > **Spec References:**
-> - [03-backend-spec.md#health-endpoints](../SPEC/03-backend-spec.md) - Endpoint specifications
-> - [07-integration-spec.md#integration-health-checks](../SPEC/07-integration-spec.md) - Health check implementation
+> - [03-backend-spec.md#health-endpoints](../spec/03-backend-spec.md) - Endpoint specifications
+> - [07-integration-spec.md#integration-health-checks](../spec/07-integration-spec.md) - Health check implementation
 
-- [ ] Create `backend/api/routes/health.py` — *See [03-backend-spec.md#health-endpoints](../SPEC/03-backend-spec.md)*:
+- [ ] Create `backend/api/routes/health.py` — *See [03-backend-spec.md#health-endpoints](../spec/03-backend-spec.md)*:
   - [ ] Implement `GET /health` endpoint:
     - [ ] Return basic health status
     - [ ] Include service name and version
-  - [ ] Implement `GET /ready` endpoint — *See [07-integration-spec.md#readiness-check](../SPEC/07-integration-spec.md)*:
+  - [ ] Implement `GET /ready` endpoint — *See [07-integration-spec.md#readiness-check](../spec/07-integration-spec.md)*:
     - [ ] Check Benchling connection (non-critical)
     - [ ] Check PostgreSQL connection (critical)
     - [ ] Check GCS connection (critical)

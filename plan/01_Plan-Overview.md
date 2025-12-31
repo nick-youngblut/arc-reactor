@@ -16,22 +16,22 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 
 ### Phase 1.1: Project Scaffolding & Development Environment
 - Initialize monorepo structure (`backend/`, `frontend/`)
-- Set up FastAPI backend with Dynaconf configuration per [03-backend-spec.md](../SPEC/03-backend-spec.md)
-- Set up Next.js 14 frontend with App Router and static export configuration per [04-frontend-spec.md](../SPEC/04-frontend-spec.md)
+- Set up FastAPI backend with Dynaconf configuration per [03-backend-spec.md](../spec/03-backend-spec.md)
+- Set up Next.js 14 frontend with App Router and static export configuration per [04-frontend-spec.md](../spec/04-frontend-spec.md)
 - Configure development tooling (Black, Ruff, ESLint, Prettier)
 - Create Docker development environment
 - Establish `GEMINI.md` repository guidelines
 
 ### Phase 1.2: GCP Infrastructure & CI/CD
 - Set up GCP project resources (Cloud Run, Cloud SQL, GCS buckets, Secret Manager)
-- Configure service accounts and IAM permissions per [08-security-spec.md](../SPEC/08-security-spec.md)
-- Implement GitHub Actions CI/CD pipeline per [09-deployment-spec.md](../SPEC/09-deployment-spec.md)
+- Configure service accounts and IAM permissions per [08-security-spec.md](../spec/08-security-spec.md)
+- Implement GitHub Actions CI/CD pipeline per [09-deployment-spec.md](../spec/09-deployment-spec.md)
 - Set up dev and prod environments with Terraform
 - Configure Cloud SQL PostgreSQL instances
 - Enable GCP IAP authentication
 
 ### Phase 1.3: Core Service Integrations
-- Implement Benchling data warehouse connection service per [07-integration-spec.md](../SPEC/07-integration-spec.md)
+- Implement Benchling data warehouse connection service per [07-integration-spec.md](../spec/07-integration-spec.md)
 - Set up Cloud SQL (PostgreSQL) connection with async SQLAlchemy
 - Implement GCS storage service for file operations
 - Configure Google Gemini API integration
@@ -45,10 +45,10 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - Basic health monitoring
 
 **References:**
-- [02-architecture-overview.md](../SPEC/02-architecture-overview.md) - System architecture
-- [03-backend-spec.md](../SPEC/03-backend-spec.md) - Backend configuration
-- [07-integration-spec.md](../SPEC/07-integration-spec.md) - Service integrations
-- [09-deployment-spec.md](../SPEC/09-deployment-spec.md) - Deployment procedures
+- [02-architecture-overview.md](../spec/02-architecture-overview.md) - System architecture
+- [03-backend-spec.md](../spec/03-backend-spec.md) - Backend configuration
+- [07-integration-spec.md](../spec/07-integration-spec.md) - Service integrations
+- [09-deployment-spec.md](../spec/09-deployment-spec.md) - Deployment procedures
 
 ---
 
@@ -59,14 +59,14 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 **Estimated Duration:** 2-3 phases
 
 ### Phase 2.1: Data Models & Persistence Layer
-- Implement PostgreSQL schema for `runs`, `users`, and `checkpoints` tables per [06-data-model-spec.md](../SPEC/06-data-model-spec.md)
+- Implement PostgreSQL schema for `runs`, `users`, and `checkpoints` tables per [06-data-model-spec.md](../spec/06-data-model-spec.md)
 - Create SQLAlchemy async models with Pydantic validation
 - Implement `RunStoreService` for run persistence
 - Implement user profile persistence (on-login upsert)
 - Set up database migrations with Alembic
 
 ### Phase 2.2: Core REST API Endpoints
-- Implement run management endpoints (`/api/runs`) per [03-backend-spec.md](../SPEC/03-backend-spec.md)
+- Implement run management endpoints (`/api/runs`) per [03-backend-spec.md](../spec/03-backend-spec.md)
   - List runs with filtering and pagination
   - Get run details
   - Create run (pending state)
@@ -79,7 +79,7 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - Implement SSE endpoint for run status updates (`/api/runs/{id}/events`)
 
 ### Phase 2.3: Log Service & File Management
-- Implement log service per [03-backend-spec.md](../SPEC/03-backend-spec.md)
+- Implement log service per [03-backend-spec.md](../spec/03-backend-spec.md)
   - Workflow log streaming from GCS
   - Task list parsing from trace.txt
   - Per-task log retrieval from Cloud Logging
@@ -94,9 +94,9 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - Log access and streaming
 
 **References:**
-- [03-backend-spec.md](../SPEC/03-backend-spec.md) - API specifications
-- [06-data-model-spec.md](../SPEC/06-data-model-spec.md) - Data models
-- [12-recovery-spec.md](../SPEC/12-recovery-spec.md) - Recovery workflow
+- [03-backend-spec.md](../spec/03-backend-spec.md) - API specifications
+- [06-data-model-spec.md](../spec/06-data-model-spec.md) - Data models
+- [12-recovery-spec.md](../spec/12-recovery-spec.md) - Recovery workflow
 
 ---
 
@@ -107,8 +107,8 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 **Estimated Duration:** 4-5 phases
 
 ### Phase 3.1: Agent Foundation
-- Set up LangChain v1 with DeepAgents framework per [05-agentic-features-spec.md](../SPEC/05-agentic-features-spec.md)
-- Configure Gemini 3 Flash model with thinking levels per [11-conf-spec.md](../SPEC/11-conf-spec.md)
+- Set up LangChain v1 with DeepAgents framework per [05-agentic-features-spec.md](../spec/05-agentic-features-spec.md)
+- Configure Gemini 3 Flash model with thinking levels per [11-conf-spec.md](../spec/11-conf-spec.md)
 - Implement system prompt and agent configuration
 - Set up AsyncPostgresSaver checkpointer for conversation state
 - Implement WebSocket chat endpoint with AI SDK streaming format
@@ -164,9 +164,9 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - Conversation state persistence
 
 **References:**
-- [05-agentic-features-spec.md](../SPEC/05-agentic-features-spec.md) - Agent architecture and tools
-- [11-conf-spec.md](../SPEC/11-conf-spec.md) - AI model configuration
-- [07-integration-spec.md](../SPEC/07-integration-spec.md) - Gemini API integration
+- [05-agentic-features-spec.md](../spec/05-agentic-features-spec.md) - Agent architecture and tools
+- [11-conf-spec.md](../spec/11-conf-spec.md) - AI model configuration
+- [07-integration-spec.md](../spec/07-integration-spec.md) - Gemini API integration
 
 ---
 
@@ -177,7 +177,7 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 **Estimated Duration:** 4-5 phases
 
 ### Phase 4.1: Layout & Core Components
-- Implement root layout with providers per [04-frontend-spec.md](../SPEC/04-frontend-spec.md)
+- Implement root layout with providers per [04-frontend-spec.md](../spec/04-frontend-spec.md)
 - Create layout components (Header, Sidebar, Footer)
 - Set up Tailwind CSS with Arc brand colors
 - Configure HeroUI component library
@@ -207,7 +207,7 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - Implement SubmitPanel with validation display
 
 ### Phase 4.4: Run Management Pages
-- Implement Runs page (`/runs`) per [04-frontend-spec.md](../SPEC/04-frontend-spec.md):
+- Implement Runs page (`/runs`) per [04-frontend-spec.md](../spec/04-frontend-spec.md):
   - RunList with sortable columns and filtering
   - RunCard components
   - Pagination
@@ -226,7 +226,7 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
   - Log search/filter
   - LogLine with syntax highlighting
   - Download logs action
-- Implement recovery modal per [12-recovery-spec.md](../SPEC/12-recovery-spec.md):
+- Implement recovery modal per [12-recovery-spec.md](../spec/12-recovery-spec.md):
   - Recovery confirmation with work directory reuse
   - Optional notes and parameter overrides
   - Recovery submission flow
@@ -239,9 +239,9 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - Responsive design (desktop, tablet, mobile)
 
 **References:**
-- [04-frontend-spec.md](../SPEC/04-frontend-spec.md) - Frontend components and state
-- [10-ux-spec.md](../SPEC/10-ux-spec.md) - UX patterns and interaction design
-- [12-recovery-spec.md](../SPEC/12-recovery-spec.md) - Recovery UI requirements
+- [04-frontend-spec.md](../spec/04-frontend-spec.md) - Frontend components and state
+- [10-ux-spec.md](../spec/10-ux-spec.md) - UX patterns and interaction design
+- [12-recovery-spec.md](../spec/12-recovery-spec.md) - Recovery UI requirements
 
 ---
 
@@ -252,7 +252,7 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 **Estimated Duration:** 2-3 phases
 
 ### Phase 5.1: GCP Batch Job Management
-- Implement BatchService per [07-integration-spec.md](../SPEC/07-integration-spec.md):
+- Implement BatchService per [07-integration-spec.md](../spec/07-integration-spec.md):
   - Job submission with proper configuration
   - Job status monitoring
   - Job cancellation
@@ -263,7 +263,7 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - Implement job label strategy for log filtering
 
 ### Phase 5.2: Nextflow Orchestrator Container
-- Build orchestrator Docker image per [09-deployment-spec.md](../SPEC/09-deployment-spec.md)
+- Build orchestrator Docker image per [09-deployment-spec.md](../spec/09-deployment-spec.md)
 - Implement entrypoint script with:
   - Configuration download from GCS
   - Nextflow execution
@@ -288,9 +288,9 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - Proper cleanup and lifecycle management
 
 **References:**
-- [07-integration-spec.md](../SPEC/07-integration-spec.md) - GCP Batch integration
-- [06-data-model-spec.md](../SPEC/06-data-model-spec.md) - Status update mechanism
-- [12-recovery-spec.md](../SPEC/12-recovery-spec.md) - Recovery orchestration
+- [07-integration-spec.md](../spec/07-integration-spec.md) - GCP Batch integration
+- [06-data-model-spec.md](../spec/06-data-model-spec.md) - Status update mechanism
+- [12-recovery-spec.md](../spec/12-recovery-spec.md) - Recovery orchestration
 
 ---
 
@@ -301,7 +301,7 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 **Estimated Duration:** 2-3 phases
 
 ### Phase 6.1: Security Hardening
-- Implement complete IAP integration per [08-security-spec.md](../SPEC/08-security-spec.md):
+- Implement complete IAP integration per [08-security-spec.md](../spec/08-security-spec.md):
   - JWT verification
   - User context extraction
   - Session management
@@ -325,12 +325,12 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - Performance testing and optimization
 
 ### Phase 6.3: Polish & Production Launch
-- Implement UX polish per [10-ux-spec.md](../SPEC/10-ux-spec.md):
+- Implement UX polish per [10-ux-spec.md](../spec/10-ux-spec.md):
   - Onboarding flow for first-time users
   - Empty states and loading states
   - Toast notifications and feedback
   - Accessibility improvements (WCAG 2.1 AA)
-- Set up monitoring and alerting per [09-deployment-spec.md](../SPEC/09-deployment-spec.md)
+- Set up monitoring and alerting per [09-deployment-spec.md](../spec/09-deployment-spec.md)
 - Documentation (user guide, API docs, runbooks)
 - Production deployment and DNS configuration
 - Gradual rollout to pilot users
@@ -343,9 +343,9 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - User documentation
 
 **References:**
-- [08-security-spec.md](../SPEC/08-security-spec.md) - Security requirements
-- [09-deployment-spec.md](../SPEC/09-deployment-spec.md) - Production deployment
-- [10-ux-spec.md](../SPEC/10-ux-spec.md) - UX polish
+- [08-security-spec.md](../spec/08-security-spec.md) - Security requirements
+- [09-deployment-spec.md](../spec/09-deployment-spec.md) - Production deployment
+- [10-ux-spec.md](../spec/10-ux-spec.md) - UX polish
 
 ---
 
@@ -389,7 +389,7 @@ Sprint 3 (AI Agent)       Sprint 4 (Frontend)
 
 ## Out of Scope for MVP
 
-Per [01-project-overview.md](../SPEC/01-project-overview.md), the following are explicitly out of scope:
+Per [01-project-overview.md](../spec/01-project-overview.md), the following are explicitly out of scope:
 
 - Multiple pipeline support (beyond nf-core/scrnaseq)
 - Collaborative editing
@@ -419,15 +419,15 @@ Per [01-project-overview.md](../SPEC/01-project-overview.md), the following are 
 
 | Specification | Primary Sprints |
 |---------------|-----------------|
-| [01-project-overview.md](../SPEC/01-project-overview.md) | All sprints (scope) |
-| [02-architecture-overview.md](../SPEC/02-architecture-overview.md) | Sprint 1, 2, 5 |
-| [03-backend-spec.md](../SPEC/03-backend-spec.md) | Sprint 1, 2, 3 |
-| [04-frontend-spec.md](../SPEC/04-frontend-spec.md) | Sprint 4 |
-| [05-agentic-features-spec.md](../SPEC/05-agentic-features-spec.md) | Sprint 3 |
-| [06-data-model-spec.md](../SPEC/06-data-model-spec.md) | Sprint 2, 5 |
-| [07-integration-spec.md](../SPEC/07-integration-spec.md) | Sprint 1, 3, 5 |
-| [08-security-spec.md](../SPEC/08-security-spec.md) | Sprint 1, 6 |
-| [09-deployment-spec.md](../SPEC/09-deployment-spec.md) | Sprint 1, 5, 6 |
-| [10-ux-spec.md](../SPEC/10-ux-spec.md) | Sprint 4, 6 |
-| [11-conf-spec.md](../SPEC/11-conf-spec.md) | Sprint 3 |
-| [12-recovery-spec.md](../SPEC/12-recovery-spec.md) | Sprint 2, 4, 5 |
+| [01-project-overview.md](../spec/01-project-overview.md) | All sprints (scope) |
+| [02-architecture-overview.md](../spec/02-architecture-overview.md) | Sprint 1, 2, 5 |
+| [03-backend-spec.md](../spec/03-backend-spec.md) | Sprint 1, 2, 3 |
+| [04-frontend-spec.md](../spec/04-frontend-spec.md) | Sprint 4 |
+| [05-agentic-features-spec.md](../spec/05-agentic-features-spec.md) | Sprint 3 |
+| [06-data-model-spec.md](../spec/06-data-model-spec.md) | Sprint 2, 5 |
+| [07-integration-spec.md](../spec/07-integration-spec.md) | Sprint 1, 3, 5 |
+| [08-security-spec.md](../spec/08-security-spec.md) | Sprint 1, 6 |
+| [09-deployment-spec.md](../spec/09-deployment-spec.md) | Sprint 1, 5, 6 |
+| [10-ux-spec.md](../spec/10-ux-spec.md) | Sprint 4, 6 |
+| [11-conf-spec.md](../spec/11-conf-spec.md) | Sprint 3 |
+| [12-recovery-spec.md](../spec/12-recovery-spec.md) | Sprint 2, 4, 5 |

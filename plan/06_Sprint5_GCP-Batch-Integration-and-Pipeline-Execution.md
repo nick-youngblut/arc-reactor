@@ -6,10 +6,10 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ## References
 
-- [06-data-model-spec.md](../SPEC/06-data-model-spec.md) - Status update mechanism
-- [07-integration-spec.md](../SPEC/07-integration-spec.md) - GCP Batch integration
-- [09-deployment-spec.md](../SPEC/09-deployment-spec.md) - Orchestrator container
-- [12-recovery-spec.md](../SPEC/12-recovery-spec.md) - Recovery orchestration
+- [06-data-model-spec.md](../spec/06-data-model-spec.md) - Status update mechanism
+- [07-integration-spec.md](../spec/07-integration-spec.md) - GCP Batch integration
+- [09-deployment-spec.md](../spec/09-deployment-spec.md) - Orchestrator container
+- [12-recovery-spec.md](../spec/12-recovery-spec.md) - Recovery orchestration
 
 ---
 

@@ -6,9 +6,9 @@ This sprint implements security hardening, comprehensive testing, performance op
 
 ## References
 
-- [08-security-spec.md](../SPEC/08-security-spec.md) - Security requirements
-- [09-deployment-spec.md](../SPEC/09-deployment-spec.md) - Production deployment
-- [10-ux-spec.md](../SPEC/10-ux-spec.md) - UX polish
+- [08-security-spec.md](../spec/08-security-spec.md) - Security requirements
+- [09-deployment-spec.md](../spec/09-deployment-spec.md) - Production deployment
+- [10-ux-spec.md](../spec/10-ux-spec.md) - UX polish
 
 ---
 
