@@ -36,6 +36,11 @@ dev = [
     "black>=24.0.0",
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+namespaces = false
+
 [tool.ruff]
 line-length = 100
 select = ["E", "F", "I"]
