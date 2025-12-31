@@ -21,14 +21,14 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 
 ### LangChain/DeepAgents Setup
 
-- [ ] Create `backend/agents/__init__.py`:
-  - [ ] Initialize agent module
-  - [ ] Export main agent classes
+- [x] Create `backend/agents/__init__.py`:
+  - [x] Initialize agent module
+  - [x] Export main agent classes
 
-- [ ] Create `backend/agents/pipeline_agent.py` — *See [05-agentic-features-spec.md#pipeline-agent](../spec/05-agentic-features-spec.md)*:
-  - [ ] Import LangChain DeepAgents framework
-  - [ ] Create `PipelineAgent` class
-  - [ ] Configure agent with tools and subagents
+- [x] Create `backend/agents/pipeline_agent.py` — *See [05-agentic-features-spec.md#pipeline-agent](../spec/05-agentic-features-spec.md)*:
+  - [x] Import LangChain DeepAgents framework
+  - [x] Create `PipelineAgent` class
+  - [x] Configure agent with tools and subagents
 
 ### Gemini Model Configuration
 
@@ -36,44 +36,44 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 > - [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md) - Model parameters
 > - [07-integration-spec.md#google-gemini-api-integration](../spec/07-integration-spec.md) - API integration
 
-- [ ] Create `backend/agents/model.py` — *See [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md)*:
-  - [ ] Implement `get_chat_model()` function:
-    - [ ] Use `init_chat_model()` from langchain
-    - [ ] Model: `google_genai:gemini-3-flash-preview` — *See [11-conf-spec.md#model](../spec/11-conf-spec.md)*
-    - [ ] Temperature: 1.0 (required for thinking) — *See [11-conf-spec.md#temperature](../spec/11-conf-spec.md)*
-    - [ ] Max output tokens: 8192 — *See [11-conf-spec.md#max-output-tokens](../spec/11-conf-spec.md)*
-    - [ ] Thinking level from settings (default "low") — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
-  - [ ] Support Vertex AI backend option — *See [07-integration-spec.md#authentication](../spec/07-integration-spec.md)*:
-    - [ ] Check for `GOOGLE_CLOUD_PROJECT` env var
-    - [ ] Set `vertexai=True` if using Vertex AI
-  - [ ] Implement streaming configuration
+- [x] Create `backend/agents/model.py` — *See [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md)*:
+  - [x] Implement `get_chat_model()` function:
+    - [x] Use `init_chat_model()` from langchain
+    - [x] Model: `google_genai:gemini-3-flash-preview` — *See [11-conf-spec.md#model](../spec/11-conf-spec.md)*
+    - [x] Temperature: 1.0 (required for thinking) — *See [11-conf-spec.md#temperature](../spec/11-conf-spec.md)*
+    - [x] Max output tokens: 8192 — *See [11-conf-spec.md#max-output-tokens](../spec/11-conf-spec.md)*
+    - [x] Thinking level from settings (default "low") — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
+  - [x] Support Vertex AI backend option — *See [07-integration-spec.md#authentication](../spec/07-integration-spec.md)*:
+    - [x] Check for `GOOGLE_CLOUD_PROJECT` env var
+    - [x] Set `vertexai=True` if using Vertex AI
+  - [x] Implement streaming configuration
 
 ### System Prompt
 
 > **Spec References:**
 > - [05-agentic-features-spec.md#system-prompt](../spec/05-agentic-features-spec.md) - Complete system prompt
 
-- [ ] Create `backend/agents/prompts.py` — *See [05-agentic-features-spec.md#system-prompt](../spec/05-agentic-features-spec.md)*:
-  - [ ] Define `PIPELINE_AGENT_SYSTEM_PROMPT`:
-    - [ ] Role description (Arc Reactor AI assistant)
-    - [ ] Capabilities overview:
-      - [ ] Discover NGS samples from Benchling
-      - [ ] Generate pipeline configurations
-      - [ ] Validate and submit runs
-      - [ ] Provide guidance and troubleshooting
-    - [ ] Workflow guidance — *See [05-agentic-features-spec.md#common-conversation-patterns](../spec/05-agentic-features-spec.md)*:
-      - [ ] Start by understanding user's data
-      - [ ] Discover samples via NGS tools
-      - [ ] Generate samplesheet and config
-      - [ ] Validate before submission
-      - [ ] Explain errors and suggest fixes
-    - [ ] Important notes:
-      - [ ] SspArc refers to NGS Pooled Sample name
-      - [ ] Always verify data before generation
-      - [ ] Human approval required for submissions — *See [05-agentic-features-spec.md#human-in-the-loop](../spec/05-agentic-features-spec.md)*
-    - [ ] Schema knowledge:
-      - [ ] NGS workflow: samples → library prep → pooling → sequencing
-      - [ ] Key entities and relationships
+- [x] Create `backend/agents/prompts.py` — *See [05-agentic-features-spec.md#system-prompt](../spec/05-agentic-features-spec.md)*:
+  - [x] Define `PIPELINE_AGENT_SYSTEM_PROMPT`:
+    - [x] Role description (Arc Reactor AI assistant)
+    - [x] Capabilities overview:
+      - [x] Discover NGS samples from Benchling
+      - [x] Generate pipeline configurations
+      - [x] Validate and submit runs
+      - [x] Provide guidance and troubleshooting
+    - [x] Workflow guidance — *See [05-agentic-features-spec.md#common-conversation-patterns](../spec/05-agentic-features-spec.md)*:
+      - [x] Start by understanding user's data
+      - [x] Discover samples via NGS tools
+      - [x] Generate samplesheet and config
+      - [x] Validate before submission
+      - [x] Explain errors and suggest fixes
+    - [x] Important notes:
+      - [x] SspArc refers to NGS Pooled Sample name
+      - [x] Always verify data before generation
+      - [x] Human approval required for submissions — *See [05-agentic-features-spec.md#human-in-the-loop](../spec/05-agentic-features-spec.md)*
+    - [x] Schema knowledge:
+      - [x] NGS workflow: samples → library prep → pooling → sequencing
+      - [x] Key entities and relationships
 
 ### Conversation State Management
 
@@ -81,34 +81,22 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 > - [05-agentic-features-spec.md#state-management](../spec/05-agentic-features-spec.md) - Conversation persistence
 > - [06-data-model-spec.md#checkpoints-table](../spec/06-data-model-spec.md) - Checkpoint storage
 
-- [ ] Create `backend/agents/checkpointer.py` — *See [05-agentic-features-spec.md#state-management](../spec/05-agentic-features-spec.md)*:
-  - [ ] Implement AsyncPostgresSaver for LangGraph:
-    - [ ] Use existing Cloud SQL connection
-    - [ ] Store checkpoints in `checkpoints` table — *See [06-data-model-spec.md#checkpoints-table](../spec/06-data-model-spec.md)*
-  - [ ] Configure checkpoint serialization
-  - [ ] Implement thread cleanup for old conversations
+- [x] Create `backend/agents/checkpointer.py` — *See [05-agentic-features-spec.md#state-management](../spec/05-agentic-features-spec.md)*:
+  - [x] Implement AsyncPostgresSaver for LangGraph:
+    - [x] Use existing Cloud SQL connection
+    - [x] Store checkpoints in `checkpoints` table — *See [06-data-model-spec.md#checkpoints-table](../spec/06-data-model-spec.md)*
+  - [x] Configure checkpoint serialization
+  - [x] Implement thread cleanup for old conversations
 
-### Agent Graph Structure
+### DeepAgents Orchestration
 
 > **Spec References:**
-> - [05-agentic-features-spec.md#agent-architecture](../spec/05-agentic-features-spec.md) - Graph structure
+> - [05-agentic-features-spec.md#agent-architecture](../spec/05-agentic-features-spec.md) - DeepAgents framework
 
-- [ ] Create `backend/agents/graph.py`:
-  - [ ] Define agent state schema — *See [05-agentic-features-spec.md#state-management](../spec/05-agentic-features-spec.md)*:
-    - [ ] `messages`: List of conversation messages
-    - [ ] `current_ngs_run`: Active NGS run being configured
-    - [ ] `current_samples`: Samples from recent queries
-    - [ ] `generated_files`: Dict of filename -> content
-    - [ ] `validation_result`: Latest validation output
-  - [ ] Define agent nodes:
-    - [ ] `agent`: Main reasoning node
-    - [ ] `tools`: Tool execution node
-    - [ ] `human_approval`: HITL approval node
-  - [ ] Define conditional edges:
-    - [ ] Route to tools when tool calls present
-    - [ ] Route to human_approval for HITL tools
-    - [ ] Route to END on completion
-  - [ ] Compile graph with checkpointer
+- [x] Configure DeepAgents (no explicit LangGraph graph):
+  - [x] Create DeepAgent with tools, system prompt, and checkpointer
+  - [x] Use agent-level streaming events for tool/text routing
+  - [x] Keep HITL enforcement in tool layer (no graph routing)
 
 ### WebSocket Chat Endpoint
 
@@ -116,48 +104,48 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 > - [03-backend-spec.md#websocket-chat](../spec/03-backend-spec.md) - WebSocket specification
 > - [05-agentic-features-spec.md#tool-output-handling](../spec/05-agentic-features-spec.md) - Response formatting
 
-- [ ] Create `backend/api/routes/chat.py` — *See [03-backend-spec.md#websocket-chat](../spec/03-backend-spec.md)*:
-  - [ ] Implement `WebSocket /ws/chat` endpoint:
-    - [ ] Accept WebSocket connection
-    - [ ] Validate user authentication
-    - [ ] Initialize or resume conversation thread
-    - [ ] Handle incoming messages
-  - [ ] Implement message handling:
-    - [ ] Parse incoming AI SDK format messages
-    - [ ] Invoke agent with message
-    - [ ] Stream response back to client
-  - [ ] Implement AI SDK streaming format — *See [04-frontend-spec.md#ai-sdk-protocol](../spec/04-frontend-spec.md)*:
-    - [ ] Text chunks: `0:{content}\n`
-    - [ ] Tool calls: `9:{tool_call}\n`
-    - [ ] Tool results: `a:{tool_result}\n`
-    - [ ] Finish: `d:{finish_reason}\n`
-  - [ ] Implement reasoning block filtering — *See [05-agentic-features-spec.md#tool-output-handling](../spec/05-agentic-features-spec.md)*:
-    - [ ] Check content block type
-    - [ ] Filter out "reasoning" blocks — *See [07-integration-spec.md#filtering-thinking-output](../spec/07-integration-spec.md)*
-    - [ ] Only stream "text" blocks to frontend
+- [x] Create `backend/api/routes/chat.py` — *See [03-backend-spec.md#websocket-chat](../spec/03-backend-spec.md)*:
+  - [x] Implement `WebSocket /ws/chat` endpoint:
+    - [x] Accept WebSocket connection
+    - [x] Validate user authentication
+    - [x] Initialize or resume conversation thread
+    - [x] Handle incoming messages
+  - [x] Implement message handling:
+    - [x] Parse incoming AI SDK format messages
+    - [x] Invoke agent with message
+    - [x] Stream response back to client
+  - [x] Implement AI SDK streaming format — *See [04-frontend-spec.md#ai-sdk-protocol](../spec/04-frontend-spec.md)*:
+    - [x] Text chunks: `0:{content}\n`
+    - [x] Tool calls: `9:{tool_call}\n`
+    - [x] Tool results: `a:{tool_result}\n`
+    - [x] Finish: `d:{finish_reason}\n`
+  - [x] Implement reasoning block filtering — *See [05-agentic-features-spec.md#tool-output-handling](../spec/05-agentic-features-spec.md)*:
+    - [x] Check content block type
+    - [x] Filter out "reasoning" blocks — *See [07-integration-spec.md#filtering-thinking-output](../spec/07-integration-spec.md)*
+    - [x] Only stream "text" blocks to frontend
 
-- [ ] Create `backend/api/routes/chat_rest.py`:
-  - [ ] Implement `POST /api/chat` endpoint (REST fallback) — *See [03-backend-spec.md#chat-endpoint](../spec/03-backend-spec.md)*:
-    - [ ] Accept message in request body
-    - [ ] Return streamed response with SSE
-    - [ ] Support same AI SDK format
+- [x] Create `backend/api/routes/chat_rest.py`:
+  - [x] Implement `POST /api/chat` endpoint (REST fallback) — *See [03-backend-spec.md#chat-endpoint](../spec/03-backend-spec.md)*:
+    - [x] Accept message in request body
+    - [x] Return streamed response with SSE
+    - [x] Support same AI SDK format
 
 ### Streaming Response Handler
 
 > **Spec References:**
 > - [07-integration-spec.md#streaming](../spec/07-integration-spec.md) - Streaming implementation
 
-- [ ] Create `backend/agents/streaming.py`:
-  - [ ] Implement `stream_agent_response()` generator:
-    - [ ] Accept agent graph and messages
-    - [ ] Use `astream_events()` with version "v2"
-    - [ ] Parse event types and route appropriately
-    - [ ] Format output in AI SDK protocol
-  - [ ] Handle event types:
-    - [ ] `on_chat_model_stream`: Text tokens
-    - [ ] `on_tool_start`: Tool invocation started
-    - [ ] `on_tool_end`: Tool result received
-  - [ ] Implement error handling in stream — *See [05-agentic-features-spec.md#error-handling](../spec/05-agentic-features-spec.md)*
+- [x] Create `backend/agents/streaming.py`:
+  - [x] Implement `stream_agent_response()` generator:
+    - [x] Accept agent graph and messages
+    - [x] Use `astream_events()` with version "v2"
+    - [x] Parse event types and route appropriately
+    - [x] Format output in AI SDK protocol
+  - [x] Handle event types:
+    - [x] `on_chat_model_stream`: Text tokens
+    - [x] `on_tool_start`: Tool invocation started
+    - [x] `on_tool_end`: Tool result received
+  - [x] Implement error handling in stream — *See [05-agentic-features-spec.md#error-handling](../spec/05-agentic-features-spec.md)*
 
 ---
 

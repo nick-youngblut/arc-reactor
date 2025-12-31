@@ -11,6 +11,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .api.routes import api_router
+from .api.routes.chat import router as chat_router
 from .api.routes.health import router as health_router
 from .config import settings
 from .services.benchling import BenchlingService
@@ -76,6 +77,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(api_router, prefix="/api")
+    app.include_router(chat_router)
 
     dist_dir = Path(settings.get("frontend_out_dir", "frontend/out")).resolve()
     _mount_static_assets(app, dist_dir)

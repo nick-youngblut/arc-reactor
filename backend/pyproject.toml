@@ -22,6 +22,8 @@ dependencies = [
     "google-cloud-secret-manager>=2.20.0",
     "langchain>=1.1.0,<2.0.0",
     "langchain-google-genai>=1.0.0",
+    "langgraph>=0.2.0",
+    "deepagents>=0.2.0",
     "benchling-py @ git+https://github.com/arcinstitute/benchling-py.git@main",
     "circuitbreaker>=2.0.0",
 ]
