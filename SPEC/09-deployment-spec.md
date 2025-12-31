@@ -59,7 +59,9 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 
 **Cloud SQL Connection:**
 - Attach Cloud SQL instance to Cloud Run service
-- Provide `DATABASE_URL` using the Cloud SQL Unix socket
+- Provide `DATABASE_URL` using the Cloud SQL Unix socket for Cloud Run
+- For GCP Batch jobs, pass `DATABASE_URL` using the Cloud SQL **Private IP**
+  (not the Unix socket), e.g. `postgresql+asyncpg://USER:PASS@PRIVATE_IP:5432/DB`
 
 ### GCS Buckets
 
@@ -180,6 +182,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 - The orchestrator image must include `orchestrator/update_status.py` at `/update_status.py`.
 - The container needs `asyncpg` and access to Cloud SQL via `DATABASE_URL`.
 - Batch job spec must pass `DATABASE_URL` and `RUN_ID` to the container.
+- `DATABASE_URL` for Batch must use the Cloud SQL **Private IP**, not the Unix socket.
 
 **Nextflow hook invocation (example):**
 ```groovy

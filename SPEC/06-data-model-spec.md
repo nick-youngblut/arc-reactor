@@ -451,7 +451,8 @@ workflow hooks and only touches allowed fields.
 **Script location:** `orchestrator/update_status.py` (packaged into the orchestrator image)
 
 **Required environment:**
-- `DATABASE_URL` (Cloud SQL connection string; Batch service account has `roles/cloudsql.client`)
+- `DATABASE_URL` (Cloud SQL connection string; Batch service account has `roles/cloudsql.client`).
+  For GCP Batch, this must use the Cloud SQL **Private IP**, not the Cloud Run Unix socket.
 
 **CLI usage (examples):**
 ```

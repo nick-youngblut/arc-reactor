@@ -182,7 +182,7 @@ logs_policy:
 | `CONFIG_GCS_PATH` | GCS path to config file |
 | `PARAMS_GCS_PATH` | GCS path to params file |
 | `WORK_DIR` | GCS work directory (original for recovery) |
-| `DATABASE_URL` | Cloud SQL connection string for run status updates |
+| `DATABASE_URL` | Cloud SQL connection string for run status updates (Batch must use Private IP) |
 
 ### Run Status Updates (Orchestrator)
 
@@ -339,12 +339,30 @@ def check_files_exist(gcs_paths: list[str]) -> dict[str, bool]:
 
 ### Connection Configuration
 
+**Cloud Run (Unix socket):**
 ```python
 from sqlalchemy.ext.asyncio import create_async_engine
 
 DATABASE_URL = (
     "postgresql+asyncpg://{user}:{password}@/{db}"
     "?host=/cloudsql/{connection_name}"
+)
+
+engine = create_async_engine(
+    DATABASE_URL,
+    pool_size=5,
+    max_overflow=10,
+    pool_timeout=30,
+    pool_recycle=1800,
+)
+```
+
+**GCP Batch (Private IP):**
+```python
+from sqlalchemy.ext.asyncio import create_async_engine
+
+DATABASE_URL = (
+    "postgresql+asyncpg://{user}:{password}@{private_ip}:5432/{db}"
 )
 
 engine = create_async_engine(
