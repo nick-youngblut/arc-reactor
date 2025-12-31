@@ -18,6 +18,7 @@ from .services.database import DatabaseService
 from .services.gemini import DisabledGeminiService, GeminiService
 from .services.storage import StorageService
 from .utils.circuit_breaker import create_breakers
+from .utils.errors import register_exception_handlers
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,7 @@ def create_app() -> FastAPI:
         title=settings.get("app_name", "Arc Reactor"),
         lifespan=lifespan,
     )
+    register_exception_handlers(app)
 
     app.add_middleware(
         CORSMiddleware,

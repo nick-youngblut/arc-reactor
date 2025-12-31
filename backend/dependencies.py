@@ -9,6 +9,7 @@ from .services.database import DatabaseService
 from .services.gemini import DisabledGeminiService, GeminiService
 from .services.storage import StorageService
 from .utils.circuit_breaker import Breakers
+from .utils.auth import UserContext, get_current_user
 
 
 def get_settings() -> object:
@@ -44,3 +45,7 @@ async def get_db_session(
 ):
     async for session in database.get_session():
         yield session
+
+
+async def get_current_user_context(request: Request) -> UserContext:
+    return await get_current_user(request)

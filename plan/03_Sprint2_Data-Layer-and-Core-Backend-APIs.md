@@ -218,33 +218,33 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [03-backend-spec.md#run-management-endpoints](../spec/03-backend-spec.md) - Endpoints specification
 > - [03-backend-spec.md#authorization](../spec/03-backend-spec.md) - Access control rules
 
-- [ ] Create `backend/api/routes/runs.py` — *See [03-backend-spec.md#run-management-endpoints](../spec/03-backend-spec.md)*:
-  - [ ] Implement `GET /api/runs` endpoint:
-    - [ ] Accept query parameters: status, pipeline, page, page_size
-    - [ ] Filter by current user or all (based on permissions) — *See [03-backend-spec.md#authorization](../spec/03-backend-spec.md)*
-    - [ ] Return paginated RunListResponse
-  - [ ] Implement `GET /api/runs/{id}` endpoint:
-    - [ ] Fetch run by ID
-    - [ ] Check user authorization (owner or admin) — *See [08-security-spec.md#resource-level-access](../spec/08-security-spec.md)*
-    - [ ] Return RunResponse
-    - [ ] Return 404 if not found
-  - [ ] Implement `POST /api/runs` endpoint:
-    - [ ] Validate RunCreateRequest
-    - [ ] Validate pipeline exists in registry
-    - [ ] Create run record with status "pending"
-    - [ ] Return RunResponse with run_id
-  - [ ] Implement `DELETE /api/runs/{id}` endpoint:
-    - [ ] Verify run is cancellable (not already terminal)
-    - [ ] Cancel GCP Batch job if running
-    - [ ] Update status to "cancelled"
-    - [ ] Set cancelled_at timestamp
-  - [ ] Implement `POST /api/runs/{id}/recover` endpoint — *See [12-recovery-spec.md#api](../spec/12-recovery-spec.md)*:
-    - [ ] Validate run is in terminal state (failed or cancelled) — *See [12-recovery-spec.md#recovery-preconditions](../spec/12-recovery-spec.md)*
-    - [ ] Verify work directory exists in GCS
-    - [ ] Accept RunRecoverRequest body
-    - [ ] Create new recovery run record
-    - [ ] Return new RunResponse
-- [ ] Register runs router in main app
+- [x] Create `backend/api/routes/runs.py` — *See [03-backend-spec.md#run-management-endpoints](../spec/03-backend-spec.md)*:
+  - [x] Implement `GET /api/runs` endpoint:
+    - [x] Accept query parameters: status, pipeline, page, page_size
+    - [x] Filter by current user or all (based on permissions) — *See [03-backend-spec.md#authorization](../spec/03-backend-spec.md)*
+    - [x] Return paginated RunListResponse
+  - [x] Implement `GET /api/runs/{id}` endpoint:
+    - [x] Fetch run by ID
+    - [x] Check user authorization (owner or admin) — *See [08-security-spec.md#resource-level-access](../spec/08-security-spec.md)*
+    - [x] Return RunResponse
+    - [x] Return 404 if not found
+  - [x] Implement `POST /api/runs` endpoint:
+    - [x] Validate RunCreateRequest
+    - [x] Validate pipeline exists in registry
+    - [x] Create run record with status "pending"
+    - [x] Return RunResponse with run_id
+  - [x] Implement `DELETE /api/runs/{id}` endpoint:
+    - [x] Verify run is cancellable (not already terminal)
+    - [x] Cancel GCP Batch job if running
+    - [x] Update status to "cancelled"
+    - [x] Set cancelled_at timestamp
+  - [x] Implement `POST /api/runs/{id}/recover` endpoint — *See [12-recovery-spec.md#api](../spec/12-recovery-spec.md)*:
+    - [x] Validate run is in terminal state (failed or cancelled) — *See [12-recovery-spec.md#recovery-preconditions](../spec/12-recovery-spec.md)*
+    - [x] Verify work directory exists in GCS
+    - [x] Accept RunRecoverRequest body
+    - [x] Create new recovery run record
+    - [x] Return new RunResponse
+- [x] Register runs router in main app
 
 ### Run Files Endpoint
 
@@ -252,11 +252,11 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [03-backend-spec.md#run-files-endpoint](../spec/03-backend-spec.md) - Files API
 > - [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md) - File organization
 
-- [ ] Implement `GET /api/runs/{id}/files` endpoint:
-  - [ ] List files under run's GCS path — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*
-  - [ ] Group by directory (inputs, results, logs)
-  - [ ] Return file metadata (name, size, updated_at)
-  - [ ] Include signed download URLs — *See [07-integration-spec.md#signed-url-generation](../spec/07-integration-spec.md)*
+- [x] Implement `GET /api/runs/{id}/files` endpoint:
+  - [x] List files under run's GCS path — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*
+  - [x] Group by directory (inputs, results, logs)
+  - [x] Return file metadata (name, size, updated_at)
+  - [x] Include signed download URLs — *See [07-integration-spec.md#signed-url-generation](../spec/07-integration-spec.md)*
 
 ### Run Status Events Endpoint (SSE)
 
@@ -264,13 +264,13 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [03-backend-spec.md#run-events-endpoint](../spec/03-backend-spec.md) - SSE specification
 > - [07-integration-spec.md#sse-integration](../spec/07-integration-spec.md) - SSE implementation
 
-- [ ] Implement `GET /api/runs/{id}/events` endpoint — *See [03-backend-spec.md#run-events-endpoint](../spec/03-backend-spec.md)*:
-  - [ ] Use Server-Sent Events (SSE) format
-  - [ ] Poll database for status changes — *See [07-integration-spec.md#sse-integration](../spec/07-integration-spec.md)*
-  - [ ] Emit "status" events on change
-  - [ ] Emit "done" event when run reaches terminal state
-  - [ ] Handle client disconnection gracefully
-  - [ ] Implement timeout for long-running connections
+- [x] Implement `GET /api/runs/{id}/events` endpoint — *See [03-backend-spec.md#run-events-endpoint](../spec/03-backend-spec.md)*:
+  - [x] Use Server-Sent Events (SSE) format
+  - [x] Poll database for status changes — *See [07-integration-spec.md#sse-integration](../spec/07-integration-spec.md)*
+  - [x] Emit "status" events on change
+  - [x] Emit "done" event when run reaches terminal state
+  - [x] Handle client disconnection gracefully
+  - [x] Implement timeout for long-running connections
 
 ### Pipeline Registry Endpoints
 
@@ -278,32 +278,32 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [03-backend-spec.md#pipeline-endpoints](../spec/03-backend-spec.md) - Pipeline API
 > - [03-backend-spec.md#pipelineregistry](../spec/03-backend-spec.md) - Registry service
 
-- [ ] Create `backend/services/pipelines.py` — *See [03-backend-spec.md#pipelineregistry](../spec/03-backend-spec.md)*:
-  - [ ] Implement `PipelineRegistry` class
-  - [ ] Define nf-core/scrnaseq configuration — *See [01-project-overview.md#mvp-scope](../spec/01-project-overview.md)*:
-    - [ ] Pipeline name and display name
-    - [ ] Description
-    - [ ] Repository URL
-    - [ ] Available versions (2.7.1, 2.6.0, 2.5.1)
-    - [ ] Default version
-    - [ ] Samplesheet columns (sample, fastq_1, fastq_2, expected_cells)
-    - [ ] Required params (genome, protocol)
-    - [ ] Optional params (aligner, expected_cells)
-  - [ ] Implement `list_pipelines()` method
-  - [ ] Implement `get_pipeline()` method
-  - [ ] Implement `get_samplesheet_schema()` method
-  - [ ] Implement `validate_params()` method
-  - [ ] Implement `render_config()` method (template rendering)
+- [x] Create `backend/services/pipelines.py` — *See [03-backend-spec.md#pipelineregistry](../spec/03-backend-spec.md)*:
+  - [x] Implement `PipelineRegistry` class
+  - [x] Define nf-core/scrnaseq configuration — *See [01-project-overview.md#mvp-scope](../spec/01-project-overview.md)*:
+    - [x] Pipeline name and display name
+    - [x] Description
+    - [x] Repository URL
+    - [x] Available versions (2.7.1, 2.6.0, 2.5.1)
+    - [x] Default version
+    - [x] Samplesheet columns (sample, fastq_1, fastq_2, expected_cells)
+    - [x] Required params (genome, protocol)
+    - [x] Optional params (aligner, expected_cells)
+  - [x] Implement `list_pipelines()` method
+  - [x] Implement `get_pipeline()` method
+  - [x] Implement `get_samplesheet_schema()` method
+  - [x] Implement `validate_params()` method
+  - [x] Implement `render_config()` method (template rendering)
 
-- [ ] Create `backend/api/routes/pipelines.py` — *See [03-backend-spec.md#pipeline-endpoints](../spec/03-backend-spec.md)*:
-  - [ ] Implement `GET /api/pipelines` endpoint:
-    - [ ] Return list of available pipelines
-  - [ ] Implement `GET /api/pipelines/{name}` endpoint:
-    - [ ] Return pipeline configuration
-    - [ ] Return 404 if not found
-  - [ ] Implement `GET /api/pipelines/{name}/schema` endpoint:
-    - [ ] Return samplesheet schema and parameter definitions
-- [ ] Register pipelines router in main app
+- [x] Create `backend/api/routes/pipelines.py` — *See [03-backend-spec.md#pipeline-endpoints](../spec/03-backend-spec.md)*:
+  - [x] Implement `GET /api/pipelines` endpoint:
+    - [x] Return list of available pipelines
+  - [x] Implement `GET /api/pipelines/{name}` endpoint:
+    - [x] Return pipeline configuration
+    - [x] Return 404 if not found
+  - [x] Implement `GET /api/pipelines/{name}/schema` endpoint:
+    - [x] Return samplesheet schema and parameter definitions
+- [x] Register pipelines router in main app
 
 ### Benchling Data Endpoints
 
@@ -311,18 +311,18 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [03-backend-spec.md#benchling-endpoints](../spec/03-backend-spec.md) - Benchling API
 > - [06-data-model-spec.md#benchling-data-warehouse](../spec/06-data-model-spec.md) - Available tables
 
-- [ ] Create `backend/api/routes/benchling.py`:
-  - [ ] Implement `GET /api/benchling/runs` endpoint:
-    - [ ] Accept query parameters for filtering
-    - [ ] Query Benchling warehouse for NGS runs — *See [06-data-model-spec.md#key-tables](../spec/06-data-model-spec.md)*
-    - [ ] Return formatted list
-  - [ ] Implement `GET /api/benchling/runs/{name}/samples` endpoint:
-    - [ ] Query samples for specific NGS run
-    - [ ] Include FASTQ paths and metadata
-  - [ ] Implement `GET /api/benchling/metadata` endpoint:
-    - [ ] Return available projects, instruments, etc.
-    - [ ] Cache results (5 minute TTL) — *See [07-integration-spec.md#caching-strategy](../spec/07-integration-spec.md)*
-- [ ] Register benchling router in main app
+- [x] Create `backend/api/routes/benchling.py`:
+  - [x] Implement `GET /api/benchling/runs` endpoint:
+    - [x] Accept query parameters for filtering
+    - [x] Query Benchling warehouse for NGS runs — *See [06-data-model-spec.md#key-tables](../spec/06-data-model-spec.md)*
+    - [x] Return formatted list
+  - [x] Implement `GET /api/benchling/runs/{name}/samples` endpoint:
+    - [x] Query samples for specific NGS run
+    - [x] Include FASTQ paths and metadata
+  - [x] Implement `GET /api/benchling/metadata` endpoint:
+    - [x] Return available projects, instruments, etc.
+    - [x] Cache results (5 minute TTL) — *See [07-integration-spec.md#caching-strategy](../spec/07-integration-spec.md)*
+- [x] Register benchling router in main app
 
 ### Authentication Middleware
 
@@ -331,18 +331,18 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [07-integration-spec.md#gcp-iap-integration](../spec/07-integration-spec.md) - IAP JWT handling
 > - [08-security-spec.md#jwt-token-handling](../spec/08-security-spec.md) - Token validation
 
-- [ ] Create `backend/utils/auth.py` — *See [07-integration-spec.md#jwt-verification](../spec/07-integration-spec.md)*:
-  - [ ] Implement `verify_iap_jwt()` function:
-    - [ ] Verify JWT signature using Google's public keys
-    - [ ] Validate audience claim
-    - [ ] Validate expiration
-    - [ ] Confirm hosted domain — *See [08-security-spec.md#jwt-token-handling](../spec/08-security-spec.md)*
-  - [ ] Implement `get_current_user()` dependency — *See [07-integration-spec.md#user-context](../spec/07-integration-spec.md)*:
-    - [ ] Extract JWT from `X-Goog-IAP-JWT-Assertion` header
-    - [ ] Verify JWT and extract claims
-    - [ ] Return User object (email, name)
-    - [ ] Support development bypass when debug=True
-- [ ] Apply authentication to all API routes
+- [x] Create `backend/utils/auth.py` — *See [07-integration-spec.md#jwt-verification](../spec/07-integration-spec.md)*:
+  - [x] Implement `verify_iap_jwt()` function:
+    - [x] Verify JWT signature using Google's public keys
+    - [x] Validate audience claim
+    - [x] Validate expiration
+    - [x] Confirm hosted domain — *See [08-security-spec.md#jwt-token-handling](../spec/08-security-spec.md)*
+  - [x] Implement `get_current_user()` dependency — *See [07-integration-spec.md#user-context](../spec/07-integration-spec.md)*:
+    - [x] Extract JWT from `X-Goog-IAP-JWT-Assertion` header
+    - [x] Verify JWT and extract claims
+    - [x] Return User object (email, name)
+    - [x] Support development bypass when debug=True
+- [x] Apply authentication to all API routes
 
 ### Error Handling
 
@@ -350,16 +350,16 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [03-backend-spec.md#error-handling](../spec/03-backend-spec.md) - Error response format
 > - [07-integration-spec.md#error-handling-matrix](../spec/07-integration-spec.md) - Integration errors
 
-- [ ] Create `backend/utils/errors.py` — *See [03-backend-spec.md#error-handling](../spec/03-backend-spec.md)*:
-  - [ ] Define custom exception classes:
-    - [ ] `NotFoundError`
-    - [ ] `ValidationError`
-    - [ ] `AuthorizationError`
-    - [ ] `BenchlingError`
-    - [ ] `BatchError`
-  - [ ] Define `ErrorResponse` model — *See [03-backend-spec.md#error-response-format](../spec/03-backend-spec.md)*
-  - [ ] Implement exception handlers for FastAPI
-- [ ] Register exception handlers in main app
+- [x] Create `backend/utils/errors.py` — *See [03-backend-spec.md#error-handling](../spec/03-backend-spec.md)*:
+  - [x] Define custom exception classes:
+    - [x] `NotFoundError`
+    - [x] `ValidationError`
+    - [x] `AuthorizationError`
+    - [x] `BenchlingError`
+    - [x] `BatchError`
+  - [x] Define `ErrorResponse` model — *See [03-backend-spec.md#error-response-format](../spec/03-backend-spec.md)*
+  - [x] Implement exception handlers for FastAPI
+- [x] Register exception handlers in main app
 
 ---
 
