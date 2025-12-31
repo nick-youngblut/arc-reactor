@@ -391,28 +391,28 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 
 ### Pipeline Info Tools
 
-- [ ] Create `backend/agents/tools/pipeline_tools.py`:
+- [x] Create `backend/agents/tools/pipeline_tools.py`:
 
-- [ ] Implement `list_pipelines()` function — *See [05-agentic-features-spec.md#list_pipelines](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `category` (str, optional): Filter by category
-  - [ ] Query pipeline registry
-  - [ ] Return formatted table with:
-    - [ ] Pipeline name
-    - [ ] Version
-    - [ ] Description
-    - [ ] Category
+- [x] Implement `list_pipelines()` function — *See [05-agentic-features-spec.md#list_pipelines](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `category` (str, optional): Filter by category
+  - [x] Query pipeline registry
+  - [x] Return formatted table with:
+    - [x] Pipeline name
+    - [x] Version
+    - [x] Description
+    - [x] Category
 
-- [ ] Implement `get_pipeline_schema()` function — *See [05-agentic-features-spec.md#get_pipeline_schema](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `pipeline` (str, required): Pipeline name
-    - [ ] `version` (str, optional): Specific version
-  - [ ] Fetch from pipeline registry — *See [03-backend-spec.md#pipelineregistry](../spec/03-backend-spec.md)*
-  - [ ] Return formatted output with:
-    - [ ] Required parameters with descriptions
-    - [ ] Optional parameters with defaults
-    - [ ] Samplesheet column definitions
-    - [ ] Valid values for enum params (genome, protocol, aligner)
+- [x] Implement `get_pipeline_schema()` function — *See [05-agentic-features-spec.md#get_pipeline_schema](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `pipeline` (str, required): Pipeline name
+    - [x] `version` (str, optional): Specific version
+  - [x] Fetch from pipeline registry — *See [03-backend-spec.md#pipelineregistry](../spec/03-backend-spec.md)*
+  - [x] Return formatted output with:
+    - [x] Required parameters with descriptions
+    - [x] Optional parameters with defaults
+    - [x] Samplesheet column definitions
+    - [x] Valid values for enum params (genome, protocol, aligner)
 
 ### File Generation Tools
 
@@ -420,63 +420,63 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 > - [05-agentic-features-spec.md#generate_samplesheet](../spec/05-agentic-features-spec.md) - Samplesheet generation
 > - [05-agentic-features-spec.md#generate_config](../spec/05-agentic-features-spec.md) - Config generation
 
-- [ ] Create `backend/agents/tools/file_generation.py`:
+- [x] Create `backend/agents/tools/file_generation.py`:
 
-- [ ] Implement `generate_samplesheet()` function — *See [05-agentic-features-spec.md#generate_samplesheet](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `ngs_run` (str, optional): NGS run name
-    - [ ] `pooled_sample` (str, optional): SspArc name
-    - [ ] `sample_ids` (str, optional): Specific samples (semicolon-delimited)
-    - [ ] `pipeline` (str, required): Target pipeline
-    - [ ] `expected_cells` (int, optional): Expected cells per sample
-  - [ ] Fetch sample data using NGS tools
-  - [ ] Get samplesheet schema for pipeline — *See [03-backend-spec.md#pipelineregistry](../spec/03-backend-spec.md)*
-  - [ ] Build CSV with required columns:
-    - [ ] sample
-    - [ ] fastq_1
-    - [ ] fastq_2
-    - [ ] expected_cells (for scrnaseq)
-  - [ ] Validate FASTQ paths exist — *See [07-integration-spec.md#file-existence-check](../spec/07-integration-spec.md)*
-  - [ ] Store in agent state `generated_files`
-  - [ ] Return summary with sample count
+- [x] Implement `generate_samplesheet()` function — *See [05-agentic-features-spec.md#generate_samplesheet](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `ngs_run` (str, optional): NGS run name
+    - [x] `pooled_sample` (str, optional): SspArc name
+    - [x] `sample_ids` (str, optional): Specific samples (semicolon-delimited)
+    - [x] `pipeline` (str, required): Target pipeline
+    - [x] `expected_cells` (int, optional): Expected cells per sample
+  - [x] Fetch sample data using NGS tools
+  - [x] Get samplesheet schema for pipeline — *See [03-backend-spec.md#pipelineregistry](../spec/03-backend-spec.md)*
+  - [x] Build CSV with required columns:
+    - [x] sample
+    - [x] fastq_1
+    - [x] fastq_2
+    - [x] expected_cells (for scrnaseq)
+  - [x] Validate FASTQ paths exist — *See [07-integration-spec.md#file-existence-check](../spec/07-integration-spec.md)*
+  - [x] Store in agent state `generated_files`
+  - [x] Return summary with sample count
 
-- [ ] Implement `generate_config()` function — *See [05-agentic-features-spec.md#generate_config](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `pipeline` (str, required): Pipeline name
-    - [ ] `params` (dict, optional): Pipeline parameters
-    - [ ] `profile` (str, optional): Execution profile (default "gcp_batch")
-  - [ ] Get pipeline schema
-  - [ ] Render Nextflow config template:
-    - [ ] params block with user values
-    - [ ] process block with GCP Batch settings
-    - [ ] google block with project/region/service account
-  - [ ] Store in agent state `generated_files`
-  - [ ] Return config summary
+- [x] Implement `generate_config()` function — *See [05-agentic-features-spec.md#generate_config](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `pipeline` (str, required): Pipeline name
+    - [x] `params` (dict, optional): Pipeline parameters
+    - [x] `profile` (str, optional): Execution profile (default "gcp_batch")
+  - [x] Get pipeline schema
+  - [x] Render Nextflow config template:
+    - [x] params block with user values
+    - [x] process block with GCP Batch settings
+    - [x] google block with project/region/service account
+  - [x] Store in agent state `generated_files`
+  - [x] Return config summary
 
 ### Validation Tool
 
 > **Spec References:**
 > - [05-agentic-features-spec.md#validate_inputs](../spec/05-agentic-features-spec.md) - Validation tool
 
-- [ ] Implement `validate_inputs()` function — *See [05-agentic-features-spec.md#validate_inputs](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `samplesheet_csv` (str, required): CSV content
-    - [ ] `config_content` (str, required): Config content
-    - [ ] `pipeline` (str, required): Pipeline name
-  - [ ] Validate samplesheet — *See [06-data-model-spec.md#data-integrity](../spec/06-data-model-spec.md)*:
-    - [ ] Check required columns present
-    - [ ] Validate required fields not empty
-    - [ ] Validate FASTQ path format
-    - [ ] Check FASTQ files exist in GCS
-  - [ ] Validate config:
-    - [ ] Parse Nextflow config format
-    - [ ] Check required params present
-    - [ ] Validate param values against schema
-  - [ ] Return validation result:
-    - [ ] `valid`: boolean
-    - [ ] `errors`: list of error objects
-    - [ ] `warnings`: list of warning strings
-    - [ ] `summary`: sample count, files verified, estimated runtime
+- [x] Implement `validate_inputs()` function — *See [05-agentic-features-spec.md#validate_inputs](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `samplesheet_csv` (str, required): CSV content
+    - [x] `config_content` (str, required): Config content
+    - [x] `pipeline` (str, required): Pipeline name
+  - [x] Validate samplesheet — *See [06-data-model-spec.md#data-integrity](../spec/06-data-model-spec.md)*:
+    - [x] Check required columns present
+    - [x] Validate required fields not empty
+    - [x] Validate FASTQ path format
+    - [x] Check FASTQ files exist in GCS
+  - [x] Validate config:
+    - [x] Parse Nextflow config format
+    - [x] Check required params present
+    - [x] Validate param values against schema
+  - [x] Return validation result:
+    - [x] `valid`: boolean
+    - [x] `errors`: list of error objects
+    - [x] `warnings`: list of warning strings
+    - [x] `summary`: sample count, files verified, estimated runtime
 
 ---
 
@@ -668,12 +668,12 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
   - [ ] get_dropdown_values
   - [ ] list_projects
 - [ ] Pipeline tools:
-  - [ ] list_pipelines
-  - [ ] get_pipeline_schema
+  - [x] list_pipelines
+  - [x] get_pipeline_schema
 - [ ] File generation tools:
-  - [ ] generate_samplesheet
-  - [ ] generate_config
-  - [ ] validate_inputs
+  - [x] generate_samplesheet
+  - [x] generate_config
+  - [x] validate_inputs
 - [ ] HITL-protected submission tools:
   - [ ] submit_run
   - [ ] cancel_run

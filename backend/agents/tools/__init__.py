@@ -15,6 +15,7 @@ from .ngs_discovery import (
     get_ngs_run_samples,
     search_ngs_runs,
 )
+from .pipeline_tools import get_pipeline_schema, list_pipelines
 from .schema_tools import (
     execute_warehouse_query,
     get_dropdown_values,
@@ -22,6 +23,7 @@ from .schema_tools import (
     get_schemas,
     list_projects,
 )
+from .file_generation import generate_config, generate_samplesheet, validate_inputs
 
 NGS_TOOL_CATEGORY = "ngs"
 BENCHLING_TOOL_CATEGORY = "benchling"
@@ -34,6 +36,11 @@ def get_agent_tools() -> list[BaseTool]:
         get_ngs_run_samples,
         get_ngs_run_qc,
         get_fastq_paths,
+        list_pipelines,
+        get_pipeline_schema,
+        generate_samplesheet,
+        generate_config,
+        validate_inputs,
         get_entities,
         get_entity_relationships,
         list_entries,
