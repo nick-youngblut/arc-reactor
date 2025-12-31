@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-arc-mist text-arc-slate;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
