@@ -68,18 +68,18 @@ The Arc Reactor follows a modern cloud-native architecture with clear separation
           │              │                    │                    │
           │              │                    │                    │
           ▼              ▼                    ▼                    ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│  Benchling   │  │  Cloud SQL   │  │  Firestore   │  │     GCS      │  │  GCP Batch   │
-│  Warehouse   │  │ (PostgreSQL) │  │              │  │              │  │              │
-│              │  │  • runs      │  │  • users     │  │  • inputs    │  │  • orchestr. │
-│  • samples   │  │  • checkpoints│ │  • prefs     │  │  • work      │  │  • tasks     │
-│  • runs      │  │              │  │              │  │  • results   │  │              │
-│  • metadata  │  │              │  │              │  │  • logs      │  │              │
-└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
-                                           │                    │
-                                           │                    │
-                                           ▼                    ▼
-                                    ┌──────────────────────────────┐
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  Benchling   │  │  Cloud SQL   │  │     GCS      │  │  GCP Batch   │
+│  Warehouse   │  │ (PostgreSQL) │  │              │  │              │
+│              │  │  • runs      │  │  • inputs    │  │  • orchestr. │
+│  • samples   │  │  • users     │  │  • work      │  │  • tasks     │
+│  • runs      │  │  • checkpoints│ │  • results   │  │              │
+│  • metadata  │  │              │  │  • logs      │  │              │
+└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
+                                                │                    │
+                                                │                    │
+                                                ▼                    ▼
+                                         ┌──────────────────────────────┐
                                     │     NEXTFLOW EXECUTION       │
                                     │                              │
                                     │  Orchestrator Job            │
@@ -172,16 +172,15 @@ Custom tools giving the agent comprehensive access to Benchling and platform cap
 
 #### Cloud SQL (PostgreSQL)
 
-Primary application database for run records and chat checkpoints.
+Primary application database for all application state including run records, user profiles, and chat checkpoints.
 
 | Table | Purpose | Access Pattern |
 |-------|---------|----------------|
 | `runs` | Pipeline run records | Write-heavy, read with filters |
+| `users` | User profiles and preferences | Read-heavy, low write volume |
 | `checkpoints` | LangGraph chat checkpoints | Write-heavy, append-only |
 
-#### Firestore (User Accounts)
-
-Stores user profiles and preferences (read-heavy, low write volume).
+> **Design Decision:** PostgreSQL is used for all application state (runs, users, checkpoints) rather than splitting data across multiple database technologies. This simplifies infrastructure, local development, and backup/recovery procedures.
 
 #### Google Cloud Storage
 
@@ -413,4 +412,6 @@ User → Cloud Load Balancer → IAP Authentication → Cloud Run
 - **Checkpointing**: AsyncPostgresSaver and LangGraph are first-class
 - **Transactions**: ACID guarantees for run state updates
 - **Querying**: Rich filtering and ordering for run history
-- **Consolidation**: Aligns with Benchling warehouse query patterns
+- **Consolidation**: Single database for all application state (runs, users, checkpoints)
+- **Simplicity**: One database technology to manage, backup, and mock in local development
+- **Alignment**: Consistent with Benchling warehouse query patterns

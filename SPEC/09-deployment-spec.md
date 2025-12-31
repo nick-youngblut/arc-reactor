@@ -78,12 +78,7 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 | `arc-reactor-db` | Production |
 | `arc-reactor-db-dev` | Dev |
 
-### Firestore (User Accounts)
 
-| Database | Environment |
-|----------|-------------|
-| `(default)` | Production |
-| `dev` | Dev |
 
 ### Secret Manager
 
@@ -343,7 +338,6 @@ production:
   gcp_project: "arc-ctc-project"
   gcp_region: "us-west1"
   nextflow_bucket: "arc-reactor-runs"
-  firestore_database: "(default)"
   log_level: "INFO"
 ```
 
@@ -356,7 +350,6 @@ dev:
   gcp_project: "arc-ctc-project"
   gcp_region: "us-west1"
   nextflow_bucket: "arc-reactor-runs-dev"
-  firestore_database: "dev"
   log_level: "DEBUG"
 ```
 
@@ -454,12 +447,8 @@ resource "google_sql_database_instance" "main" {
   }
 }
 
-# Firestore database (user accounts and preferences)
-resource "google_firestore_database" "database" {
-  name        = var.firestore_database
-  location_id = var.region
-  type        = "FIRESTORE_NATIVE"
-}
+# Note: User accounts and preferences are stored in Cloud SQL (users table)
+# rather than Firestore to consolidate all application state in a single database.
 ```
 
 ## Deployment Procedures
@@ -572,11 +561,10 @@ gsutil cp gs://arc-reactor-runs/runs/RUN_ID/file#VERSION gs://arc-reactor-runs/r
 | Cloud Run (2 instances avg) | $100 |
 | GCS (500 GB) | $10 |
 | Cloud SQL (db-f1-micro) | $25 |
-| Firestore (user accounts) | $5 |
 | GCP Batch (10 runs/day) | $500 |
 | Gemini API (estimated 10M tokens/day) | ~$150 |
 | Networking | $50 |
-| **Total** | **~$840/month** |
+| **Total** | **~$835/month** |
 
 ### Cost Optimization
 

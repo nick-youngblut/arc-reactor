@@ -37,10 +37,10 @@ Security is implemented at multiple layers: network, authentication, authorizati
                                     │
                     ┌───────────────┼───────────────┐
                     ▼               ▼               ▼
-            ┌───────────┐   ┌───────────┐   ┌───────────┐   ┌───────────┐
-            │ Cloud SQL │   │ Firestore │   │    GCS    │   │ GCP Batch │
-            │ (VPC SC)  │   │ (VPC SC)  │   │ (VPC SC)  │   │           │
-            └───────────┘   └───────────┘   └───────────┘   └───────────┘
+            ┌───────────┐   ┌───────────┐   ┌───────────┐
+            │ Cloud SQL │   │    GCS    │   │ GCP Batch │
+            │ (VPC SC)  │   │ (VPC SC)  │   │           │
+            └───────────┘   └───────────┘   └───────────┘
 ```
 
 ## Authentication
@@ -148,8 +148,7 @@ async def authorize_run_access(
 ```yaml
 # arc-reactor@project.iam.gserviceaccount.com
 roles:
-  - roles/cloudsql.client          # Cloud SQL access
-  - roles/datastore.user           # Firestore user accounts
+  - roles/cloudsql.client          # Cloud SQL access (runs, users, checkpoints)
   - roles/storage.objectAdmin      # GCS read/write (pipeline bucket)
   - roles/storage.objectViewer     # GCS read (NGS data bucket)
   - roles/batch.jobsEditor         # Create/manage Batch jobs
@@ -195,7 +194,6 @@ roles:
 
 **At Rest:**
 - Cloud SQL: Google-managed encryption (AES-256)
-- Firestore: Google-managed encryption (AES-256)
 - GCS: Google-managed encryption (AES-256)
 - Secret Manager: Google-managed encryption
 

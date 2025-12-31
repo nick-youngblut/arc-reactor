@@ -7,10 +7,9 @@ The platform integrates with several external systems:
 1. **Benchling**: Sample and sequencing data (LIMS)
 2. **GCP Batch**: Pipeline execution
 3. **Google Cloud Storage**: File storage
-4. **Cloud SQL (PostgreSQL)**: Application database (runs + checkpoints)
-5. **Firestore**: User accounts and preferences
-6. **Google Gemini API**: AI model (Gemini 3 Flash)
-7. **GCP IAP**: Authentication
+4. **Cloud SQL (PostgreSQL)**: Application database (runs, users, checkpoints)
+5. **Google Gemini API**: AI model (Gemini 3 Flash)
+6. **GCP IAP**: Authentication
 
 ## Benchling Integration
 
@@ -391,10 +390,11 @@ async def get_run_status(run_id: str) -> dict:
 The backend exposes `GET /api/runs/{id}/events` and polls PostgreSQL for status
 changes. The frontend uses EventSource for automatic reconnection.
 
-## Firestore Integration (User Accounts)
+## User Data Integration
 
-Use Firestore for user profiles and preferences (read-heavy, low write volume)
-and avoid real-time listeners for run status.
+User profiles and preferences are stored in the Cloud SQL PostgreSQL `users` table
+(see `06-data-model-spec.md`). This consolidates all application state in a single
+database, simplifying infrastructure and local development.
 
 ## Google Gemini API Integration
 

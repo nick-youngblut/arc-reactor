@@ -2,12 +2,13 @@
 
 ## Overview
 
-The platform uses multiple data stores, each optimized for its specific purpose:
+The platform uses the following data stores:
 
-1. **Cloud SQL (PostgreSQL)**: Application state (runs, chat checkpoints)
-2. **Firestore**: User accounts and preferences
-3. **Google Cloud Storage**: Pipeline files (inputs, outputs, logs)
-4. **Benchling Data Warehouse**: Sample and sequencing data (read-only)
+1. **Cloud SQL (PostgreSQL)**: All application state (runs, users, chat checkpoints)
+2. **Google Cloud Storage**: Pipeline files (inputs, outputs, logs)
+3. **Benchling Data Warehouse**: Sample and sequencing data (read-only)
+
+> **Design Decision:** A single PostgreSQL database is used for all application state rather than splitting data across multiple database technologies (e.g., Firestore for users). This simplifies infrastructure management, local development (one less service to mock), backup/recovery procedures, and reduces operational complexity.
 
 ## Cloud SQL (PostgreSQL)
 
@@ -168,11 +169,9 @@ CREATE TABLE checkpoints (
 );
 ```
 
-## Firestore Collections (User Accounts)
+### Table: `users`
 
-### Collection: `users`
-
-Stores user profiles and preferences.
+Stores user profiles and preferences. This table is populated on first login and updated on subsequent logins.
 
 ```typescript
 interface User {
@@ -181,10 +180,10 @@ interface User {
   display_name: string;              // From Google Workspace
   
   // Timestamps
-  created_at: Timestamp;             // First login
-  last_login_at: Timestamp;          // Most recent login
+  created_at: string;                // First login (TIMESTAMPTZ as ISO 8601)
+  last_login_at: string;             // Most recent login
   
-  // Preferences
+  // Preferences (JSONB)
   preferences: {
     default_pipeline?: string;       // Default pipeline selection
     default_genome?: string;         // Default genome
@@ -192,7 +191,7 @@ interface User {
     notifications_enabled: boolean;  // Email notifications (future)
   };
   
-  // Usage stats
+  // Usage stats (JSONB)
   stats: {
     total_runs: number;
     successful_runs: number;
@@ -201,7 +200,21 @@ interface User {
 }
 ```
 
-**Example Document:**
+**Schema (PostgreSQL):**
+```sql
+CREATE TABLE users (
+    email VARCHAR(255) PRIMARY KEY,
+    display_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    last_login_at TIMESTAMPTZ DEFAULT NOW(),
+    preferences JSONB NOT NULL DEFAULT '{"notifications_enabled": false}'::jsonb,
+    stats JSONB NOT NULL DEFAULT '{"total_runs": 0, "successful_runs": 0, "total_samples_processed": 0}'::jsonb
+);
+
+CREATE INDEX idx_users_last_login_at ON users(last_login_at DESC);
+```
+
+**Example Row:**
 ```json
 {
   "email": "jane.smith@arcinstitute.org",
@@ -222,35 +235,7 @@ interface User {
 }
 ```
 
-### Collection: `sessions`
-
-Stores chat session state (optional, can use in-memory).
-
-```typescript
-interface Session {
-  // Identity
-  session_id: string;                // Unique identifier
-  user_email: string;                // Owner
-  
-  // Timestamps
-  created_at: Timestamp;
-  updated_at: Timestamp;
-  
-  // State
-  pipeline: string;                  // Selected pipeline
-  pipeline_version: string;
-  
-  // Generated files (cached)
-  generated_samplesheet?: string;    // CSV content
-  generated_config?: string;         // Config content
-  
-  // Agent state
-  thread_id: string;                 // LangChain thread ID
-  
-  // Expiry
-  expires_at: Timestamp;             // Auto-delete after 24 hours
-}
-```
+> **Note:** Session state for the chat interface is managed by LangGraph checkpoints in the `checkpoints` table, not a separate sessions table. This eliminates potential inconsistency between session state and agent state.
 
 ## Google Cloud Storage Structure
 
@@ -516,8 +501,8 @@ workflow.onError {
 
 | Data Type | Retention | Notes |
 |-----------|-----------|-------|
-| Run metadata | Indefinite | Never deleted |
-| User profiles | Indefinite | Never deleted |
+| Run metadata (PostgreSQL) | Indefinite | Never deleted |
+| User profiles (PostgreSQL) | Indefinite | Never deleted |
 | Chat checkpoints | 30 days | Prune old threads |
 | Input files | Indefinite | Never deleted |
 | Work directories | 30 days | Cleaned by lifecycle policy |
