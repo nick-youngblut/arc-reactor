@@ -211,7 +211,7 @@ All secrets stored in GCP Secret Manager.
 | Secret | Usage |
 |--------|-------|
 | `benchling-warehouse-password` | Database connection |
-| `anthropic-api-key` | AI model access |
+| `google-api-key` | AI model access |
 
 **Access Pattern:**
 ```python
@@ -249,7 +249,7 @@ def get_secret(secret_id: str) -> str:
                                   │
                                   ▼
                           External Services
-                          (Benchling, Anthropic)
+                          (Benchling, Gemini)
 ```
 
 ### Firewall Rules
@@ -264,7 +264,8 @@ def get_secret(secret_id: str) -> str:
 
 Outbound traffic allowed to:
 - `*.googleapis.com` (GCP services)
-- `api.anthropic.com` (AI API)
+- `generativelanguage.googleapis.com` (Gemini Developer API)
+- `aiplatform.googleapis.com` (Vertex AI Gemini)
 - `benchling-warehouse.arcinstitute.org` (Benchling)
 - `github.com` (Nextflow pipelines)
 - `docker.io`, `gcr.io`, `quay.io` (Container images)

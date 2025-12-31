@@ -100,14 +100,18 @@ default:
   benchling_warehouse_host: "benchling-warehouse.arcinstitute.org"
   benchling_warehouse_db: "benchling"
   
-  # AI Configuration
-  anthropic_model: "claude-sonnet-4-5-20250929"
+  # AI Configuration (Google Gemini)
+  gemini_model: "gemini-3-flash-preview"
+  gemini_thinking_level: "low"  # minimal, low, medium, high
+
+  # Legacy Anthropic (for fallback/comparison)
+  # anthropic_model: "claude-sonnet-4-5-20250929"
 
   # Circuit Breakers
   benchling_cb_failure_threshold: 5
   benchling_cb_recovery_timeout: 30
-  anthropic_cb_failure_threshold: 3
-  anthropic_cb_recovery_timeout: 60
+  gemini_cb_failure_threshold: 3
+  gemini_cb_recovery_timeout: 60
   
   # Frontend
   frontend_out_dir: "/app/frontend/out"
@@ -128,9 +132,12 @@ production:
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `DYNACONF` | Environment name (development/production) | Yes |
-| `ANTHROPIC_API_KEY` | Claude API key | Yes |
+| `GOOGLE_API_KEY` | Google AI API key | Yes* |
+| `GOOGLE_CLOUD_PROJECT` | GCP project ID (for Vertex AI) | No |
 | `BENCHLING_WAREHOUSE_PASSWORD` | Benchling warehouse credentials | Yes |
 | `GCP_PROJECT` | GCP project ID (override) | No |
+
+*One of `GOOGLE_API_KEY` or `GOOGLE_CLOUD_PROJECT` is required depending on deployment mode.
 
 ## CORS Configuration
 

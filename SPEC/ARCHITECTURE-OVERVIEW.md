@@ -141,7 +141,7 @@ The core AI component that powers the conversational interface.
 | Aspect | Details |
 |--------|---------|
 | **Framework** | LangChain v1 + DeepAgents |
-| **Model** | Claude Sonnet 4.5 (claude-sonnet-4-5-20250929; see `SPEC/CONFIG-SPEC.md`) |
+| **Model** | Gemini 3 Flash (gemini-3-flash-preview; see `SPEC/CONFIG-SPEC.md`) |
 | **State** | PostgreSQL checkpointer (AsyncPostgresSaver) |
 | **Streaming** | Full token + tool streaming |
 
@@ -385,6 +385,14 @@ User → Cloud Load Balancer → IAP Authentication → Cloud Run
 - **Streaming**: First-class streaming support
 - **State management**: Built-in checkpointing
 - **Arc precedent**: Established patterns in other Arc apps
+
+### Why Gemini 3 Flash over Claude?
+
+- **Cost efficiency**: ~75% lower cost per token
+- **Speed**: 3x faster inference for interactive applications
+- **GCP native**: Better integration with existing GCP infrastructure
+- **Tool use**: Strong agentic capabilities for pipeline orchestration
+- **Multimodal**: Native support for analyzing pipeline outputs and visualizations
 
 ### Why GCP Batch over Kubernetes?
 

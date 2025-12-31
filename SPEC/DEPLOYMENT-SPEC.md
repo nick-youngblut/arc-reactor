@@ -88,8 +88,7 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 | Secret | Environments |
 |--------|--------------|
 | `benchling-warehouse-password` | Both |
-| `anthropic-api-key-prod` | Production |
-| `anthropic-api-key-staging` | Staging |
+| `google-api-key` | Both |
 
 ## Container Build
 
@@ -325,7 +324,7 @@ jobs:
             --service-account=arc-reactor@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
             --set-env-vars=ENV_FOR_DYNACONF=${{ steps.env.outputs.env }}
             --set-secrets=BENCHLING_WAREHOUSE_PASSWORD=benchling-warehouse-password:latest
-            --set-secrets=ANTHROPIC_API_KEY=anthropic-api-key-${{ steps.env.outputs.env }}:latest
+            --set-secrets=GOOGLE_API_KEY=google-api-key:latest
             --vpc-connector=projects/${{ env.PROJECT_ID }}/locations/${{ env.REGION }}/connectors/serverless-connector
             --ingress=internal-and-cloud-load-balancing
 ```
@@ -499,7 +498,7 @@ gcloud run services update-traffic arc-reactor \
 | Readiness | `/ready` | 30s |
 
 Readiness returns 200 when critical dependencies are healthy, and 503 only when
-critical dependencies fail. Non-critical failures (e.g., Benchling or Anthropic)
+critical dependencies fail. Non-critical failures (e.g., Benchling or Gemini)
 return 200 with a degraded status in the response body.
 
 ### Cloud Monitoring Alerts
@@ -572,8 +571,9 @@ gsutil cp gs://arc-reactor-runs/runs/RUN_ID/file#VERSION gs://arc-reactor-runs/r
 | Cloud SQL (db-f1-micro) | $25 |
 | Firestore (user accounts) | $5 |
 | GCP Batch (10 runs/day) | $500 |
+| Gemini API (estimated 10M tokens/day) | ~$150 |
 | Networking | $50 |
-| **Total** | **~$690/month** |
+| **Total** | **~$840/month** |
 
 ### Cost Optimization
 

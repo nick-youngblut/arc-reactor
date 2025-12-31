@@ -63,6 +63,27 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 Model configuration values are defined in `SPEC/CONFIG-SPEC.md` and must be
 referenced from there to avoid drift.
 
+**Default Model**: `google_genai:gemini-3-flash-preview`
+
+**Initialization Pattern**:
+```python
+from langchain.chat_models import init_chat_model
+
+# Main agent model
+model = init_chat_model(
+    "google_genai:gemini-3-flash-preview",
+    temperature=1.0,  # Required for Gemini with thinking
+    thinking_level="low",  # Default thinking level
+)
+
+# For complex reasoning tasks (subagents)
+model_thinking = init_chat_model(
+    "google_genai:gemini-3-flash-preview",
+    temperature=1.0,
+    thinking_level="high",
+)
+```
+
 ### System Prompt
 
 ```markdown
@@ -493,7 +514,7 @@ benchling_expert = {
     4. Present a clear summary
     """,
     "tools": [search_ngs_runs, get_run_samples, get_sample_metadata],
-    "model": "anthropic:claude-sonnet-4-5-20250929",
+    "model": "google_genai:gemini-3-flash-preview",
 }
 ```
 
@@ -548,7 +569,7 @@ config_expert = {
     4. Estimate runtime and costs
     """,
     "tools": [list_pipelines, get_pipeline_schema],
-    "model": "anthropic:claude-sonnet-4-5-20250929",
+    "model": "google_genai:gemini-3-flash-preview",
 }
 ```
 

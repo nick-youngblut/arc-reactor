@@ -9,7 +9,7 @@ The platform integrates with several external systems:
 3. **Google Cloud Storage**: File storage
 4. **Cloud SQL (PostgreSQL)**: Application database (runs + checkpoints)
 5. **Firestore**: User accounts and preferences
-6. **Anthropic API**: AI model (Claude)
+6. **Google Gemini API**: AI model (Gemini 3 Flash)
 7. **GCP IAP**: Authentication
 
 ## Benchling Integration
@@ -378,7 +378,7 @@ changes. The frontend uses EventSource for automatic reconnection.
 Use Firestore for user profiles and preferences (read-heavy, low write volume)
 and avoid real-time listeners for run status.
 
-## Anthropic API Integration
+## Google Gemini API Integration
 
 ### Configuration
 
@@ -386,15 +386,37 @@ Model configuration values are defined in `SPEC/CONFIG-SPEC.md` and must be
 referenced from there to avoid drift. See the backend settings guidance in
 `SPEC/BACKEND-SPEC.md`.
 
+### Authentication
+
+The platform supports two authentication modes:
+
+1. **Gemini Developer API** (recommended for development):
+   - Set `GOOGLE_API_KEY` environment variable
+   - Simpler setup, no GCP project required
+
+2. **Vertex AI** (recommended for production):
+   - Uses GCP service account authentication
+   - Set `GOOGLE_CLOUD_PROJECT` environment variable
+   - Better integration with GCP IAM and audit logging
+
 ### LangChain Integration
 
 ```python
 from langchain.chat_models import init_chat_model
 
+# Standard initialization
 model = init_chat_model(
-    "anthropic:claude-sonnet-4-5-20250929",
-    temperature=0.1,
-    max_tokens=6000,
+    "google_genai:gemini-3-flash-preview",
+    temperature=1.0,
+    thinking_level="low",
+)
+
+# With Vertex AI backend
+model = init_chat_model(
+    "google_genai:gemini-3-flash-preview",
+    temperature=1.0,
+    thinking_level="low",
+    vertexai=True,  # Use Vertex AI backend
 )
 ```
 
@@ -414,6 +436,19 @@ async def stream_response(messages: list) -> AsyncIterator[str]:
             yield f'0:{json.dumps(content)}\n'
 ```
 
+### Thinking Output
+
+Gemini 3 Flash supports exposing reasoning steps:
+
+```python
+async for chunk in model.astream(messages):
+    for block in chunk.content_blocks:
+        if block["type"] == "reasoning":
+            print(f"Thinking: {block.get('reasoning', '')}")
+        elif block["type"] == "text":
+            print(block["text"])
+```
+
 ### Error Handling
 
 | Error | Response |
@@ -421,6 +456,7 @@ async def stream_response(messages: list) -> AsyncIterator[str]:
 | Rate limit (429) | Retry with exponential backoff |
 | Context length exceeded | Summarize history and retry |
 | API error (5xx) | Retry 3x, then fail gracefully |
+| Invalid thinking_level | Fall back to "low" |
 
 ## GCP IAP Integration
 
@@ -489,8 +525,8 @@ async def query_benchling(query: str):
     pass
 
 @circuit(failure_threshold=3, recovery_timeout=60)
-async def call_anthropic(messages: list):
-    # Anthropic API call
+async def call_gemini(messages: list):
+    # Gemini API call
     pass
 ```
 
@@ -508,7 +544,7 @@ async def readiness_check():
         "postgres": await check_postgres_connection(),
         "gcs": await check_gcs_connection(),
         "batch": await check_batch_api(),
-        "anthropic": await check_anthropic_api(),
+        "gemini": await check_gemini_api(),
     }
     
     critical = ["postgres", "gcs", "batch"]
@@ -564,7 +600,7 @@ async def check_gcs_connection() -> bool:
 | Service | Limit | Notes |
 |---------|-------|-------|
 | Benchling warehouse | 100 concurrent connections | Pool size = 5 |
-| Anthropic API | 60 requests/minute | Per API key |
+| Gemini API | 60 requests/minute | Per API key |
 | GCP Batch | 100 concurrent jobs | Per project |
 | Cloud SQL | Connection limits | Pool size = 5 |
 
@@ -587,5 +623,5 @@ async def check_gcs_connection() -> bool:
 | GCS | Access denied | "Storage access error" | Alert admin |
 | GCS | Object not found | "File not found" | Show file path |
 | Cloud SQL | Write failed | "Unable to save" | Retry |
-| Anthropic | Rate limit | Automatic retry | Backoff |
-| Anthropic | Context exceeded | "Conversation too long" | Summarize |
+| Gemini | Rate limit | Automatic retry | Backoff |
+| Gemini | Context exceeded | "Conversation too long" | Summarize |
