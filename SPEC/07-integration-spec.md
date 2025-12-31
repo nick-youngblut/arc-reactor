@@ -233,7 +233,7 @@ google {
 ### Run Recovery (`-resume`)
 
 Recovery submissions reuse the original work directory and add `-resume`.
-See `SPEC/RECOVERY-SPEC.md` for eligibility and workflow details.
+See `SPEC/12-recovery-spec.md` for eligibility and workflow details.
 
 ## Cloud Logging Integration
 
@@ -382,9 +382,9 @@ and avoid real-time listeners for run status.
 
 ### Configuration
 
-Model configuration values are defined in `SPEC/CONFIG-SPEC.md` and must be
+Model configuration values are defined in `SPEC/11-conf-spec.md` and must be
 referenced from there to avoid drift. See the backend settings guidance in
-`SPEC/BACKEND-SPEC.md`.
+`SPEC/03-backend-spec.md`.
 
 ### Authentication
 

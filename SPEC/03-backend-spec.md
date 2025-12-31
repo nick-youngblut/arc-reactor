@@ -78,7 +78,7 @@ Configuration uses Dynaconf with environment-based overrides.
 #### Shared Configuration Source
 
 Canonical AI configuration values (model ID, temperature, max tokens) are defined
-in `SPEC/CONFIG-SPEC.md`. Backend settings and examples must reference those
+in `SPEC/11-conf-spec.md`. Backend settings and examples must reference those
 values to avoid drift across specifications.
 
 ```yaml
@@ -178,7 +178,7 @@ app.add_middleware(
 | `GET /api/runs/{id}/files` | GET | List run files | Required |
 | `GET /api/runs/{id}/events` | GET (SSE) | Stream run status updates | Required |
 
-**Run Recovery:** See `SPEC/RECOVERY-SPEC.md` for the `-resume` workflow and
+**Run Recovery:** See `SPEC/12-recovery-spec.md` for the `-resume` workflow and
 recovery eligibility rules.
 
 ### Log Endpoints

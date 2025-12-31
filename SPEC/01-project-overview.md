@@ -156,7 +156,7 @@ Users can track their pipeline runs through:
 | **Chat Interface** | Vercel AI SDK | Streaming, tool calls, great DX |
 | **Backend** | FastAPI | Async, OpenAPI docs, Python ecosystem |
 | **AI Framework** | LangChain + DeepAgents | Tool use, streaming, state management |
-| **LLM** | Gemini 3 Flash (`gemini-3-flash-preview`) | Best balance of speed, capability, and cost (see `SPEC/CONFIG-SPEC.md`) |
+| **LLM** | Gemini 3 Flash (`gemini-3-flash-preview`) | Best balance of speed, capability, and cost (see `SPEC/11-conf-spec.md`) |
 | **Database** | Cloud SQL (PostgreSQL) | ACID transactions, rich queries |
 | **File Storage** | Google Cloud Storage | Native Nextflow integration |
 | **Job Execution** | GCP Batch | Long-running jobs, native GCP |
@@ -183,7 +183,7 @@ Users can track their pipeline runs through:
 - Advanced scheduling/queuing
 - Cost estimation and budgeting
 - Automated re-runs on failure
-- Manual recovery with Nextflow `-resume` (see `SPEC/RECOVERY-SPEC.md`)
+- Manual recovery with Nextflow `-resume` (see `SPEC/12-recovery-spec.md`)
 - Slack/email notifications
 - Custom pipeline uploads
 - Result visualization

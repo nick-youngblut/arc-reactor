@@ -138,7 +138,7 @@ Make it easy to recover from mistakes.
    └── Remove samples, fix in Benchling, retry, or recover with `-resume`
 ```
 
-Recovery UX details are defined in `SPEC/RECOVERY-SPEC.md`.
+Recovery UX details are defined in `SPEC/12-recovery-spec.md`.
 
 ## Interface Components
 

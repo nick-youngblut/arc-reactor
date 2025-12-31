@@ -193,7 +193,7 @@ Detailed view of a specific run with logs and files.
 
 **Recovery (Nextflow `-resume`):**
 - Show **Recover Run** action for `failed` or `cancelled` runs
-- Recovery flow is defined in `SPEC/RECOVERY-SPEC.md`
+- Recovery flow is defined in `SPEC/12-recovery-spec.md`
 
 **Log Viewing:**
 - Workflow logs stream in real time while a run is `running` via `GET /api/runs/{id}/logs/stream?source=workflow`

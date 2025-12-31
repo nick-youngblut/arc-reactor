@@ -141,7 +141,7 @@ The core AI component that powers the conversational interface.
 | Aspect | Details |
 |--------|---------|
 | **Framework** | LangChain v1 + DeepAgents |
-| **Model** | Gemini 3 Flash (gemini-3-flash-preview; see `SPEC/CONFIG-SPEC.md`) |
+| **Model** | Gemini 3 Flash (gemini-3-flash-preview; see `SPEC/11-conf-spec.md`) |
 | **State** | PostgreSQL checkpointer (AsyncPostgresSaver) |
 | **Streaming** | Full token + tool streaming |
 
@@ -270,7 +270,7 @@ Recover Action → Frontend → POST /api/runs/{id}/recover → Validate work di
 User Feedback ← Frontend ← REST Response ← Recovery Run Created
 ```
 
-See `SPEC/RECOVERY-SPEC.md` for recovery eligibility rules and parameters.
+See `SPEC/12-recovery-spec.md` for recovery eligibility rules and parameters.
 
 ### Pattern 4: Run Monitoring Flow
 

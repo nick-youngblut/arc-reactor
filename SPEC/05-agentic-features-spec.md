@@ -60,7 +60,7 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 
 ### Model Selection
 
-Model configuration values are defined in `SPEC/CONFIG-SPEC.md` and must be
+Model configuration values are defined in `SPEC/11-conf-spec.md` and must be
 referenced from there to avoid drift.
 
 **Default Model**: `google_genai:gemini-3-flash-preview`

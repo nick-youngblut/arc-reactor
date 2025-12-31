@@ -578,6 +578,6 @@ gsutil cp gs://arc-reactor-runs/runs/RUN_ID/file#VERSION gs://arc-reactor-runs/r
 ### Cost Optimization
 
 - Cloud Run min instances = 1 (avoid cold starts)
-- GCS lifecycle policies for work directories (must retain `work/` long enough to support `-resume` recovery; see `SPEC/RECOVERY-SPEC.md`)
+- GCS lifecycle policies for work directories (must retain `work/` long enough to support `-resume` recovery; see `SPEC/12-recovery-spec.md`)
 - Spot instances for Batch jobs
 - Reserved capacity for predictable workloads

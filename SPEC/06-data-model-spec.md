@@ -150,7 +150,7 @@ CREATE INDEX idx_runs_created_at ON runs(created_at DESC);
 ```
 
 Recovery behavior and `-resume` semantics are defined in
-`SPEC/RECOVERY-SPEC.md`.
+`SPEC/12-recovery-spec.md`.
 
 ### Table: `checkpoints`
 
