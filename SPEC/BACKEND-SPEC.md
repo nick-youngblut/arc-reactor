@@ -27,6 +27,7 @@ backend/
 │       ├── __init__.py
 │       ├── chat.py         # WebSocket chat endpoint
 │       ├── runs.py         # Run CRUD operations
+│       ├── logs.py         # Log streaming and task log endpoints
 │       ├── pipelines.py    # Pipeline registry endpoints
 │       └── health.py       # Health check endpoints
 │
@@ -43,6 +44,7 @@ backend/
 │   ├── batch.py            # GCP Batch job management
 │   ├── runs.py             # Run persistence (Cloud SQL PostgreSQL)
 │   ├── run_events.py       # SSE streaming for run status
+│   ├── logs.py             # Log access + streaming
 │   ├── storage.py          # GCS file operations
 │   └── pipelines.py        # Pipeline registry and templates
 │
@@ -144,9 +146,18 @@ production:
 | `GET /api/runs/{id}` | GET | Get run details | Required |
 | `POST /api/runs` | POST | Submit new run | Required |
 | `DELETE /api/runs/{id}` | DELETE | Cancel run | Required |
-| `GET /api/runs/{id}/logs` | GET | Get run logs | Required |
 | `GET /api/runs/{id}/files` | GET | List run files | Required |
 | `GET /api/runs/{id}/events` | GET (SSE) | Stream run status updates | Required |
+
+### Log Endpoints
+
+| Endpoint | Method | Description | Auth |
+|----------|--------|-------------|------|
+| `GET /api/runs/{id}/logs` | GET | Get workflow log (complete) | Required |
+| `GET /api/runs/{id}/logs/stream` | GET (SSE) | Stream logs in real time | Required |
+| `GET /api/runs/{id}/tasks` | GET | List tasks with metadata from trace | Required |
+| `GET /api/runs/{id}/tasks/{task_id}/logs` | GET | Get task stdout/stderr | Required |
+| `GET /api/runs/{id}/logs/download` | GET | Download logs archive | Required |
 
 ### Pipeline Management
 
@@ -211,6 +222,32 @@ class RunListResponse(BaseModel):
     total: int
     page: int
     page_size: int
+
+class LogEntry(BaseModel):
+    timestamp: datetime
+    source: Literal["nextflow", "task", "batch"]
+    message: str
+    task_name: str | None = None
+    stream: Literal["stdout", "stderr"] | None = None
+
+class TaskInfo(BaseModel):
+    task_id: str
+    name: str
+    process: str
+    status: str
+    exit_code: int | None
+    duration: str | None
+    cpu_percent: str | None
+    memory_peak: str | None
+    start_time: str | None
+    end_time: str | None
+    work_dir: str | None
+    has_logs: bool
+
+class TaskLogs(BaseModel):
+    task_id: str
+    stdout: str
+    stderr: str
 ```
 
 ### Pipeline Models
@@ -300,7 +337,7 @@ Manages GCP Batch job submission and monitoring.
 | `get_run_status()` | Get current run status | RunStatus |
 | `cancel_run()` | Cancel a running job | bool |
 | `list_runs()` | List runs with filters | list[RunResponse] |
-| `get_run_logs()` | Get Cloud Logging entries | list[LogEntry] |
+| `get_run_logs()` | Get Batch job log entries | list[LogEntry] |
 
 **Job Configuration:**
 
@@ -335,7 +372,10 @@ gs://{settings.nextflow_bucket}/
         ├── work/                    # Nextflow work dir
         ├── results/                 # Pipeline outputs
         └── logs/
-            └── nextflow.log
+            ├── nextflow.log
+            ├── trace.txt
+            ├── timeline.html
+            └── report.html
 ```
 
 ### RunStoreService (PostgreSQL)
@@ -360,6 +400,30 @@ Streams run status updates over SSE by polling PostgreSQL.
 | Method | Description | Returns |
 |--------|-------------|---------|
 | `stream_run_events()` | Yield status changes | AsyncIterator[RunEvent] |
+
+### LogService
+
+Provides workflow and task log access across GCS and Cloud Logging.
+
+**Log Sources and Access Patterns:**
+
+| Log Source | Location | Access Method | Use Case |
+|------------|----------|---------------|----------|
+| Nextflow main log | GCS `logs/nextflow.log` | GCS API | Workflow progress |
+| Nextflow trace | GCS `logs/trace.txt` | GCS API | Task metadata |
+| Task stdout/stderr | Cloud Logging | Logging API | Per-task debugging |
+| Batch job logs | Cloud Logging | Logging API | Infrastructure issues |
+
+**Key Methods:**
+
+| Method | Description | Returns |
+|--------|-------------|---------|
+| `get_workflow_log()` | Fetch full `nextflow.log` from GCS | list[LogEntry] |
+| `stream_workflow_log()` | Stream `nextflow.log` via polling | AsyncIterator[LogEntry] |
+| `list_tasks()` | Parse `trace.txt` and return task metadata | list[TaskInfo] |
+| `get_task_logs()` | Fetch stdout/stderr for a task | TaskLogs |
+| `stream_task_logs()` | Stream task logs from Cloud Logging | AsyncIterator[LogEntry] |
+| `create_log_archive()` | Build zip/tar archive for download | Path |
 
 ### PipelineRegistry
 

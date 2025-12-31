@@ -39,7 +39,12 @@ frontend/
 │   │   ├── RunCard.tsx             # Individual run card
 │   │   ├── RunDetail.tsx           # Full run details
 │   │   ├── RunStatus.tsx           # Status badge component
-│   │   ├── RunLogs.tsx             # Log viewer
+│   │   ├── RunLogs.tsx             # Log viewer with tabs
+│   │   ├── WorkflowLogViewer.tsx   # Nextflow log streaming
+│   │   ├── TaskLogViewer.tsx       # Per-task log viewer
+│   │   ├── TaskList.tsx            # Task list sidebar
+│   │   ├── LogLine.tsx             # Log line with highlighting
+│   │   └── StreamingIndicator.tsx  # Live stream status
 │   │   └── RunFiles.tsx            # File browser
 │   │
 │   ├── chat/
@@ -186,6 +191,11 @@ Detailed view of a specific run with logs and files.
 - Primary: SSE stream from `GET /api/runs/{id}/events` for real-time status changes
 - Fallback: Poll `GET /api/runs/{id}` every 5-30 seconds if SSE is unavailable
 
+**Log Viewing:**
+- Workflow logs stream in real time while a run is `running` via `GET /api/runs/{id}/logs/stream?source=workflow`
+- Task logs pull from `GET /api/runs/{id}/tasks` and `GET /api/runs/{id}/tasks/{task_id}/logs`
+- Download logs archive from `GET /api/runs/{id}/logs/download`
+
 ## Key Components
 
 ### PipelineWorkspace
@@ -316,6 +326,26 @@ Table displaying run history.
 | Created | Creation timestamp | Yes |
 | Samples | Sample count | Yes |
 | Actions | View, Re-run, Cancel | No |
+
+### RunLogs
+
+Log viewer for workflow and task-level debugging.
+
+**Tabs:**
+- **Workflow Log**: Streams `nextflow.log` while running, fetches full log when complete
+- **Task Logs**: Task list from `trace.txt` with per-task stdout/stderr
+
+**Features:**
+- Real-time streaming via SSE for active runs
+- Search/filter across visible log lines
+- Auto-scroll toggle while streaming
+- Log download action (zip/tar archive)
+
+**Data Sources:**
+- `GET /api/runs/{id}/logs/stream?source=workflow`
+- `GET /api/runs/{id}/tasks`
+- `GET /api/runs/{id}/tasks/{task_id}/logs`
+- `GET /api/runs/{id}/logs/download`
 
 ## State Management
 

@@ -230,6 +230,26 @@ google {
 }
 ```
 
+## Cloud Logging Integration
+
+Nextflow task stdout/stderr and Batch job logs are available in Cloud Logging for
+per-task debugging and infrastructure diagnostics.
+
+### Query Patterns
+
+| Query | Filter |
+|-------|--------|
+| All task logs for a run | `labels.run_id="RUN_ID"` |
+| Specific task | `labels.task_name="STAR (1)"` |
+| Errors only | `severity>=ERROR` |
+
+### Required Labels on Batch Jobs
+
+- `run_id`: Arc Reactor run identifier
+- `task_name`: Nextflow task name
+- `process`: Nextflow process name
+- `stream`: `stdout` or `stderr`
+
 ## Google Cloud Storage Integration
 
 ### Bucket Configuration
