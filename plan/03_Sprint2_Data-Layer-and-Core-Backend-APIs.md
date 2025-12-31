@@ -23,9 +23,9 @@ This sprint implements the data models, persistence layer, and core REST API end
 
 ### PostgreSQL Schema Design
 
-- [ ] Create `backend/models/database.py` with SQLAlchemy models:
-  - [ ] Define `Base` declarative base class
-  - [ ] Configure metadata naming conventions
+- [x] Create `backend/models/database.py` with SQLAlchemy models:
+  - [x] Define `Base` declarative base class
+  - [x] Configure metadata naming conventions
 
 ### Runs Table
 
@@ -34,70 +34,70 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [06-data-model-spec.md#run-status-values](../spec/06-data-model-spec.md) - Valid status values
 > - [12-recovery-spec.md#run-record-fields](../spec/12-recovery-spec.md) - Recovery-specific fields
 
-- [ ] Create `backend/models/runs.py`:
-  - [ ] Define `Run` SQLAlchemy model with columns — *See [06-data-model-spec.md#runs-table](../spec/06-data-model-spec.md)*:
-    - [ ] `run_id` (VARCHAR(50), PRIMARY KEY)
-    - [ ] `pipeline` (VARCHAR(100), NOT NULL)
-    - [ ] `pipeline_version` (VARCHAR(20), NOT NULL)
-    - [ ] `status` (VARCHAR(20), NOT NULL) — *See [06-data-model-spec.md#run-status-values](../spec/06-data-model-spec.md)*
-    - [ ] `user_email` (VARCHAR(255), NOT NULL)
-    - [ ] `user_name` (VARCHAR(255))
-    - [ ] `created_at` (TIMESTAMPTZ, DEFAULT NOW())
-    - [ ] `updated_at` (TIMESTAMPTZ, DEFAULT NOW())
-    - [ ] `submitted_at` (TIMESTAMPTZ, nullable)
-    - [ ] `started_at` (TIMESTAMPTZ, nullable)
-    - [ ] `completed_at` (TIMESTAMPTZ, nullable)
-    - [ ] `failed_at` (TIMESTAMPTZ, nullable)
-    - [ ] `cancelled_at` (TIMESTAMPTZ, nullable)
-    - [ ] `gcs_path` (TEXT, NOT NULL) — *See [06-data-model-spec.md#google-cloud-storage](../spec/06-data-model-spec.md)*
-    - [ ] `batch_job_name` (TEXT, nullable)
-    - [ ] `params` (JSONB, NOT NULL) — *See [06-data-model-spec.md#params-jsonb](../spec/06-data-model-spec.md)*
-    - [ ] `sample_count` (INTEGER, NOT NULL)
-    - [ ] `source_ngs_runs` (TEXT[], nullable)
-    - [ ] `source_project` (TEXT, nullable)
-    - [ ] `parent_run_id` (VARCHAR(50), nullable) — *See [12-recovery-spec.md#run-record-fields](../spec/12-recovery-spec.md)*
-    - [ ] `is_recovery` (BOOLEAN, DEFAULT FALSE) — *See [12-recovery-spec.md#run-record-fields](../spec/12-recovery-spec.md)*
-    - [ ] `recovery_notes` (TEXT, nullable) — *See [12-recovery-spec.md#run-record-fields](../spec/12-recovery-spec.md)*
-    - [ ] `reused_work_dir` (TEXT, nullable) — *See [12-recovery-spec.md#run-record-fields](../spec/12-recovery-spec.md)*
-    - [ ] `exit_code` (INTEGER, nullable)
-    - [ ] `error_message` (TEXT, nullable) — *See [06-data-model-spec.md#error-fields](../spec/06-data-model-spec.md)*
-    - [ ] `error_task` (TEXT, nullable)
-    - [ ] `metrics` (JSONB, nullable) — *See [06-data-model-spec.md#metrics-jsonb](../spec/06-data-model-spec.md)*
-  - [ ] Define indexes — *See [06-data-model-spec.md#indexes](../spec/06-data-model-spec.md)*:
-    - [ ] `idx_runs_user_email_created_at` (user_email, created_at DESC)
-    - [ ] `idx_runs_status_created_at` (status, created_at DESC)
-    - [ ] `idx_runs_created_at` (created_at DESC)
+- [x] Create `backend/models/runs.py`:
+  - [x] Define `Run` SQLAlchemy model with columns — *See [06-data-model-spec.md#runs-table](../spec/06-data-model-spec.md)*:
+    - [x] `run_id` (VARCHAR(50), PRIMARY KEY)
+    - [x] `pipeline` (VARCHAR(100), NOT NULL)
+    - [x] `pipeline_version` (VARCHAR(20), NOT NULL)
+    - [x] `status` (VARCHAR(20), NOT NULL) — *See [06-data-model-spec.md#run-status-values](../spec/06-data-model-spec.md)*
+    - [x] `user_email` (VARCHAR(255), NOT NULL)
+    - [x] `user_name` (VARCHAR(255))
+    - [x] `created_at` (TIMESTAMPTZ, DEFAULT NOW())
+    - [x] `updated_at` (TIMESTAMPTZ, DEFAULT NOW())
+    - [x] `submitted_at` (TIMESTAMPTZ, nullable)
+    - [x] `started_at` (TIMESTAMPTZ, nullable)
+    - [x] `completed_at` (TIMESTAMPTZ, nullable)
+    - [x] `failed_at` (TIMESTAMPTZ, nullable)
+    - [x] `cancelled_at` (TIMESTAMPTZ, nullable)
+    - [x] `gcs_path` (TEXT, NOT NULL) — *See [06-data-model-spec.md#google-cloud-storage](../spec/06-data-model-spec.md)*
+    - [x] `batch_job_name` (TEXT, nullable)
+    - [x] `params` (JSONB, NOT NULL) — *See [06-data-model-spec.md#params-jsonb](../spec/06-data-model-spec.md)*
+    - [x] `sample_count` (INTEGER, NOT NULL)
+    - [x] `source_ngs_runs` (TEXT[], nullable)
+    - [x] `source_project` (TEXT, nullable)
+    - [x] `parent_run_id` (VARCHAR(50), nullable) — *See [12-recovery-spec.md#run-record-fields](../spec/12-recovery-spec.md)*
+    - [x] `is_recovery` (BOOLEAN, DEFAULT FALSE) — *See [12-recovery-spec.md#run-record-fields](../spec/12-recovery-spec.md)*
+    - [x] `recovery_notes` (TEXT, nullable) — *See [12-recovery-spec.md#run-record-fields](../spec/12-recovery-spec.md)*
+    - [x] `reused_work_dir` (TEXT, nullable) — *See [12-recovery-spec.md#run-record-fields](../spec/12-recovery-spec.md)*
+    - [x] `exit_code` (INTEGER, nullable)
+    - [x] `error_message` (TEXT, nullable) — *See [06-data-model-spec.md#error-fields](../spec/06-data-model-spec.md)*
+    - [x] `error_task` (TEXT, nullable)
+    - [x] `metrics` (JSONB, nullable) — *See [06-data-model-spec.md#metrics-jsonb](../spec/06-data-model-spec.md)*
+  - [x] Define indexes — *See [06-data-model-spec.md#indexes](../spec/06-data-model-spec.md)*:
+    - [x] `idx_runs_user_email_created_at` (user_email, created_at DESC)
+    - [x] `idx_runs_status_created_at` (status, created_at DESC)
+    - [x] `idx_runs_created_at` (created_at DESC)
 
 ### Users Table
 
 > **Spec References:**
 > - [06-data-model-spec.md#users-table](../spec/06-data-model-spec.md) - Complete column definitions
 
-- [ ] Create `backend/models/users.py`:
-  - [ ] Define `User` SQLAlchemy model with columns — *See [06-data-model-spec.md#users-table](../spec/06-data-model-spec.md)*:
-    - [ ] `email` (VARCHAR(255), PRIMARY KEY)
-    - [ ] `display_name` (VARCHAR(255), NOT NULL)
-    - [ ] `created_at` (TIMESTAMPTZ, DEFAULT NOW())
-    - [ ] `last_login_at` (TIMESTAMPTZ, DEFAULT NOW())
-    - [ ] `preferences` (JSONB, NOT NULL, DEFAULT JSON object) — *See [06-data-model-spec.md#preferences-jsonb](../spec/06-data-model-spec.md)*
-    - [ ] `stats` (JSONB, NOT NULL, DEFAULT JSON object) — *See [06-data-model-spec.md#stats-jsonb](../spec/06-data-model-spec.md)*
-  - [ ] Define indexes:
-    - [ ] `idx_users_last_login_at` (last_login_at DESC)
+- [x] Create `backend/models/users.py`:
+  - [x] Define `User` SQLAlchemy model with columns — *See [06-data-model-spec.md#users-table](../spec/06-data-model-spec.md)*:
+    - [x] `email` (VARCHAR(255), PRIMARY KEY)
+    - [x] `display_name` (VARCHAR(255), NOT NULL)
+    - [x] `created_at` (TIMESTAMPTZ, DEFAULT NOW())
+    - [x] `last_login_at` (TIMESTAMPTZ, DEFAULT NOW())
+    - [x] `preferences` (JSONB, NOT NULL, DEFAULT JSON object) — *See [06-data-model-spec.md#preferences-jsonb](../spec/06-data-model-spec.md)*
+    - [x] `stats` (JSONB, NOT NULL, DEFAULT JSON object) — *See [06-data-model-spec.md#stats-jsonb](../spec/06-data-model-spec.md)*
+  - [x] Define indexes:
+    - [x] `idx_users_last_login_at` (last_login_at DESC)
 
 ### Checkpoints Table
 
 > **Spec References:**
 > - [06-data-model-spec.md#checkpoints-table](../spec/06-data-model-spec.md) - LangGraph checkpoint storage
 
-- [ ] Create `backend/models/checkpoints.py`:
-  - [ ] Define `Checkpoint` SQLAlchemy model for LangGraph — *See [06-data-model-spec.md#checkpoints-table](../spec/06-data-model-spec.md)*:
-    - [ ] `thread_id` (VARCHAR(100), NOT NULL)
-    - [ ] `checkpoint_id` (VARCHAR(100), NOT NULL)
-    - [ ] `parent_checkpoint_id` (VARCHAR(100), nullable)
-    - [ ] `checkpoint` (JSONB, NOT NULL)
-    - [ ] `metadata` (JSONB, nullable)
-    - [ ] `created_at` (TIMESTAMPTZ, DEFAULT NOW())
-    - [ ] PRIMARY KEY (thread_id, checkpoint_id)
+- [x] Create `backend/models/checkpoints.py`:
+  - [x] Define `Checkpoint` SQLAlchemy model for LangGraph — *See [06-data-model-spec.md#checkpoints-table](../spec/06-data-model-spec.md)*:
+    - [x] `thread_id` (VARCHAR(100), NOT NULL)
+    - [x] `checkpoint_id` (VARCHAR(100), NOT NULL)
+    - [x] `parent_checkpoint_id` (VARCHAR(100), nullable)
+    - [x] `checkpoint` (JSONB, NOT NULL)
+    - [x] `metadata` (JSONB, nullable)
+    - [x] `created_at` (TIMESTAMPTZ, DEFAULT NOW())
+    - [x] PRIMARY KEY (thread_id, checkpoint_id)
 
 ### Pydantic Request/Response Models
 
@@ -105,41 +105,41 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [03-backend-spec.md#request-response-models](../spec/03-backend-spec.md) - Model definitions
 > - [03-backend-spec.md#run-models](../spec/03-backend-spec.md) - Run request/response schemas
 
-- [ ] Create `backend/models/schemas/runs.py` — *See [03-backend-spec.md#run-models](../spec/03-backend-spec.md)*:
-  - [ ] Define `RunStatus` enum (pending, submitted, running, completed, failed, cancelled)
-  - [ ] Define `RunCreateRequest` model:
-    - [ ] `pipeline` (str, regex pattern validation)
-    - [ ] `pipeline_version` (str, semver pattern)
-    - [ ] `samplesheet_csv` (str, max length 10MB)
-    - [ ] `config_content` (str, max length 100KB)
-    - [ ] `params` (dict)
-  - [ ] Define `RunResponse` model with all run fields
-  - [ ] Define `RunListResponse` model with pagination
-  - [ ] Define `RunRecoverRequest` model — *See [12-recovery-spec.md#api](../spec/12-recovery-spec.md)*:
-    - [ ] `reuse_work_dir` (bool, default True)
-    - [ ] `notes` (str, optional)
-    - [ ] `override_params` (dict, optional)
-    - [ ] `override_config` (str, optional)
-- [ ] Create `backend/models/schemas/pipelines.py` — *See [03-backend-spec.md#pipeline-models](../spec/03-backend-spec.md)*:
-  - [ ] Define `PipelineParam` model
-  - [ ] Define `SamplesheetColumn` model
-  - [ ] Define `PipelineSchema` model
-  - [ ] Define `PipelineListResponse` model
-- [ ] Create `backend/models/schemas/logs.py`:
-  - [ ] Define `LogEntry` model
-  - [ ] Define `TaskInfo` model
-  - [ ] Define `TaskLogs` model
+- [x] Create `backend/models/schemas/runs.py` — *See [03-backend-spec.md#run-models](../spec/03-backend-spec.md)*:
+  - [x] Define `RunStatus` enum (pending, submitted, running, completed, failed, cancelled)
+  - [x] Define `RunCreateRequest` model:
+    - [x] `pipeline` (str, regex pattern validation)
+    - [x] `pipeline_version` (str, semver pattern)
+    - [x] `samplesheet_csv` (str, max length 10MB)
+    - [x] `config_content` (str, max length 100KB)
+    - [x] `params` (dict)
+  - [x] Define `RunResponse` model with all run fields
+  - [x] Define `RunListResponse` model with pagination
+  - [x] Define `RunRecoverRequest` model — *See [12-recovery-spec.md#api](../spec/12-recovery-spec.md)*:
+    - [x] `reuse_work_dir` (bool, default True)
+    - [x] `notes` (str, optional)
+    - [x] `override_params` (dict, optional)
+    - [x] `override_config` (str, optional)
+- [x] Create `backend/models/schemas/pipelines.py` — *See [03-backend-spec.md#pipeline-models](../spec/03-backend-spec.md)*:
+  - [x] Define `PipelineParam` model
+  - [x] Define `SamplesheetColumn` model
+  - [x] Define `PipelineSchema` model
+  - [x] Define `PipelineListResponse` model
+- [x] Create `backend/models/schemas/logs.py`:
+  - [x] Define `LogEntry` model
+  - [x] Define `TaskInfo` model
+  - [x] Define `TaskLogs` model
 
 ### Database Migrations with Alembic
 
-- [ ] Initialize Alembic in backend directory:
-  - [ ] Run `alembic init migrations`
-  - [ ] Configure `alembic.ini` with database URL
-  - [ ] Update `migrations/env.py` for async support
-- [ ] Create initial migration:
-  - [ ] `alembic revision --autogenerate -m "initial_schema"`
-  - [ ] Review generated migration file
-  - [ ] Include runs, users, and checkpoints tables
+- [x] Initialize Alembic in backend directory:
+  - [x] Run `alembic init migrations`
+  - [x] Configure `alembic.ini` with database URL
+  - [x] Update `migrations/env.py` for async support
+- [x] Create initial migration:
+  - [x] `alembic revision --autogenerate -m "initial_schema"`
+  - [x] Review generated migration file
+  - [x] Include runs, users, and checkpoints tables
 - [ ] Test migration:
   - [ ] Apply migration to dev database
   - [ ] Verify table creation
@@ -151,57 +151,57 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [06-data-model-spec.md#status-transitions](../spec/06-data-model-spec.md) - Valid status transitions
 > - [06-data-model-spec.md#data-integrity](../spec/06-data-model-spec.md) - Validation rules
 
-- [ ] Create `backend/services/runs.py` — *See [03-backend-spec.md#runstoreservice](../spec/03-backend-spec.md)*:
-  - [ ] Implement `RunStoreService` class
-  - [ ] Implement `create_run()` method:
-    - [ ] Generate unique run_id (e.g., "run-{uuid4[:8]}")
-    - [ ] Set initial status to "pending"
-    - [ ] Set created_at and updated_at timestamps
-    - [ ] Construct gcs_path from settings and run_id — *See [06-data-model-spec.md#gcs-path-format](../spec/06-data-model-spec.md)*
-    - [ ] Insert into database
-    - [ ] Return run_id
-  - [ ] Implement `get_run()` method:
-    - [ ] Query by run_id
-    - [ ] Return RunResponse or None
-  - [ ] Implement `list_runs()` method:
-    - [ ] Support filtering by user_email, status, pipeline
-    - [ ] Support pagination (page, page_size)
-    - [ ] Support ordering by created_at DESC
-    - [ ] Return RunListResponse
-  - [ ] Implement `update_run_status()` method — *See [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md)*:
-    - [ ] Update status and corresponding timestamp
-    - [ ] Update updated_at
-    - [ ] Handle status-specific fields (error_message, exit_code, etc.)
-    - [ ] Validate status transitions — *See [06-data-model-spec.md#status-transitions](../spec/06-data-model-spec.md)*
-  - [ ] Implement `create_recovery_run()` method — *See [12-recovery-spec.md#backend-workflow](../spec/12-recovery-spec.md)*:
-    - [ ] Create new run linked to parent_run_id
-    - [ ] Set is_recovery to True
-    - [ ] Copy relevant fields from parent run
-    - [ ] Set reused_work_dir from parent
-- [ ] Add validation for status transitions — *See [06-data-model-spec.md#status-transitions](../spec/06-data-model-spec.md)*:
-  - [ ] pending → submitted, cancelled
-  - [ ] submitted → running, cancelled
-  - [ ] running → completed, failed, cancelled
-- [ ] Add unit tests for RunStoreService
+- [x] Create `backend/services/runs.py` — *See [03-backend-spec.md#runstoreservice](../spec/03-backend-spec.md)*:
+  - [x] Implement `RunStoreService` class
+  - [x] Implement `create_run()` method:
+    - [x] Generate unique run_id (e.g., "run-{uuid4[:8]}")
+    - [x] Set initial status to "pending"
+    - [x] Set created_at and updated_at timestamps
+    - [x] Construct gcs_path from settings and run_id — *See [06-data-model-spec.md#gcs-path-format](../spec/06-data-model-spec.md)*
+    - [x] Insert into database
+    - [x] Return run_id
+  - [x] Implement `get_run()` method:
+    - [x] Query by run_id
+    - [x] Return RunResponse or None
+  - [x] Implement `list_runs()` method:
+    - [x] Support filtering by user_email, status, pipeline
+    - [x] Support pagination (page, page_size)
+    - [x] Support ordering by created_at DESC
+    - [x] Return RunListResponse
+  - [x] Implement `update_run_status()` method — *See [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md)*:
+    - [x] Update status and corresponding timestamp
+    - [x] Update updated_at
+    - [x] Handle status-specific fields (error_message, exit_code, etc.)
+    - [x] Validate status transitions — *See [06-data-model-spec.md#status-transitions](../spec/06-data-model-spec.md)*
+  - [x] Implement `create_recovery_run()` method — *See [12-recovery-spec.md#backend-workflow](../spec/12-recovery-spec.md)*:
+    - [x] Create new run linked to parent_run_id
+    - [x] Set is_recovery to True
+    - [x] Copy relevant fields from parent run
+    - [x] Set reused_work_dir from parent
+- [x] Add validation for status transitions — *See [06-data-model-spec.md#status-transitions](../spec/06-data-model-spec.md)*:
+  - [x] pending → submitted, cancelled
+  - [x] submitted → running, cancelled
+  - [x] running → completed, failed, cancelled
+- [x] Add unit tests for RunStoreService
 
 ### UserService
 
 > **Spec References:**
 > - [07-integration-spec.md#user-data-integration](../spec/07-integration-spec.md) - User data storage
 
-- [ ] Create `backend/services/users.py`:
-  - [ ] Implement `UserService` class
-  - [ ] Implement `get_or_create_user()` method:
-    - [ ] Check if user exists by email
-    - [ ] If exists, update last_login_at and return
-    - [ ] If not exists, create new user record
-  - [ ] Implement `get_user()` method
-  - [ ] Implement `update_preferences()` method
-  - [ ] Implement `update_stats()` method — *See [06-data-model-spec.md#stats-jsonb](../spec/06-data-model-spec.md)*:
-    - [ ] Increment total_runs
-    - [ ] Increment successful_runs (on completion)
-    - [ ] Add to total_samples_processed
-- [ ] Add unit tests for UserService
+- [x] Create `backend/services/users.py`:
+  - [x] Implement `UserService` class
+  - [x] Implement `get_or_create_user()` method:
+    - [x] Check if user exists by email
+    - [x] If exists, update last_login_at and return
+    - [x] If not exists, create new user record
+  - [x] Implement `get_user()` method
+  - [x] Implement `update_preferences()` method
+  - [x] Implement `update_stats()` method — *See [06-data-model-spec.md#stats-jsonb](../spec/06-data-model-spec.md)*:
+    - [x] Increment total_runs
+    - [x] Increment successful_runs (on completion)
+    - [x] Add to total_samples_processed
+- [x] Add unit tests for UserService
 
 ---
 
