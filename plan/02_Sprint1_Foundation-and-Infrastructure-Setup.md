@@ -201,39 +201,39 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 
 ### GCP Project Resources
 
-- [ ] Create or configure GCP project for Arc Reactor
-- [ ] Enable required GCP APIs:
-  - [ ] Cloud Run API — *See [02-architecture-overview.md#web-application-layer](../spec/02-architecture-overview.md)*
-  - [ ] Cloud SQL Admin API — *See [02-architecture-overview.md#data-layer](../spec/02-architecture-overview.md)*
-  - [ ] Cloud Storage API — *See [02-architecture-overview.md#data-layer](../spec/02-architecture-overview.md)*
-  - [ ] Cloud Batch API — *See [02-architecture-overview.md#compute-layer](../spec/02-architecture-overview.md)*
-  - [ ] Secret Manager API — *See [08-security-spec.md#secret-management](../spec/08-security-spec.md)*
-  - [ ] Cloud Logging API
-  - [ ] Identity-Aware Proxy API — *See [08-security-spec.md#identity-aware-proxy-iap](../spec/08-security-spec.md)*
-  - [ ] Artifact Registry API (for container images)
+- [x] Create or configure GCP project for Arc Reactor
+- [x] Enable required GCP APIs:
+  - [x] Cloud Run API — *See [02-architecture-overview.md#web-application-layer](../spec/02-architecture-overview.md)*
+  - [x] Cloud SQL Admin API — *See [02-architecture-overview.md#data-layer](../spec/02-architecture-overview.md)*
+  - [x] Cloud Storage API — *See [02-architecture-overview.md#data-layer](../spec/02-architecture-overview.md)*
+  - [x] Cloud Batch API — *See [02-architecture-overview.md#compute-layer](../spec/02-architecture-overview.md)*
+  - [x] Secret Manager API — *See [08-security-spec.md#secret-management](../spec/08-security-spec.md)*
+  - [x] Cloud Logging API
+  - [x] Identity-Aware Proxy API — *See [08-security-spec.md#identity-aware-proxy-iap](../spec/08-security-spec.md)*
+  - [x] Artifact Registry API (for container images)
 
 ### Service Accounts & IAM
 
 > **Spec References:**
 > - [08-security-spec.md#service-account-permissions](../spec/08-security-spec.md) - Complete IAM roles
 
-- [ ] Create Cloud Run service account (`arc-reactor@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#cloud-run-service-account](../spec/08-security-spec.md)*:
-  - [ ] Grant `roles/cloudsql.client`
-  - [ ] Grant `roles/storage.objectAdmin` for pipeline bucket
-  - [ ] Grant `roles/storage.objectViewer` for NGS data bucket
-  - [ ] Grant `roles/batch.jobsEditor`
-  - [ ] Grant `roles/logging.logWriter`
-  - [ ] Grant `roles/secretmanager.secretAccessor`
-- [ ] Create Batch orchestrator service account (`nextflow-orchestrator@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#batch-orchestrator-service-account](../spec/08-security-spec.md)*:
-  - [ ] Grant `roles/cloudsql.client`
-  - [ ] Grant `roles/storage.objectAdmin` for pipeline bucket
-  - [ ] Grant `roles/storage.objectViewer` for NGS data bucket
-  - [ ] Grant `roles/batch.jobsEditor`
-  - [ ] Grant `roles/logging.logWriter`
-- [ ] Create Nextflow tasks service account (`nextflow-tasks@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#nextflow-tasks-service-account](../spec/08-security-spec.md)*:
-  - [ ] Grant `roles/storage.objectAdmin` for work directory
-  - [ ] Grant `roles/storage.objectViewer` for NGS data bucket
-  - [ ] Grant `roles/logging.logWriter`
+- [x] Create Cloud Run service account (`arc-reactor@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#cloud-run-service-account](../spec/08-security-spec.md)*:
+  - [x] Grant `roles/cloudsql.client`
+  - [x] Grant `roles/storage.objectAdmin` for pipeline bucket
+  - [x] Grant `roles/storage.objectViewer` for NGS data bucket
+  - [x] Grant `roles/batch.jobsEditor`
+  - [x] Grant `roles/logging.logWriter`
+  - [x] Grant `roles/secretmanager.secretAccessor`
+- [x] Create Batch orchestrator service account (`nextflow-orchestrator@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#batch-orchestrator-service-account](../spec/08-security-spec.md)*:
+  - [x] Grant `roles/cloudsql.client`
+  - [x] Grant `roles/storage.objectAdmin` for pipeline bucket
+  - [x] Grant `roles/storage.objectViewer` for NGS data bucket
+  - [x] Grant `roles/batch.jobsEditor`
+  - [x] Grant `roles/logging.logWriter`
+- [x] Create Nextflow tasks service account (`nextflow-tasks@PROJECT.iam.gserviceaccount.com`) — *See [08-security-spec.md#nextflow-tasks-service-account](../spec/08-security-spec.md)*:
+  - [x] Grant `roles/storage.objectAdmin` for work directory
+  - [x] Grant `roles/storage.objectViewer` for NGS data bucket
+  - [x] Grant `roles/logging.logWriter`
 
 ### Cloud SQL (PostgreSQL)
 
@@ -242,18 +242,18 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [07-integration-spec.md#cloud-sql-postgresql-integration](../spec/07-integration-spec.md) - Connection configuration
 > - [09-deployment-spec.md#cloud-sql-postgresql](../spec/09-deployment-spec.md) - Instance settings
 
-- [ ] Create Cloud SQL PostgreSQL instance for dev environment:
-  - [ ] Instance name: `arc-reactor-db-dev`
-  - [ ] PostgreSQL version: 15
-  - [ ] Region: `us-west1`
-  - [ ] Machine type: `db-f1-micro` for dev
-  - [ ] Enable private IP — *See [07-integration-spec.md#connection-configuration](../spec/07-integration-spec.md)*
-  - [ ] Configure automated backups — *See [06-data-model-spec.md#backup-and-recovery](../spec/06-data-model-spec.md)*
-- [ ] Create Cloud SQL PostgreSQL instance for prod environment:
-  - [ ] Instance name: `arc-reactor-db`
-  - [ ] Same configuration as dev but larger machine type
-- [ ] Create database user with appropriate permissions
-- [ ] Create databases: `arc_reactor_dev`, `arc_reactor_prod`
+- [x] Create Cloud SQL PostgreSQL instance for dev environment:
+  - [x] Instance name: `arc-reactor-db-dev`
+  - [x] PostgreSQL version: 15
+  - [x] Region: `us-west1`
+  - [x] Machine type: `db-f1-micro` for dev
+  - [x] Enable private IP — *See [07-integration-spec.md#connection-configuration](../spec/07-integration-spec.md)*
+  - [x] Configure automated backups — *See [06-data-model-spec.md#backup-and-recovery](../spec/06-data-model-spec.md)*
+- [x] Create Cloud SQL PostgreSQL instance for prod environment:
+  - [x] Instance name: `arc-reactor-db`
+  - [x] Same configuration as dev but larger machine type
+- [x] Create database user with appropriate permissions
+- [x] Create databases: `arc_reactor_dev`, `arc_reactor_prod`
 
 ### GCS Buckets
 
@@ -261,28 +261,28 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [06-data-model-spec.md#google-cloud-storage](../spec/06-data-model-spec.md) - Bucket structure and lifecycle
 > - [07-integration-spec.md#google-cloud-storage-integration](../spec/07-integration-spec.md) - GCS operations
 
-- [ ] Create dev runs bucket (`arc-reactor-runs-dev`) — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
-  - [ ] Region: `us-west1`
-  - [ ] Uniform bucket-level access enabled
-  - [ ] Configure lifecycle policy for `runs/*/work/` (30-day deletion) — *See [06-data-model-spec.md#file-lifecycle](../spec/06-data-model-spec.md)*
-  - [ ] Enable versioning for `inputs/` and `results/` paths
-  - [ ] Configure soft delete with 7-day recovery — *See [06-data-model-spec.md#backup-and-recovery](../spec/06-data-model-spec.md)*
-- [ ] Create prod runs bucket (`arc-reactor-runs`):
-  - [ ] Same configuration as dev bucket
-- [ ] Configure IAM bindings for service accounts
+- [x] Create dev runs bucket (`arc-reactor-runs-dev`) — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
+  - [x] Region: `us-west1`
+  - [x] Uniform bucket-level access enabled
+  - [x] Configure lifecycle policy for `runs/*/work/` (30-day deletion) — *See [06-data-model-spec.md#file-lifecycle](../spec/06-data-model-spec.md)*
+  - [x] Enable versioning for `inputs/` and `results/` paths
+  - [x] Configure soft delete with 7-day recovery — *See [06-data-model-spec.md#backup-and-recovery](../spec/06-data-model-spec.md)*
+- [x] Create prod runs bucket (`arc-reactor-runs`):
+  - [x] Same configuration as dev bucket
+- [x] Configure IAM bindings for service accounts
 
 ### Secret Manager
 
 > **Spec References:**
 > - [08-security-spec.md#secret-management](../spec/08-security-spec.md) - Secret storage
 
-- [ ] Create secret for Benchling warehouse password:
-  - [ ] Secret name: `benchling-warehouse-password`
-  - [ ] Add secret version with actual password
-- [ ] Create secret for Google API key — *See [11-conf-spec.md#environment-variables](../spec/11-conf-spec.md)*:
-  - [ ] Secret name: `google-api-key`
-  - [ ] Add secret version with Gemini API key
-- [ ] Grant secret accessor role to Cloud Run service account
+- [x] Create secret for Benchling warehouse password:
+  - [x] Secret name: `benchling-warehouse-password`
+  - [x] Add secret version with actual password
+- [x] Create secret for Google API key — *See [11-conf-spec.md#environment-variables](../spec/11-conf-spec.md)*:
+  - [x] Secret name: `google-api-key`
+  - [x] Add secret version with Gemini API key
+- [x] Grant secret accessor role to Cloud Run service account
 
 ### VPC & Networking
 
@@ -290,15 +290,15 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [08-security-spec.md#network-security](../spec/08-security-spec.md) - VPC configuration
 > - [08-security-spec.md#egress-controls](../spec/08-security-spec.md) - Allowed destinations
 
-- [ ] Create or configure VPC network for Arc Reactor
-- [ ] Create Serverless VPC Connector for Cloud Run:
-  - [ ] Region: `us-west1`
-  - [ ] Configure IP range
-- [ ] Configure Cloud NAT for egress traffic
-- [ ] Configure firewall rules — *See [08-security-spec.md#firewall-rules](../spec/08-security-spec.md)*:
-  - [ ] Allow IAP ranges to Cloud Run
-  - [ ] Allow internal VPC traffic
-  - [ ] Default deny all other ingress
+- [x] Create or configure VPC network for Arc Reactor
+- [x] Create Serverless VPC Connector for Cloud Run:
+  - [x] Region: `us-west1`
+  - [x] Configure IP range
+- [x] Configure Cloud NAT for egress traffic
+- [x] Configure firewall rules — *See [08-security-spec.md#firewall-rules](../spec/08-security-spec.md)*:
+  - [x] Allow IAP ranges to Cloud Run
+  - [x] Allow internal VPC traffic
+  - [x] Default deny all other ingress
 
 ### IAP Configuration
 
@@ -306,64 +306,64 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > - [07-integration-spec.md#gcp-iap-integration](../spec/07-integration-spec.md) - IAP authentication flow
 > - [08-security-spec.md#identity-aware-proxy-iap](../spec/08-security-spec.md) - IAP settings
 
-- [ ] Configure Cloud Run backend service for IAP:
-  - [ ] Enable IAP on the backend service
-  - [ ] Configure OAuth consent screen
-- [ ] Create IAP access policy — *See [08-security-spec.md#authorized-groups](../spec/08-security-spec.md)*:
-  - [ ] Create Google Group for users (`arc-reactor-users@arcinstitute.org`)
-  - [ ] Create Google Group for admins (`arc-reactor-admins@arcinstitute.org`)
-  - [ ] Grant `roles/iap.httpsResourceAccessor` to user group
+- [x] Configure Cloud Run backend service for IAP:
+  - [x] Enable IAP on the backend service
+  - [x] Configure OAuth consent screen
+- [x] Create IAP access policy — *See [08-security-spec.md#authorized-groups](../spec/08-security-spec.md)*:
+  - [x] Create Google Group for users (`arc-reactor-users@arcinstitute.org`)
+  - [x] Create Google Group for admins (`arc-reactor-admins@arcinstitute.org`)
+  - [x] Grant `roles/iap.httpsResourceAccessor` to user group
 
 ### GitHub Actions CI/CD
 
 > **Spec References:**
 > - [09-deployment-spec.md#github-actions-workflow](../spec/09-deployment-spec.md) - Complete workflow YAML
 
-- [ ] Create `.github/workflows/ci.yml` for pull request checks:
-  - [ ] Checkout code
-  - [ ] Set up Python 3.11
-  - [ ] Install backend dependencies
-  - [ ] Run Ruff linting
-  - [ ] Run mypy type checking
-  - [ ] Run pytest
-  - [ ] Set up Node.js 20
-  - [ ] Install frontend dependencies
-  - [ ] Run ESLint
-  - [ ] Run TypeScript type checking
-  - [ ] Run frontend tests
-- [ ] Create `.github/workflows/deploy.yml` for deployment — *See [09-deployment-spec.md#github-actions-workflow](../spec/09-deployment-spec.md)*:
-  - [ ] Trigger on push to `main` and `develop` branches
-  - [ ] Authenticate to GCP using service account key
-  - [ ] Determine environment from branch (main=prod, develop=dev)
-  - [ ] Build Docker image with BuildKit
-  - [ ] Push to Artifact Registry or GCR
-  - [ ] Deploy to Cloud Run with appropriate configuration
-  - [ ] Configure environment variables and secrets
-- [ ] Add GitHub repository secrets:
-  - [ ] `GCP_SA_KEY`: Service account JSON key
-  - [ ] `GITHUB_TOKEN`: For private dependencies
+- [x] Create `.github/workflows/ci.yml` for pull request checks:
+  - [x] Checkout code
+  - [x] Set up Python 3.11
+  - [x] Install backend dependencies
+  - [x] Run Ruff linting
+  - [x] Run mypy type checking
+  - [x] Run pytest
+  - [x] Set up Node.js 20
+  - [x] Install frontend dependencies
+  - [x] Run ESLint
+  - [x] Run TypeScript type checking
+  - [x] Run frontend tests
+- [x] Create `.github/workflows/deploy.yml` for deployment — *See [09-deployment-spec.md#github-actions-workflow](../spec/09-deployment-spec.md)*:
+  - [x] Trigger on push to `main` and `develop` branches
+  - [x] Authenticate to GCP using service account key
+  - [x] Determine environment from branch (main=prod, develop=dev)
+  - [x] Build Docker image with BuildKit
+  - [x] Push to Artifact Registry or GCR
+  - [x] Deploy to Cloud Run with appropriate configuration
+  - [x] Configure environment variables and secrets
+- [x] Add GitHub repository secrets:
+  - [x] `GCP_SA_KEY`: Service account JSON key
+  - [x] `GITHUB_TOKEN`: For private dependencies
 
 ### Terraform Infrastructure as Code
 
 > **Spec References:**
 > - [09-deployment-spec.md#terraform-resources](../spec/09-deployment-spec.md) - Terraform examples
 
-- [ ] Create `terraform/` directory structure:
-  - [ ] `terraform/main.tf` - Main resources
-  - [ ] `terraform/variables.tf` - Input variables
-  - [ ] `terraform/outputs.tf` - Output values
-  - [ ] `terraform/environments/dev.tfvars`
-  - [ ] `terraform/environments/prod.tfvars`
-- [ ] Define Terraform resources — *See [09-deployment-spec.md#terraform-resources](../spec/09-deployment-spec.md)*:
-  - [ ] Cloud Run service
-  - [ ] Cloud SQL instance
-  - [ ] GCS buckets
-  - [ ] Service accounts with IAM bindings
-  - [ ] Secret Manager secrets
-  - [ ] VPC connector
-  - [ ] IAP configuration
-- [ ] Create Terraform backend configuration for state storage
-- [ ] Document Terraform usage in README
+- [x] Create `terraform/` directory structure:
+  - [x] `terraform/main.tf` - Main resources
+  - [x] `terraform/variables.tf` - Input variables
+  - [x] `terraform/outputs.tf` - Output values
+  - [x] `terraform/environments/dev.tfvars`
+  - [x] `terraform/environments/prod.tfvars`
+- [x] Define Terraform resources — *See [09-deployment-spec.md#terraform-resources](../spec/09-deployment-spec.md)*:
+  - [x] Cloud Run service
+  - [x] Cloud SQL instance
+  - [x] GCS buckets
+  - [x] Service accounts with IAM bindings
+  - [x] Secret Manager secrets
+  - [x] VPC connector
+  - [x] IAP configuration
+- [x] Create Terraform backend configuration for state storage
+- [x] Document Terraform usage in README
 
 ---
 
