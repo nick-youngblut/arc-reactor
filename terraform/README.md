@@ -29,7 +29,7 @@ terraform apply -var-file=environments/dev.tfvars \
 ```
 
 ## Notes
-- Bucket versioning is enabled at the bucket level. The lifecycle rule removes archived objects after 7 days to provide a soft-delete window.
+- Bucket versioning is enabled at the bucket level. A lifecycle rule deletes `runs/*/work/` objects after 30 days; archived objects are removed after 7 days to provide a soft-delete window.
 - IAP requires a serverless NEG and backend service. You still need to attach a HTTPS load balancer and domain mapping for external access.
 - Update `terraform/backend.tf` with the actual state bucket name.
 - Secrets are stored in Secret Manager via variables. Avoid committing sensitive values in tfvars.

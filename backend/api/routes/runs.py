@@ -177,9 +177,7 @@ async def recover_run(
         raise ValidationError("Run is not eligible for recovery", detail=run.status.value)
 
     if payload.reuse_work_dir:
-        prefix = f"runs/{run_id}/work/"
-        existing = storage.list_files(prefix)
-        if not existing:
+        if not storage.check_work_dir_exists(run_id):
             raise ValidationError("Recovery unavailable: work directory not found")
 
     recovery_id = await service.create_recovery_run(
@@ -212,33 +210,16 @@ async def list_run_files(
         raise NotFoundError("Run not found", detail=f"No run exists with ID {run_id}")
     _ensure_owner_or_admin(run, user)
 
-    prefix = f"runs/{run_id}/"
-    files = storage.list_files(prefix)
-
-    grouped: dict[str, list[dict[str, Any]]] = {"inputs": [], "results": [], "logs": []}
-    for entry in files:
-        name = str(entry["name"])
-        if not name.startswith(prefix):
-            continue
-        rel = name[len(prefix) :]
-        if "/" not in rel:
-            continue
-        top_dir = rel.split("/", 1)[0]
-        if top_dir not in grouped:
-            continue
-        gcs_uri = f"gs://{storage.bucket_name}/{name}"
-        grouped[top_dir].append(
-            {
-                "name": rel,
-                "size": entry.get("size"),
-                "updated_at": entry.get("updated").isoformat()
-                if isinstance(entry.get("updated"), datetime)
-                else entry.get("updated"),
-                "gcs_uri": gcs_uri,
-                "download_url": storage.generate_signed_url(gcs_uri),
-            }
-        )
-
+    grouped = storage.get_run_files(run_id)
+    for entries in grouped.values():
+        for entry in entries:
+            gcs_uri = str(entry.get("gcs_uri"))
+            entry["download_url"] = storage.generate_signed_url(gcs_uri)
+            updated = entry.get("updated")
+            if isinstance(updated, datetime):
+                entry["updated_at"] = updated.isoformat()
+            elif updated is not None:
+                entry["updated_at"] = updated
     return grouped
 
 

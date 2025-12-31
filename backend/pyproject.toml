@@ -17,6 +17,7 @@ dependencies = [
     "asyncpg>=0.29.0",
     "google-auth>=2.29.0",
     "google-cloud-batch>=0.17.0",
+    "google-cloud-logging>=3.10.0",
     "google-cloud-storage>=2.14.0",
     "google-cloud-secret-manager>=2.20.0",
     "langchain>=1.1.0,<2.0.0",

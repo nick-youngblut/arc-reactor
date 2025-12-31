@@ -372,25 +372,25 @@ This sprint implements the data models, persistence layer, and core REST API end
 
 ### Log Service Implementation
 
-- [ ] Create `backend/services/logs.py` — *See [03-backend-spec.md#logservice](../spec/03-backend-spec.md)*:
-  - [ ] Implement `LogService` class
+- [x] Create `backend/services/logs.py` — *See [03-backend-spec.md#logservice](../spec/03-backend-spec.md)*:
+  - [x] Implement `LogService` class
 
 #### Workflow Log Access
 
 > **Spec References:**
 > - [03-backend-spec.md#workflow-log](../spec/03-backend-spec.md) - Workflow log streaming
 
-- [ ] Implement `get_workflow_log()` method:
-  - [ ] Fetch `nextflow.log` from GCS (`logs/nextflow.log`) — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*
-  - [ ] Parse log lines into LogEntry objects
-  - [ ] Support offset/limit for pagination
-  - [ ] Handle missing log file gracefully
+- [x] Implement `get_workflow_log()` method:
+  - [x] Fetch `nextflow.log` from GCS (`logs/nextflow.log`) — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*
+  - [x] Parse log lines into LogEntry objects
+  - [x] Support offset/limit for pagination
+  - [x] Handle missing log file gracefully
 
-- [ ] Implement `stream_workflow_log()` method:
-  - [ ] Async generator for log streaming
-  - [ ] Poll GCS for new content periodically
-  - [ ] Track file offset for incremental reads
-  - [ ] Yield LogEntry objects
+- [x] Implement `stream_workflow_log()` method:
+  - [x] Async generator for log streaming
+  - [x] Poll GCS for new content periodically
+  - [x] Track file offset for incremental reads
+  - [x] Yield LogEntry objects
 
 #### Task Log Access
 
@@ -398,57 +398,57 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [03-backend-spec.md#task-logs](../spec/03-backend-spec.md) - Task log retrieval
 > - [07-integration-spec.md#cloud-logging-integration](../spec/07-integration-spec.md) - Log query patterns
 
-- [ ] Implement `list_tasks()` method — *See [03-backend-spec.md#task-list](../spec/03-backend-spec.md)*:
-  - [ ] Fetch and parse `trace.txt` from GCS
-  - [ ] Extract task metadata:
-    - [ ] task_id, name, process
-    - [ ] status, exit_code
-    - [ ] duration, cpu_percent, memory_peak
-    - [ ] start_time, end_time
-    - [ ] work_dir
-  - [ ] Return list of TaskInfo objects
-  - [ ] Cache trace parsing results
+- [x] Implement `list_tasks()` method — *See [03-backend-spec.md#task-list](../spec/03-backend-spec.md)*:
+  - [x] Fetch and parse `trace.txt` from GCS
+  - [x] Extract task metadata:
+    - [x] task_id, name, process
+    - [x] status, exit_code
+    - [x] duration, cpu_percent, memory_peak
+    - [x] start_time, end_time
+    - [x] work_dir
+  - [x] Return list of TaskInfo objects
+  - [x] Cache trace parsing results
 
-- [ ] Implement `get_task_logs()` method:
-  - [ ] Fetch task stdout/stderr from Cloud Logging — *See [07-integration-spec.md#query-patterns](../spec/07-integration-spec.md)*
-  - [ ] Filter by run_id and task labels — *See [07-integration-spec.md#required-labels-on-batch-jobs](../spec/07-integration-spec.md)*
-  - [ ] Return TaskLogs object with stdout and stderr
+- [x] Implement `get_task_logs()` method:
+  - [x] Fetch task stdout/stderr from Cloud Logging — *See [07-integration-spec.md#query-patterns](../spec/07-integration-spec.md)*
+  - [x] Filter by run_id and task labels — *See [07-integration-spec.md#required-labels-on-batch-jobs](../spec/07-integration-spec.md)*
+  - [x] Return TaskLogs object with stdout and stderr
 
-- [ ] Implement `stream_task_logs()` method:
-  - [ ] Async generator for Cloud Logging streaming
-  - [ ] Filter by task identifiers
+- [x] Implement `stream_task_logs()` method:
+  - [x] Async generator for Cloud Logging streaming
+  - [x] Filter by task identifiers
 
 #### Log Download
 
-- [ ] Implement `create_log_archive()` method:
-  - [ ] Download all log files for a run
-  - [ ] Create zip archive in memory or temp file
-  - [ ] Include nextflow.log, trace.txt, timeline.html, report.html
-  - [ ] Return archive path or bytes
+- [x] Implement `create_log_archive()` method:
+  - [x] Download all log files for a run
+  - [x] Create zip archive in memory or temp file
+  - [x] Include nextflow.log, trace.txt, timeline.html, report.html
+  - [x] Return archive path or bytes
 
 ### Log API Endpoints
 
 > **Spec References:**
 > - [03-backend-spec.md#log-endpoints](../spec/03-backend-spec.md) - Complete log API
 
-- [ ] Create `backend/api/routes/logs.py` — *See [03-backend-spec.md#log-endpoints](../spec/03-backend-spec.md)*:
-  - [ ] Implement `GET /api/runs/{id}/logs` endpoint:
-    - [ ] Return complete workflow log
-    - [ ] Support query params: offset, limit
-  - [ ] Implement `GET /api/runs/{id}/logs/stream` (SSE) endpoint:
-    - [ ] Stream workflow log in real-time
-    - [ ] Return LogEntry objects as SSE events
-    - [ ] Handle end-of-log gracefully
-  - [ ] Implement `GET /api/runs/{id}/tasks` endpoint:
-    - [ ] Return list of tasks with metadata
-    - [ ] Parse from trace.txt
-  - [ ] Implement `GET /api/runs/{id}/tasks/{task_id}/logs` endpoint:
-    - [ ] Return stdout and stderr for specific task
-    - [ ] Fetch from Cloud Logging
-  - [ ] Implement `GET /api/runs/{id}/logs/download` endpoint:
-    - [ ] Generate log archive
-    - [ ] Return as attachment with appropriate content-type
-- [ ] Register logs router in main app
+- [x] Create `backend/api/routes/logs.py` — *See [03-backend-spec.md#log-endpoints](../spec/03-backend-spec.md)*:
+  - [x] Implement `GET /api/runs/{id}/logs` endpoint:
+    - [x] Return complete workflow log
+    - [x] Support query params: offset, limit
+  - [x] Implement `GET /api/runs/{id}/logs/stream` (SSE) endpoint:
+    - [x] Stream workflow log in real-time
+    - [x] Return LogEntry objects as SSE events
+    - [x] Handle end-of-log gracefully
+  - [x] Implement `GET /api/runs/{id}/tasks` endpoint:
+    - [x] Return list of tasks with metadata
+    - [x] Parse from trace.txt
+  - [x] Implement `GET /api/runs/{id}/tasks/{task_id}/logs` endpoint:
+    - [x] Return stdout and stderr for specific task
+    - [x] Fetch from Cloud Logging
+  - [x] Implement `GET /api/runs/{id}/logs/download` endpoint:
+    - [x] Generate log archive
+    - [x] Return as attachment with appropriate content-type
+- [x] Register logs router in main app
 
 ### GCS File Operations Enhancement
 
@@ -456,21 +456,21 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [03-backend-spec.md#storageservice](../spec/03-backend-spec.md) - Storage operations
 > - [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md) - File organization
 
-- [ ] Enhance `backend/services/storage.py`:
-  - [ ] Implement `upload_run_files()` method:
-    - [ ] Accept run_id and dict of filename -> content
-    - [ ] Upload samplesheet.csv, nextflow.config, params.yaml
-    - [ ] Return list of GCS URIs
-  - [ ] Implement `get_run_files()` method:
-    - [ ] List all files for a run
-    - [ ] Organize by directory (inputs, results, logs) — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*
-    - [ ] Return FileInfo objects with metadata
-  - [ ] Implement `get_file_content()` method:
-    - [ ] Download and return file content
-    - [ ] Support text and binary modes
-  - [ ] Implement `check_work_dir_exists()` method — *See [12-recovery-spec.md#recovery-preconditions](../spec/12-recovery-spec.md)*:
-    - [ ] Check if work directory exists for recovery
-    - [ ] Return boolean
+- [x] Enhance `backend/services/storage.py`:
+  - [x] Implement `upload_run_files()` method:
+    - [x] Accept run_id and dict of filename -> content
+    - [x] Upload samplesheet.csv, nextflow.config, params.yaml
+    - [x] Return list of GCS URIs
+  - [x] Implement `get_run_files()` method:
+    - [x] List all files for a run
+    - [x] Organize by directory (inputs, results, logs) — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*
+    - [x] Return FileInfo objects with metadata
+  - [x] Implement `get_file_content()` method:
+    - [x] Download and return file content
+    - [x] Support text and binary modes
+  - [x] Implement `check_work_dir_exists()` method — *See [12-recovery-spec.md#recovery-preconditions](../spec/12-recovery-spec.md)*:
+    - [x] Check if work directory exists for recovery
+    - [x] Return boolean
 
 ### GCS Lifecycle Policies
 
@@ -478,31 +478,31 @@ This sprint implements the data models, persistence layer, and core REST API end
 > - [06-data-model-spec.md#file-lifecycle](../spec/06-data-model-spec.md) - Retention policies
 > - [07-integration-spec.md#lifecycle-policies](../spec/07-integration-spec.md) - Policy configuration
 
-- [ ] Create lifecycle policy configuration — *See [07-integration-spec.md#lifecycle-policies](../spec/07-integration-spec.md)*:
-  - [ ] Delete objects under `runs/*/work/` after 30 days
-  - [ ] Document in terraform or gcloud commands
-- [ ] Implement in terraform:
-  - [ ] Add lifecycle_rule to GCS bucket resource
-  - [ ] Condition: age = 30, matches_prefix = ["runs/*/work/"]
-  - [ ] Action: Delete
+- [x] Create lifecycle policy configuration — *See [07-integration-spec.md#lifecycle-policies](../spec/07-integration-spec.md)*:
+  - [x] Delete objects under `runs/*/work/` after 30 days
+  - [x] Document in terraform or gcloud commands
+- [x] Implement in terraform:
+  - [x] Add lifecycle_rule to GCS bucket resource
+  - [x] Condition: age = 30, matches_prefix = ["runs/*/work/"]
+  - [x] Action: Delete
 
 ### Run Event Service
 
 > **Spec References:**
 > - [03-backend-spec.md#runeventservice](../spec/03-backend-spec.md) - Event service interface
 
-- [ ] Create `backend/services/run_events.py` — *See [03-backend-spec.md#runeventservice](../spec/03-backend-spec.md)*:
-  - [ ] Implement `RunEventService` class
-  - [ ] Implement `stream_run_events()` method:
-    - [ ] Poll database for run status changes
-    - [ ] Compare with last known status
-    - [ ] Yield event on change
-    - [ ] Implement configurable poll interval
-    - [ ] Handle terminal states (stop polling)
-  - [ ] Define event types:
-    - [ ] "status" - Status change event
-    - [ ] "progress" - Optional progress updates
-    - [ ] "done" - Terminal state reached
+- [x] Create `backend/services/run_events.py` — *See [03-backend-spec.md#runeventservice](../spec/03-backend-spec.md)*:
+  - [x] Implement `RunEventService` class
+  - [x] Implement `stream_run_events()` method:
+    - [x] Poll database for run status changes
+    - [x] Compare with last known status
+    - [x] Yield event on change
+    - [x] Implement configurable poll interval
+    - [x] Handle terminal states (stop polling)
+  - [x] Define event types:
+    - [x] "status" - Status change event
+    - [x] "progress" - Optional progress updates
+    - [x] "done" - Terminal state reached
 
 ---
 

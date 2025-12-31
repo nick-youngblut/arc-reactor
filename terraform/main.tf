@@ -217,7 +217,7 @@ resource "google_storage_bucket" "runs" {
   lifecycle_rule {
     condition {
       age            = 30
-      matches_prefix = ["runs/"]
+      matches_prefix = ["runs/*/work/"]
     }
     action {
       type = "Delete"

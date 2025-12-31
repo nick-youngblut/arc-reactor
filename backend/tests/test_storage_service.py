@@ -46,8 +46,11 @@ class _Client:
     def bucket(self, name: str) -> _Bucket:
         return self._bucket
 
-    def list_blobs(self, name: str, prefix: str):
-        return [blob for blob in self._bucket.blobs.values() if blob.name.startswith(prefix)]
+    def list_blobs(self, name: str, prefix: str, max_results: int | None = None):
+        blobs = [blob for blob in self._bucket.blobs.values() if blob.name.startswith(prefix)]
+        if max_results is not None:
+            return blobs[:max_results]
+        return blobs
 
 
 def test_storage_upload_and_download() -> None:
@@ -82,3 +85,30 @@ def test_storage_listing_and_exists() -> None:
         "gs://arc-reactor-runs/runs/run-1/inputs/inputs.csv"
     )
     assert signed == "https://signed-url"
+
+
+def test_storage_run_files_helpers() -> None:
+    bucket = _Bucket()
+    client = _Client(bucket)
+    service = StorageService(client=client, bucket_name="arc-reactor-runs")
+
+    uploaded = service.upload_run_files(
+        "run-2",
+        {
+            "samplesheet.csv": "a,b",
+            "nextflow.config": "params {}",
+            "params.yaml": "genome: GRCh38",
+        },
+        "dev@arc.org",
+    )
+    assert len(uploaded) == 3
+
+    files = service.get_run_files("run-2")
+    assert files["inputs"]
+
+    content = service.get_file_content(uploaded[0], text=True)
+    assert isinstance(content, str)
+
+    assert service.check_work_dir_exists("run-2") is False
+    bucket.blob("runs/run-2/work/.keep").upload_from_string("x")
+    assert service.check_work_dir_exists("run-2") is True
