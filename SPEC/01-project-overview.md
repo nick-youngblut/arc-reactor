@@ -228,3 +228,5 @@ Users can track their pipeline runs through:
 8. [Security Specification](./08-security-spec.md)
 9. [Deployment Specification](./09-deployment-spec.md)
 10. [User Experience Specification](./10-ux-spec.md)
+11. [Configuration Specification](./11-conf-spec.md)
+12. [Recovery Specification](./12-recovery-spec.md)

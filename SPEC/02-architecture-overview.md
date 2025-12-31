@@ -69,10 +69,10 @@ The Arc Reactor follows a modern cloud-native architecture with clear separation
           │              │                    │                    │
           ▼              ▼                    ▼                    ▼
 ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│  Benchling   │  │  Cloud SQL   │  │  Firestore  │  │     GCS      │  │  GCP Batch   │
+│  Benchling   │  │  Cloud SQL   │  │  Firestore   │  │     GCS      │  │  GCP Batch   │
 │  Warehouse   │  │ (PostgreSQL) │  │              │  │              │  │              │
 │              │  │  • runs      │  │  • users     │  │  • inputs    │  │  • orchestr. │
-│  • samples   │  │  • checkpoints│  │  • prefs     │  │  • work      │  │  • tasks     │
+│  • samples   │  │  • checkpoints│ │  • prefs     │  │  • work      │  │  • tasks     │
 │  • runs      │  │              │  │              │  │  • results   │  │              │
 │  • metadata  │  │              │  │              │  │  • logs      │  │              │
 └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
