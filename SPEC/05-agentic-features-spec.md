@@ -32,7 +32,7 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 │  │  Pipeline Info:             │  │  config_expert:                     │   │
 │  │  • list_pipelines           │  │  • Protocol recommendations         │   │
 │  │  • get_pipeline_schema      │  │  • Parameter optimization           │   │
-│  │                             │  │  • Resource estimation              │   │
+│  │  • get_pipeline_docs        │  │  • Resource estimation              │   │
 │  │  File Generation:           │  │                                     │   │
 │  │  • generate_samplesheet     │  │                                     │   │
 │  │  • generate_config          │  │                                     │   │
@@ -94,8 +94,9 @@ You are a helpful assistant for wet lab scientists at Arc Institute. Your job is
 1. **Find samples**: Search Benchling for NGS runs and samples by date, project, instrument, or other criteria
 2. **Generate files**: Create samplesheet CSV files and Nextflow configuration files
 3. **Configure pipelines**: Help users choose appropriate pipeline parameters
-4. **Validate inputs**: Check that all required files exist and parameters are valid
-5. **Submit runs**: Submit validated pipeline runs to GCP Batch
+4. **Explain pipelines**: Provide pipeline documentation from local Markdown data files using progressive disclosure
+5. **Validate inputs**: Check that all required files exist and parameters are valid
+6. **Submit runs**: Submit validated pipeline runs to GCP Batch
 
 ## Guidelines
 
@@ -105,6 +106,7 @@ You are a helpful assistant for wet lab scientists at Arc Institute. Your job is
 - Present options when there are multiple valid choices
 - Validate configurations before allowing submission
 - If you're unsure, ask clarifying questions
+- Use pipeline documentation via progressive disclosure: start with overview sections and expand only on request
 
 ## Workflow
 
@@ -265,6 +267,56 @@ Optional Parameters:
 • expected_cells: Default expected cells per sample
   Default: 10000
 ```
+
+#### get_pipeline_docs
+
+Return progressive-disclosure documentation for a specific pipeline from local
+Markdown data files included in the codebase.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `pipeline` | string | Yes | Pipeline name |
+| `section` | list[string] | No | Section text to return (e.g., "inputs", "parameters", "outputs", "qc"); otherwise, a list of all section names are returned |
+
+**Returns:**
+```
+## nf-core/scrnaseq — Inputs (Overview)
+
+- Required columns: sample, fastq_1, fastq_2
+- Optional columns: expected_cells, chemistry
+- Supported chemistry values: 10XV2, 10XV3, 10XV4
+
+Want more detail on any input or parameter?
+```
+
+**Implementation Notes:**
+- Documentation is stored as Markdown data files in the repo at
+  `backend/data/pipelines/<pipeline>/`.
+- Each pipeline directory must include a top-level `README.md` plus optional
+  section files (e.g., `inputs.md`, `parameters.md`, `outputs.md`, `qc.md`).
+- The tool must load only the requested section (progressive disclosure),
+  and avoid dumping full docs unless the user explicitly asks.
+- The agent must cite these local Markdown sources in its responses and offer
+  to expand into deeper sections on request.
+- Packaging: `backend/pyproject.toml` must include these Markdown files so they
+  are available at runtime (editable installs and wheels). Use one of the
+  following patterns (choose one):
+
+  **Option A (recommended, modern):**
+  ```toml
+  [tool.setuptools.package-data]
+  "backend" = ["data/pipelines/**/*.md"]
+  ```
+
+  **Option B (classic):**
+  ```toml
+  [tool.setuptools]
+  include-package-data = true
+
+  [tool.setuptools.package-data]
+  "backend" = ["data/pipelines/**/*.md"]
+  ```
 
 ### File Generation Tools
 
@@ -568,7 +620,7 @@ config_expert = {
     3. Warn about potential issues
     4. Estimate runtime and costs
     """,
-    "tools": [list_pipelines, get_pipeline_schema],
+    "tools": [list_pipelines, get_pipeline_schema, get_pipeline_docs],
     "model": "google_genai:gemini-3-flash-preview",
 }
 ```
