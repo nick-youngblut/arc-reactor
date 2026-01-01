@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, timedelta
-from functools import lru_cache
+from functools import lru_cache, wraps
 from typing import Any, Iterable, Mapping, Sequence
 
 from backend.config import settings
@@ -180,6 +180,7 @@ def get_tool_context(runtime: ToolRuntime | None) -> ToolContext:
 
 
 def tool_error_handler(func):
+    @wraps(func)
     async def _wrapper(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
