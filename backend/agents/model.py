@@ -26,11 +26,12 @@ def get_chat_model(
         settings, "gemini_thinking_level", DEFAULT_THINKING_LEVEL
     )
 
+    provider = "google_vertexai" if _use_vertex_ai(settings) else "google_genai"
+
     return init_chat_model(
-        f"google_genai:{model_id}",
+        f"{provider}:{model_id}",
         temperature=DEFAULT_TEMPERATURE,
         max_output_tokens=DEFAULT_MAX_OUTPUT_TOKENS,
         thinking_level=resolved_thinking_level,
-        vertexai=_use_vertex_ai(settings),
         streaming=streaming,
     )

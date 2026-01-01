@@ -7,8 +7,9 @@ specifications and implementation examples must reference the values here.
 
 | Parameter | Value | Notes |
 |-----------|-------|-------|
-| Model | `gemini-3-flash-preview` | Google Gemini 3 Flash via google_genai provider |
-| LangChain Format | `google_genai:gemini-3-flash-preview` | Use with `init_chat_model()` |
+| Model | `gemini-3-flash-preview` | Google Gemini 3 Flash |
+| LangChain Format (Developer API) | `google_genai:gemini-3-flash-preview` | Use with `init_chat_model()` |
+| LangChain Format (Vertex AI) | `google_vertexai:gemini-3-flash-preview` | Use with `init_chat_model()` when on Vertex |
 | Temperature | 1.0 | Required for Gemini models with thinking enabled |
 | Max output tokens | 8192 | Allow longer, structured responses |
 | Thinking Level | `low` | Default thinking level for balanced speed/quality |

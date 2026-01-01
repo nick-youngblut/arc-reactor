@@ -45,7 +45,7 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
     - [x] Thinking level from settings (default "low") — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
   - [x] Support Vertex AI backend option — *See [07-integration-spec.md#authentication](../spec/07-integration-spec.md)*:
     - [x] Check for `GOOGLE_CLOUD_PROJECT` env var
-    - [x] Set `vertexai=True` if using Vertex AI
+    - [x] Use the `google_vertexai:*` provider string for Vertex AI
   - [x] Implement streaming configuration
 
 ### System Prompt

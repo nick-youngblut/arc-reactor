@@ -422,19 +422,18 @@ The platform supports two authentication modes:
 ```python
 from langchain.chat_models import init_chat_model
 
-# Standard initialization
+# Standard initialization (Gemini Developer API)
 model = init_chat_model(
     "google_genai:gemini-3-flash-preview",
     temperature=1.0,
     thinking_level="low",
 )
 
-# With Vertex AI backend
+# Vertex AI backend
 model = init_chat_model(
-    "google_genai:gemini-3-flash-preview",
+    "google_vertexai:gemini-3-flash-preview",
     temperature=1.0,
     thinking_level="low",
-    vertexai=True,  # Use Vertex AI backend
 )
 ```
 

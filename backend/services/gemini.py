@@ -24,13 +24,12 @@ class GeminiService:
     def create(cls, settings: object, breakers: Breakers) -> "GeminiService":
         model_id = getattr(settings, "gemini_model", "gemini-3-flash-preview")
         thinking_level = getattr(settings, "gemini_thinking_level", "low")
-        vertexai = _use_vertex_ai(settings)
+        provider = "google_vertexai" if _use_vertex_ai(settings) else "google_genai"
 
         model = init_chat_model(
-            f"google_genai:{model_id}",
+            f"{provider}:{model_id}",
             temperature=1.0,
             thinking_level=thinking_level,
-            vertexai=vertexai,
         )
         return cls(model=model, breaker=breakers.gemini)
 
