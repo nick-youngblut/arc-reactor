@@ -63,6 +63,7 @@ async def websocket_chat(websocket: WebSocket) -> None:
                     "user_name": user.name,
                     "benchling_service": websocket.app.state.benchling_service,
                     "storage_service": websocket.app.state.storage_service,
+                    "database_service": websocket.app.state.database_service,
                 }
             }
 

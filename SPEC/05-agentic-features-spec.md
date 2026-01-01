@@ -66,7 +66,7 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 │  │                       MIDDLEWARE STACK                                │  │
 │  │                                                                       │  │
 │  │  • TodoListMiddleware - Task planning and tracking                    │  │
-│  │  • FilesystemMiddleware - Context offloading (for large results)      │  │
+│  │  • LargeOutputMiddleware - Context offloading (for large results)     │  │
 │  │  • SummarizationMiddleware - Auto-summarize at 85% context            │  │
 │  │  • HumanInTheLoopMiddleware - Approval for destructive/costly tools   │  │
 │  └───────────────────────────────────────────────────────────────────────┘  │
@@ -1479,7 +1479,7 @@ state = {
 The agent uses several strategies to manage context:
 
 1. **Automatic summarization**: At 85% context capacity, older messages are summarized
-2. **Tool result offloading**: Large tool results (>20k tokens) are saved to filesystem
+2. **Tool result offloading**: Large tool results (>20k tokens) are saved to agent state
 3. **Selective context**: Only relevant past messages included in each turn
 
 ---

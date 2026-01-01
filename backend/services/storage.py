@@ -127,6 +127,15 @@ class StorageService:
             results[path] = blob.exists()
         return results
 
+    def delete_run_file(self, run_id: str, file_path: str) -> bool:
+        normalized = file_path.lstrip("/")
+        blob_name = f"runs/{run_id}/{normalized}"
+        blob = self._bucket().blob(blob_name)
+        if not blob.exists():
+            return False
+        blob.delete()
+        return True
+
     def generate_signed_url(self, gcs_uri: str, expiration_minutes: int = 60) -> str:
         bucket_name, blob_name = _parse_gcs_uri(gcs_uri)
         bucket = self.client.bucket(bucket_name)

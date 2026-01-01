@@ -23,6 +23,7 @@ from .schema_tools import (
     get_schemas,
     list_projects,
 )
+from .submission import cancel_run, clear_samplesheet, delete_file, submit_run
 from .file_generation import generate_config, generate_samplesheet, validate_inputs
 
 NGS_TOOL_CATEGORY = "ngs"
@@ -41,6 +42,10 @@ def get_agent_tools() -> list[BaseTool]:
         generate_samplesheet,
         generate_config,
         validate_inputs,
+        submit_run,
+        cancel_run,
+        delete_file,
+        clear_samplesheet,
         get_entities,
         get_entity_relationships,
         list_entries,

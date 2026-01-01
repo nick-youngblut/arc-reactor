@@ -492,22 +492,22 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 > **Spec References:**
 > - [05-agentic-features-spec.md#human-in-the-loop](../spec/05-agentic-features-spec.md) - HITL implementation
 
-- [ ] Create `backend/agents/middleware/hitl.py` — *See [05-agentic-features-spec.md#human-in-the-loop](../spec/05-agentic-features-spec.md)*:
-  - [ ] Implement `HumanInTheLoopMiddleware`:
-    - [ ] Define list of HITL-required tools — *See [05-agentic-features-spec.md#hitl-required-tools](../spec/05-agentic-features-spec.md)*:
-      - [ ] `submit_run`
-      - [ ] `cancel_run`
-      - [ ] `delete_file`
-      - [ ] `clear_samplesheet`
-    - [ ] Intercept tool calls before execution
-    - [ ] Check if tool requires approval
-    - [ ] Pause execution and request user confirmation
-    - [ ] Resume or cancel based on user response
-  - [ ] Define approval message format:
-    - [ ] Tool name
-    - [ ] Parameters summary
-    - [ ] Expected impact
-    - [ ] Approve/Reject options
+- [x] Create `backend/agents/middleware/hitl.py` — *See [05-agentic-features-spec.md#human-in-the-loop](../spec/05-agentic-features-spec.md)*:
+  - [x] Implement `HumanInTheLoopMiddleware`:
+    - [x] Define list of HITL-required tools — *See [05-agentic-features-spec.md#hitl-required-tools](../spec/05-agentic-features-spec.md)*:
+      - [x] `submit_run`
+      - [x] `cancel_run`
+      - [x] `delete_file`
+      - [x] `clear_samplesheet`
+    - [x] Intercept tool calls before execution
+    - [x] Check if tool requires approval
+    - [x] Pause execution and request user confirmation
+    - [x] Resume or cancel based on user response
+  - [x] Define approval message format:
+    - [x] Tool name
+    - [x] Parameters summary
+    - [x] Expected impact
+    - [x] Approve/Reject options
 
 ### Submission Tools
 
@@ -515,131 +515,130 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 > - [05-agentic-features-spec.md#submit_run](../spec/05-agentic-features-spec.md) - Submit tool
 > - [05-agentic-features-spec.md#cancel_run](../spec/05-agentic-features-spec.md) - Cancel tool
 
-- [ ] Create `backend/agents/tools/submission.py`:
+- [x] Create `backend/agents/tools/submission.py`:
 
-- [ ] Implement `submit_run()` function (HITL required) — *See [05-agentic-features-spec.md#submit_run](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `samplesheet_csv` (str, required): Validated CSV
-    - [ ] `config_content` (str, required): Validated config
-    - [ ] `pipeline` (str, required): Pipeline name
-    - [ ] `pipeline_version` (str, required): Pipeline version
-  - [ ] Upload files to GCS — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
-    - [ ] `inputs/samplesheet.csv`
-    - [ ] `inputs/nextflow.config`
-    - [ ] `inputs/params.yaml`
-  - [ ] Create run record in database
-  - [ ] Submit GCP Batch job (via BatchService) — *See [07-integration-spec.md#job-submission](../spec/07-integration-spec.md)*
-  - [ ] Update run status to "submitted"
-  - [ ] Return run information:
-    - [ ] run_id
-    - [ ] status
-    - [ ] gcs_path
-    - [ ] estimated_runtime
+- [x] Implement `submit_run()` function (HITL required) — *See [05-agentic-features-spec.md#submit_run](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `samplesheet_csv` (str, required): Validated CSV
+    - [x] `config_content` (str, required): Validated config
+    - [x] `pipeline` (str, required): Pipeline name
+    - [x] `pipeline_version` (str, required): Pipeline version
+  - [x] Upload files to GCS — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
+    - [x] `inputs/samplesheet.csv`
+    - [x] `inputs/nextflow.config`
+    - [x] `inputs/params.yaml`
+  - [x] Create run record in database
+  - [x] Submit GCP Batch job (via BatchService) — *See [07-integration-spec.md#job-submission](../spec/07-integration-spec.md)*
+  - [x] Update run status to "submitted"
+  - [x] Return run information:
+    - [x] run_id
+    - [x] status
+    - [x] gcs_path
+    - [x] estimated_runtime
 
-- [ ] Implement `cancel_run()` function (HITL required) — *See [05-agentic-features-spec.md#cancel_run](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `run_id` (str, required): Run identifier
-  - [ ] Verify run exists and is cancellable
-  - [ ] Cancel GCP Batch job — *See [07-integration-spec.md#job-cancellation](../spec/07-integration-spec.md)*
-  - [ ] Update run status to "cancelled"
-  - [ ] Return confirmation
+- [x] Implement `cancel_run()` function (HITL required) — *See [05-agentic-features-spec.md#cancel_run](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `run_id` (str, required): Run identifier
+  - [x] Verify run exists and is cancellable
+  - [x] Cancel GCP Batch job — *See [07-integration-spec.md#job-cancellation](../spec/07-integration-spec.md)*
+  - [x] Update run status to "cancelled"
+  - [x] Return confirmation
 
-- [ ] Implement `delete_file()` function (HITL required) — *See [05-agentic-features-spec.md#delete_file](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `run_id` (str, required): Run identifier
-    - [ ] `file_path` (str, required): Relative file path
-  - [ ] Verify run ownership — *See [08-security-spec.md#resource-level-access](../spec/08-security-spec.md)*
-  - [ ] Delete file from GCS
-  - [ ] Return confirmation
+- [x] Implement `delete_file()` function (HITL required) — *See [05-agentic-features-spec.md#delete_file](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `run_id` (str, required): Run identifier
+    - [x] `file_path` (str, required): Relative file path
+  - [x] Verify run ownership — *See [08-security-spec.md#resource-level-access](../spec/08-security-spec.md)*
+  - [x] Delete file from GCS
+  - [x] Return confirmation
 
-- [ ] Implement `clear_samplesheet()` function (HITL required) — *See [05-agentic-features-spec.md#clear_samplesheet](../spec/05-agentic-features-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `confirm` (bool, required): Must be True
-  - [ ] Clear samplesheet from agent state
-  - [ ] Return confirmation
+- [x] Implement `clear_samplesheet()` function (HITL required) — *See [05-agentic-features-spec.md#clear_samplesheet](../spec/05-agentic-features-spec.md)*:
+  - [x] Parameters:
+    - [x] `confirm` (bool, required): Must be True
+  - [x] Clear samplesheet from agent state
+  - [x] Return confirmation
 
 ### Subagents
 
 > **Spec References:**
 > - [05-agentic-features-spec.md#subagents](../spec/05-agentic-features-spec.md) - Subagent specifications
 
-- [ ] Create `backend/agents/subagents/__init__.py`:
-  - [ ] Export subagent configurations
+- [x] Create `backend/agents/subagents/__init__.py`:
+  - [x] Export subagent configurations
 
-- [ ] Create `backend/agents/subagents/benchling_expert.py` — *See [05-agentic-features-spec.md#benchling_expert](../spec/05-agentic-features-spec.md)*:
-  - [ ] Define `benchling_expert` configuration:
-    - [ ] Name: "benchling_expert"
-    - [ ] Description: Complex Benchling queries and lineage traversal
-    - [ ] Model: Same as main agent
-    - [ ] Tools:
-      - [ ] search_ngs_runs
-      - [ ] get_ngs_run_samples
-      - [ ] get_entities
-      - [ ] get_entity_relationships
-      - [ ] list_entries
-      - [ ] get_entry_entities
-      - [ ] execute_warehouse_query
-    - [ ] Custom system prompt for Benchling expertise:
-      - [ ] NGS workflow knowledge
-      - [ ] Schema relationship understanding
-      - [ ] Data quality handling
+- [x] Create `backend/agents/subagents/benchling_expert.py` — *See [05-agentic-features-spec.md#benchling_expert](../spec/05-agentic-features-spec.md)*:
+  - [x] Define `benchling_expert` configuration:
+    - [x] Name: "benchling_expert"
+    - [x] Description: Complex Benchling queries and lineage traversal
+    - [x] Model: Same as main agent
+    - [x] Tools:
+      - [x] search_ngs_runs
+      - [x] get_ngs_run_samples
+      - [x] get_entities
+      - [x] get_entity_relationships
+      - [x] list_entries
+      - [x] get_entry_entities
+      - [x] execute_warehouse_query
+    - [x] Custom system prompt for Benchling expertise:
+      - [x] NGS workflow knowledge
+      - [x] Schema relationship understanding
+      - [x] Data quality handling
 
-- [ ] Create `backend/agents/subagents/config_expert.py` — *See [05-agentic-features-spec.md#config_expert](../spec/05-agentic-features-spec.md)*:
-  - [ ] Define `config_expert` configuration:
-    - [ ] Name: "config_expert"
-    - [ ] Description: Pipeline configuration assistance
-    - [ ] Model: Same as main agent
-    - [ ] Tools:
-      - [ ] list_pipelines
-      - [ ] get_pipeline_schema
-      - [ ] get_dropdown_values
-    - [ ] Custom system prompt for config expertise:
-      - [ ] nf-core pipeline knowledge
-      - [ ] Parameter trade-offs
-      - [ ] Resource estimation
+- [x] Create `backend/agents/subagents/config_expert.py` — *See [05-agentic-features-spec.md#config_expert](../spec/05-agentic-features-spec.md)*:
+  - [x] Define `config_expert` configuration:
+    - [x] Name: "config_expert"
+    - [x] Description: Pipeline configuration assistance
+    - [x] Model: Same as main agent
+    - [x] Tools:
+      - [x] list_pipelines
+      - [x] get_pipeline_schema
+      - [x] get_dropdown_values
+    - [x] Custom system prompt for config expertise:
+      - [x] nf-core pipeline knowledge
+      - [x] Parameter trade-offs
+      - [x] Resource estimation
 
 ### Middleware Stack
 
 > **Spec References:**
 > - [05-agentic-features-spec.md#middleware-stack](../spec/05-agentic-features-spec.md) - Middleware components
 
-- [ ] Create `backend/agents/middleware/todo.py` — *See [05-agentic-features-spec.md#todolistmiddleware](../spec/05-agentic-features-spec.md)*:
-  - [ ] Implement `TodoListMiddleware`:
-    - [ ] Track agent's planned actions
-    - [ ] Log completed steps
-    - [ ] Provide context for next steps
+- [x] Use DeepAgents `TodoListMiddleware` — *See [05-agentic-features-spec.md#todolistmiddleware](../spec/05-agentic-features-spec.md)*:
+  - [x] Track agent's planned actions
+  - [x] Log completed steps
+  - [x] Provide context for next steps
 
-- [ ] Create `backend/agents/middleware/filesystem.py` — *See [05-agentic-features-spec.md#filesystemmiddleware](../spec/05-agentic-features-spec.md)*:
-  - [ ] Implement `FilesystemMiddleware`:
-    - [ ] Offload large tool results (>20k tokens)
-    - [ ] Store in agent state or temporary file
-    - [ ] Replace with reference in message
+- [x] Create `backend/agents/middleware/large_output.py` — *See [05-agentic-features-spec.md#filesystemmiddleware](../spec/05-agentic-features-spec.md)*:
+  - [x] Implement `LargeOutputMiddleware`:
+    - [x] Offload large tool results (>20k tokens)
+    - [x] Store in agent state or temporary file
+    - [x] Replace with reference in message
 
-- [ ] Create `backend/agents/middleware/summarization.py` — *See [05-agentic-features-spec.md#summarizationmiddleware](../spec/05-agentic-features-spec.md)*:
-  - [ ] Implement `SummarizationMiddleware`:
-    - [ ] Monitor context window usage
-    - [ ] Trigger summarization at 85% capacity
-    - [ ] Summarize older messages
-    - [ ] Replace with summary token
+- [x] Create `backend/agents/middleware/summarization.py` — *See [05-agentic-features-spec.md#summarizationmiddleware](../spec/05-agentic-features-spec.md)*:
+  - [x] Implement `SummarizationMiddleware`:
+    - [x] Monitor context window usage
+    - [x] Trigger summarization at 85% capacity
+    - [x] Summarize older messages
+    - [x] Replace with summary token
 
 ### Tool Registration
 
-- [ ] Update `backend/agents/pipeline_agent.py`:
-  - [ ] Register all tools — *See [05-agentic-features-spec.md#tool-suite](../spec/05-agentic-features-spec.md)*:
-    - [ ] NGS discovery tools
-    - [ ] Benchling discovery tools
-    - [ ] Schema tools
-    - [ ] Pipeline tools
-    - [ ] File generation tools
-    - [ ] Submission tools (with HITL)
-  - [ ] Register subagents:
-    - [ ] benchling_expert
-    - [ ] config_expert
-  - [ ] Apply middleware stack:
-    - [ ] TodoListMiddleware
-    - [ ] FilesystemMiddleware
-    - [ ] SummarizationMiddleware
-    - [ ] HumanInTheLoopMiddleware
+- [x] Update `backend/agents/pipeline_agent.py`:
+  - [x] Register all tools — *See [05-agentic-features-spec.md#tool-suite](../spec/05-agentic-features-spec.md)*:
+    - [x] NGS discovery tools
+    - [x] Benchling discovery tools
+    - [x] Schema tools
+    - [x] Pipeline tools
+    - [x] File generation tools
+    - [x] Submission tools (with HITL)
+  - [x] Register subagents:
+    - [x] benchling_expert
+    - [x] config_expert
+  - [x] Apply middleware stack:
+    - [x] TodoListMiddleware
+    - [x] LargeOutputMiddleware
+    - [x] SummarizationMiddleware
+    - [x] HumanInTheLoopMiddleware
 
 ---
 
@@ -675,18 +674,18 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
   - [x] generate_config
   - [x] validate_inputs
 - [ ] HITL-protected submission tools:
-  - [ ] submit_run
-  - [ ] cancel_run
-  - [ ] delete_file
-  - [ ] clear_samplesheet
+  - [x] submit_run
+  - [x] cancel_run
+  - [x] delete_file
+  - [x] clear_samplesheet
 - [ ] Subagents:
-  - [ ] benchling_expert
-  - [ ] config_expert
+  - [x] benchling_expert
+  - [x] config_expert
 - [ ] Middleware stack:
-  - [ ] TodoListMiddleware
-  - [ ] FilesystemMiddleware
-  - [ ] SummarizationMiddleware
-  - [ ] HumanInTheLoopMiddleware
+  - [x] TodoListMiddleware
+  - [x] LargeOutputMiddleware
+  - [x] SummarizationMiddleware
+  - [x] HumanInTheLoopMiddleware
 - [ ] execute_warehouse_query for advanced SQL
 - [ ] Unit tests for all tools
 - [ ] Integration tests for agent workflows

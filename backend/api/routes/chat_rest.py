@@ -38,6 +38,7 @@ async def _event_stream(
             "user_name": user.name,
             "benchling_service": request.app.state.benchling_service,
             "storage_service": request.app.state.storage_service,
+            "database_service": request.app.state.database_service,
         }
     }
     async with checkpointer_session(settings) as checkpointer:
