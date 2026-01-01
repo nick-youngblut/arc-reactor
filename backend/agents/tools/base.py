@@ -10,7 +10,7 @@ from backend.services.benchling import BenchlingService
 from backend.services.storage import StorageService
 from backend.utils.circuit_breaker import create_breakers
 
-from toon import encode as toon_encode
+from toon.encoder import encode as toon_encode
 
 try:  # LangChain v1 runtime injection
     from langchain.tools import ToolRuntime
