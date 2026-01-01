@@ -1,10 +1,14 @@
 export default function RunsPage() {
   return (
-    <main className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="text-3xl font-semibold text-arc-navy">Run History</h1>
-      <p className="mt-4 text-base text-arc-slate">
-        This is a placeholder for the run history view.
+    <section className="space-y-3">
+      <p className="text-sm font-semibold uppercase tracking-[0.3em] text-arc-gray-400">
+        Runs
       </p>
-    </main>
+      <h1 className="text-3xl font-semibold text-content">Run history</h1>
+      <p className="max-w-2xl text-sm text-arc-gray-500 dark:text-arc-gray-300">
+        This is a placeholder for the run history view. Run list and status details land here in
+        Phase 4.4.
+      </p>
+    </section>
   );
 }

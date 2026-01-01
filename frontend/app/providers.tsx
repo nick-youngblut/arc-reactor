@@ -1,15 +1,19 @@
 'use client';
 
 import { HeroUIProvider } from '@heroui/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState } from 'react';
+
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ThemeProvider } from '@/components/ThemeProvider';
+import { QueryProvider } from '@/lib/queryClient';
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
-
   return (
-    <HeroUIProvider>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </HeroUIProvider>
+    <ThemeProvider>
+      <HeroUIProvider>
+        <QueryProvider>
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </QueryProvider>
+      </HeroUIProvider>
+    </ThemeProvider>
   );
 }

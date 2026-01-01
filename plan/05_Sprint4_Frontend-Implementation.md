@@ -21,86 +21,86 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Root Layout & Providers
 
-- [ ] Update `frontend/app/layout.tsx` — *See [04-frontend-spec.md#root-layout](../spec/04-frontend-spec.md)*:
-  - [ ] Configure HTML structure with proper lang attribute
-  - [ ] Add metadata (title, description, favicon)
-  - [ ] Wrap with QueryClientProvider (TanStack Query) — *See [04-frontend-spec.md#tanstack-query](../spec/04-frontend-spec.md)*
-  - [ ] Wrap with HeroUI provider
-  - [ ] Add ThemeProvider for dark/light mode
-  - [ ] Add global error boundary
+- [x] Update `frontend/app/layout.tsx` — *See [04-frontend-spec.md#root-layout](../spec/04-frontend-spec.md)*:
+  - [x] Configure HTML structure with proper lang attribute
+  - [x] Add metadata (title, description, favicon)
+  - [x] Wrap with QueryClientProvider (TanStack Query) — *See [04-frontend-spec.md#tanstack-query](../spec/04-frontend-spec.md)*
+  - [x] Wrap with HeroUI provider
+  - [x] Add ThemeProvider for dark/light mode
+  - [x] Add global error boundary
 
-- [ ] Create `frontend/lib/queryClient.ts`:
-  - [ ] Configure QueryClient with defaults:
-    - [ ] Stale time: 5 minutes
-    - [ ] Retry: 3 times with backoff
-    - [ ] Refetch on window focus: true
-  - [ ] Export QueryClientProvider setup
+- [x] Create `frontend/lib/queryClient.ts`:
+  - [x] Configure QueryClient with defaults:
+    - [x] Stale time: 5 minutes
+    - [x] Retry: 3 times with backoff
+    - [x] Refetch on window focus: true
+  - [x] Export QueryClientProvider setup
 
 ### Header Component
 
 > **Spec References:**
 > - [10-ux-spec.md#interface-components](../spec/10-ux-spec.md) - Component layout
 
-- [ ] Create `frontend/components/Header.tsx`:
-  - [ ] Display Arc Reactor logo and title
-  - [ ] Navigation links (Workspace, Runs)
-  - [ ] User menu dropdown:
-    - [ ] User avatar/initials
-    - [ ] User email
-    - [ ] Settings link
-    - [ ] Logout action
-  - [ ] Theme toggle (dark/light mode)
+- [x] Create `frontend/components/Header.tsx`:
+  - [x] Display Arc Reactor logo and title
+  - [x] Navigation links (Workspace, Runs)
+  - [x] User menu dropdown:
+    - [x] User avatar/initials
+    - [x] User email
+    - [x] Settings link
+    - [x] Logout action
+  - [x] Theme toggle (dark/light mode)
 
 ### Sidebar Component
 
-- [ ] Create `frontend/components/Sidebar.tsx`:
-  - [ ] Navigation items with icons:
-    - [ ] Workspace (chat + editors)
-    - [ ] Runs (run history)
-  - [ ] Active state highlighting
-  - [ ] Collapsible on smaller screens — *See [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md)*
-  - [ ] Arc Institute branding at bottom
+- [x] Create `frontend/components/Sidebar.tsx`:
+  - [x] Navigation items with icons:
+    - [x] Workspace (chat + editors)
+    - [x] Runs (run history)
+  - [x] Active state highlighting
+  - [x] Collapsible on smaller screens — *See [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md)*
+  - [x] Arc Institute branding at bottom
 
 ### Main Layout Component
 
 > **Spec References:**
 > - [10-ux-spec.md#workspace-layout](../spec/10-ux-spec.md) - Layout structure
 
-- [ ] Create `frontend/components/MainLayout.tsx` — *See [10-ux-spec.md#workspace-layout](../spec/10-ux-spec.md)*:
-  - [ ] Integrate Header and Sidebar
-  - [ ] Main content area with routing
-  - [ ] Responsive grid layout — *See [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md)*:
-    - [ ] Desktop: Sidebar + main content
-    - [ ] Tablet: Collapsible sidebar
-    - [ ] Mobile: Bottom navigation
+- [x] Create `frontend/components/MainLayout.tsx` — *See [10-ux-spec.md#workspace-layout](../spec/10-ux-spec.md)*:
+  - [x] Integrate Header and Sidebar
+  - [x] Main content area with routing
+  - [x] Responsive grid layout — *See [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md)*:
+    - [x] Desktop: Sidebar + main content
+    - [x] Tablet: Collapsible sidebar
+    - [x] Mobile: Bottom navigation
 
 ### Tailwind CSS Configuration
 
 > **Spec References:**
 > - [04-frontend-spec.md#styling](../spec/04-frontend-spec.md) - CSS configuration
 
-- [ ] Update `tailwind.config.js` — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*:
-  - [ ] Define Arc brand colors:
-    - [ ] Primary (arc-blue)
-    - [ ] Secondary
-    - [ ] Success, Warning, Error, Info
-    - [ ] Neutral grays
-  - [ ] Configure dark mode (class-based)
-  - [ ] Add custom spacing and typography
-  - [ ] Configure HeroUI plugin
+- [x] Update `tailwind.config.js` — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*:
+  - [x] Define Arc brand colors:
+    - [x] Primary (arc-blue)
+    - [x] Secondary
+    - [x] Success, Warning, Error, Info
+    - [x] Neutral grays
+  - [x] Configure dark mode (class-based)
+  - [x] Add custom spacing and typography
+  - [x] Configure HeroUI plugin
 
-- [ ] Update `frontend/styles/globals.css`:
-  - [ ] Tailwind directives
-  - [ ] Base styles and resets
-  - [ ] Custom utility classes
-  - [ ] CSS variables for theming
+- [x] Update `frontend/styles/globals.css`:
+  - [x] Tailwind directives
+  - [x] Base styles and resets
+  - [x] Custom utility classes
+  - [x] CSS variables for theming
 
 ### HeroUI Configuration
 
-- [ ] Create `frontend/lib/heroui.ts`:
-  - [ ] Configure HeroUI theme
-  - [ ] Set default component variants
-  - [ ] Configure modal/toast defaults
+- [x] Create `frontend/lib/heroui.ts`:
+  - [x] Configure HeroUI theme
+  - [x] Set default component variants
+  - [x] Configure modal/toast defaults
 
 ### Zustand Stores
 
@@ -108,42 +108,42 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 > - [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md) - Store definitions
 > - [04-frontend-spec.md#workspace-store](../spec/04-frontend-spec.md) - Workspace state
 
-- [ ] Create `frontend/stores/workspaceStore.ts` — *See [04-frontend-spec.md#workspace-store](../spec/04-frontend-spec.md)*:
-  - [ ] State:
-    - [ ] `selectedPipeline`: Pipeline name
-    - [ ] `selectedVersion`: Pipeline version
-    - [ ] `samplesheet`: CSV content
-    - [ ] `config`: Config content
-    - [ ] `validationResult`: Validation state
-    - [ ] `isDirty`: Unsaved changes flag
-  - [ ] Actions:
-    - [ ] `setPipeline()`
-    - [ ] `setSamplesheet()`
-    - [ ] `setConfig()`
-    - [ ] `clearWorkspace()`
-    - [ ] `setValidationResult()`
+- [x] Create `frontend/stores/workspaceStore.ts` — *See [04-frontend-spec.md#workspace-store](../spec/04-frontend-spec.md)*:
+  - [x] State:
+    - [x] `selectedPipeline`: Pipeline name
+    - [x] `selectedVersion`: Pipeline version
+    - [x] `samplesheet`: CSV content
+    - [x] `config`: Config content
+    - [x] `validationResult`: Validation state
+    - [x] `isDirty`: Unsaved changes flag
+  - [x] Actions:
+    - [x] `setPipeline()`
+    - [x] `setSamplesheet()`
+    - [x] `setConfig()`
+    - [x] `clearWorkspace()`
+    - [x] `setValidationResult()`
 
-- [ ] Create `frontend/stores/chatStore.ts` — *See [04-frontend-spec.md#chat-store](../spec/04-frontend-spec.md)*:
-  - [ ] State:
-    - [ ] `messages`: Chat message array
-    - [ ] `isLoading`: Agent responding flag
-    - [ ] `threadId`: Conversation thread ID
-    - [ ] `error`: Error state
-  - [ ] Actions:
-    - [ ] `addMessage()`
-    - [ ] `updateLastMessage()`
-    - [ ] `clearMessages()`
-    - [ ] `setError()`
+- [x] Create `frontend/stores/chatStore.ts` — *See [04-frontend-spec.md#chat-store](../spec/04-frontend-spec.md)*:
+  - [x] State:
+    - [x] `messages`: Chat message array
+    - [x] `isLoading`: Agent responding flag
+    - [x] `threadId`: Conversation thread ID
+    - [x] `error`: Error state
+  - [x] Actions:
+    - [x] `addMessage()`
+    - [x] `updateLastMessage()`
+    - [x] `clearMessages()`
+    - [x] `setError()`
 
-- [ ] Create `frontend/stores/uiStore.ts`:
-  - [ ] State:
-    - [ ] `sidebarOpen`: Sidebar visibility
-    - [ ] `activeTab`: Current file tab
-    - [ ] `theme`: Light/dark mode
-  - [ ] Actions:
-    - [ ] `toggleSidebar()`
-    - [ ] `setActiveTab()`
-    - [ ] `setTheme()`
+- [x] Create `frontend/stores/uiStore.ts`:
+  - [x] State:
+    - [x] `sidebarOpen`: Sidebar visibility
+    - [x] `activeTab`: Current file tab
+    - [x] `theme`: Light/dark mode
+  - [x] Actions:
+    - [x] `toggleSidebar()`
+    - [x] `setActiveTab()`
+    - [x] `setTheme()`
 
 ### TanStack Query Setup
 
@@ -151,19 +151,19 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 > - [04-frontend-spec.md#api-client](../spec/04-frontend-spec.md) - API client configuration
 > - [04-frontend-spec.md#relative-paths](../spec/04-frontend-spec.md) - Relative path requirement
 
-- [ ] Create `frontend/lib/api.ts` — *See [04-frontend-spec.md#api-client](../spec/04-frontend-spec.md)*:
-  - [ ] Configure Axios instance:
-    - [ ] Base URL: relative paths (e.g., `/api`) — *See [04-frontend-spec.md#relative-paths](../spec/04-frontend-spec.md)*
-    - [ ] Request interceptors for auth
-    - [ ] Response interceptors for errors
-  - [ ] Export typed API functions:
-    - [ ] `fetchRuns()`
-    - [ ] `fetchRun(id)`
-    - [ ] `createRun()`
-    - [ ] `cancelRun(id)`
-    - [ ] `recoverRun(id, options)` — *See [12-recovery-spec.md#frontend-workflow](../spec/12-recovery-spec.md)*
-    - [ ] `fetchPipelines()`
-    - [ ] `fetchPipeline(name)`
+- [x] Create `frontend/lib/api.ts` — *See [04-frontend-spec.md#api-client](../spec/04-frontend-spec.md)*:
+  - [x] Configure Axios instance:
+    - [x] Base URL: relative paths (e.g., `/api`) — *See [04-frontend-spec.md#relative-paths](../spec/04-frontend-spec.md)*
+    - [x] Request interceptors for auth
+    - [x] Response interceptors for errors
+  - [x] Export typed API functions:
+    - [x] `fetchRuns()`
+    - [x] `fetchRun(id)`
+    - [x] `createRun()`
+    - [x] `cancelRun(id)`
+    - [x] `recoverRun(id, options)` — *See [12-recovery-spec.md#frontend-workflow](../spec/12-recovery-spec.md)*
+    - [x] `fetchPipelines()`
+    - [x] `fetchPipeline(name)`
 
 ---
 

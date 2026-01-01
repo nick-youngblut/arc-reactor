@@ -1,12 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
+@layer base {
+  :root {
+    color-scheme: light;
+    --color-bg: 248 250 252;
+    --color-fg: 15 23 42;
+    --color-surface: 255 255 255;
+    --color-border: 226 232 240;
+    --color-accent: 29 78 216;
+  }
+
+  .dark {
+    color-scheme: dark;
+    --color-bg: 10 15 26;
+    --color-fg: 226 232 240;
+    --color-surface: 17 24 39;
+    --color-border: 30 41 59;
+    --color-accent: 59 130 246;
+  }
+
+  * {
+    @apply border-arc-gray-200 dark:border-arc-gray-700;
+  }
+
+  body {
+    @apply min-h-screen bg-base text-content antialiased;
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: 'Space Grotesk', 'IBM Plex Sans', system-ui, sans-serif;
+  }
 }
 
-body {
-  @apply bg-arc-mist text-arc-slate;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+@layer components {
+  .arc-surface {
+    @apply rounded-2xl border border-arc-gray-200/70 bg-white/90 shadow-sm dark:border-arc-gray-700/70 dark:bg-slate-900/80;
+  }
+
+  .arc-glow {
+    box-shadow: 0 0 60px rgba(29, 78, 216, 0.22);
+  }
+}
+
+@layer utilities {
+  .bg-arc-radial {
+    background:
+      radial-gradient(circle at 20% 20%, rgba(29, 78, 216, 0.18), transparent 45%),
+      radial-gradient(circle at 80% 0%, rgba(20, 184, 166, 0.16), transparent 35%),
+      linear-gradient(180deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.9));
+  }
+
+  .bg-arc-radial-dark {
+    background:
+      radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.2), transparent 45%),
+      radial-gradient(circle at 80% 0%, rgba(45, 212, 191, 0.16), transparent 35%),
+      linear-gradient(180deg, rgba(10, 15, 26, 0.98), rgba(15, 23, 42, 0.9));
+  }
 }
