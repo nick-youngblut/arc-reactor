@@ -263,7 +263,6 @@ def get_secret(secret_id: str) -> str:
 Outbound traffic allowed to:
 - `*.googleapis.com` (GCP services)
 - `generativelanguage.googleapis.com` (Gemini Developer API)
-- `aiplatform.googleapis.com` (Vertex AI Gemini)
 - `benchling-warehouse.arcinstitute.org` (Benchling)
 - `github.com` (Nextflow pipelines)
 - `docker.io`, `gcr.io`, `quay.io` (Container images)

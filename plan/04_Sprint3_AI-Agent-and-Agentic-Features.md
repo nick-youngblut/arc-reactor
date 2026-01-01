@@ -43,9 +43,6 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
     - [x] Temperature: 1.0 (required for thinking) — *See [11-conf-spec.md#temperature](../spec/11-conf-spec.md)*
     - [x] Max output tokens: 8192 — *See [11-conf-spec.md#max-output-tokens](../spec/11-conf-spec.md)*
     - [x] Thinking level from settings (default "low") — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
-  - [x] Support Vertex AI backend option — *See [07-integration-spec.md#authentication](../spec/07-integration-spec.md)*:
-    - [x] Check for `GOOGLE_CLOUD_PROJECT` env var
-    - [x] Use the `google_vertexai:*` provider string for Vertex AI
   - [x] Implement streaming configuration
 
 ### System Prompt

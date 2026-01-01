@@ -133,11 +133,10 @@ production:
 |----------|-------------|----------|
 | `DYNACONF` | Environment name (development/production) | Yes |
 | `GOOGLE_API_KEY` | Google AI API key | Yes* |
-| `GOOGLE_CLOUD_PROJECT` | GCP project ID (for Vertex AI) | No |
 | `BENCHLING_WAREHOUSE_PASSWORD` | Benchling warehouse credentials | Yes |
 | `GCP_PROJECT` | GCP project ID (override) | No |
 
-*One of `GOOGLE_API_KEY` or `GOOGLE_CLOUD_PROJECT` is required depending on deployment mode.
+*`GOOGLE_API_KEY` is required to use Gemini.
 
 ## CORS Configuration
 

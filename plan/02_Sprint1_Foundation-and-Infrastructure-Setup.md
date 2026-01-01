@@ -453,7 +453,7 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
   - [x] Use `google_genai:gemini-3-flash-preview` model — *See [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md)*
   - [x] Set temperature to 1.0 (required for thinking)
   - [x] Set thinking_level from settings — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
-  - [x] Support both API key and Vertex AI authentication — *See [07-integration-spec.md#authentication](../spec/07-integration-spec.md)*
+  - [x] Use API key authentication for Gemini — *See [07-integration-spec.md#authentication](../spec/07-integration-spec.md)*
 - [x] Implement model initialization function
 - [x] Implement streaming response method — *See [07-integration-spec.md#streaming](../spec/07-integration-spec.md)*
 - [x] Implement Gemini health check (simple completion test)

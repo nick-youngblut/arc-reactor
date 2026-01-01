@@ -406,16 +406,11 @@ referenced from there to avoid drift. See the backend settings guidance in
 
 ### Authentication
 
-The platform supports two authentication modes:
+The platform uses the Gemini Developer API for authentication:
 
-1. **Gemini Developer API** (recommended for development):
+1. **Gemini Developer API**:
    - Set `GOOGLE_API_KEY` environment variable
    - Simpler setup, no GCP project required
-
-2. **Vertex AI** (recommended for production):
-   - Uses GCP service account authentication
-   - Set `GOOGLE_CLOUD_PROJECT` environment variable
-   - Better integration with GCP IAM and audit logging
 
 ### LangChain Integration
 
@@ -429,12 +424,6 @@ model = init_chat_model(
     thinking_level="low",
 )
 
-# Vertex AI backend
-model = init_chat_model(
-    "google_vertexai:gemini-3-flash-preview",
-    temperature=1.0,
-    thinking_level="low",
-)
 ```
 
 ### Streaming

@@ -1,18 +1,11 @@
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 from typing import Any, AsyncIterator
 
 from langchain.chat_models import init_chat_model
 
 from ..utils.circuit_breaker import Breakers
-
-
-def _use_vertex_ai(settings: object) -> bool:
-    if os.getenv("GOOGLE_CLOUD_PROJECT"):
-        return True
-    return bool(getattr(settings, "google_cloud_project", None))
 
 
 @dataclass
@@ -24,10 +17,9 @@ class GeminiService:
     def create(cls, settings: object, breakers: Breakers) -> "GeminiService":
         model_id = getattr(settings, "gemini_model", "gemini-3-flash-preview")
         thinking_level = getattr(settings, "gemini_thinking_level", "low")
-        provider = "google_vertexai" if _use_vertex_ai(settings) else "google_genai"
 
         model = init_chat_model(
-            f"{provider}:{model_id}",
+            f"google_genai:{model_id}",
             temperature=1.0,
             thinking_level=thinking_level,
         )

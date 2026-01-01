@@ -6,7 +6,7 @@
 Set the following variables in your local shell or `.env` files:
 - `DYNACONF=development`
 - `BENCHLING_WAREHOUSE_PASSWORD` (required for Benchling queries)
-- `GOOGLE_API_KEY` or `GOOGLE_CLOUD_PROJECT` (Gemini auth)
+- `GOOGLE_API_KEY` (Gemini auth)
 - `DATABASE_URL` (preferred) or `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_HOST`
 - `ARC_REACTOR_NEXTFLOW_BUCKET` (override for GCS testing)
 

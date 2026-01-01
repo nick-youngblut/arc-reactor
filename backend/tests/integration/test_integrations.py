@@ -30,7 +30,7 @@ def _has_gcs_config() -> bool:
 
 
 def _has_gemini_config() -> bool:
-    return bool(os.getenv("GOOGLE_API_KEY") or os.getenv("GOOGLE_CLOUD_PROJECT"))
+    return bool(os.getenv("GOOGLE_API_KEY"))
 
 
 @pytest.mark.asyncio
