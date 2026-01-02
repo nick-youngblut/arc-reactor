@@ -431,144 +431,144 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Runs Page
 
-- [ ] Create `frontend/app/runs/page.tsx` — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*:
-  - [ ] Page title and description
-  - [ ] RunList component
-  - [ ] Empty state when no runs — *See [10-ux-spec.md#empty-states](../spec/10-ux-spec.md)*
+- [x] Create `frontend/app/runs/page.tsx` — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*:
+  - [x] Page title and description
+  - [x] RunList component
+  - [x] Empty state when no runs — *See [10-ux-spec.md#empty-states](../spec/10-ux-spec.md)*
 
 ### Run List Component
 
 > **Spec References:**
 > - [04-frontend-spec.md#runlist](../spec/04-frontend-spec.md) - RunList specification
 
-- [ ] Create `frontend/components/runs/RunList.tsx` — *See [04-frontend-spec.md#runlist](../spec/04-frontend-spec.md)*:
-  - [ ] Fetch runs with TanStack Query
-  - [ ] Sortable table columns:
-    - [ ] Run ID
-    - [ ] Pipeline
-    - [ ] Status
-    - [ ] Sample Count
-    - [ ] Created At
-    - [ ] Duration
-  - [ ] Filtering:
-    - [ ] Status dropdown
-    - [ ] Pipeline dropdown
-    - [ ] Date range picker
-  - [ ] Pagination controls
-  - [ ] Click row to navigate to detail
+- [x] Create `frontend/components/runs/RunList.tsx` — *See [04-frontend-spec.md#runlist](../spec/04-frontend-spec.md)*:
+  - [x] Fetch runs with TanStack Query
+  - [x] Sortable table columns:
+    - [x] Run ID
+    - [x] Pipeline
+    - [x] Status
+    - [x] Sample Count
+    - [x] Created At
+    - [x] Duration
+  - [x] Filtering:
+    - [x] Status dropdown
+    - [x] Pipeline dropdown
+    - [x] Date range picker
+  - [x] Pagination controls
+  - [x] Click row to navigate to detail
 
 ### Run Card Component
 
-- [ ] Create `frontend/components/runs/RunCard.tsx`:
-  - [ ] Alternative card-based display
-  - [ ] Run summary:
-    - [ ] Run ID and status badge
-    - [ ] Pipeline name and version
-    - [ ] Sample count
-    - [ ] Created timestamp
-  - [ ] Quick actions:
-    - [ ] View details
-    - [ ] Cancel (if running)
+- [x] Create `frontend/components/runs/RunCard.tsx`:
+  - [x] Alternative card-based display
+  - [x] Run summary:
+    - [x] Run ID and status badge
+    - [x] Pipeline name and version
+    - [x] Sample count
+    - [x] Created timestamp
+  - [x] Quick actions:
+    - [x] View details
+    - [x] Cancel (if running)
 
 ### Run Status Badge Component
 
 > **Spec References:**
 > - [10-ux-spec.md#run-status-indicators](../spec/10-ux-spec.md) - Status badge design
 
-- [ ] Create `frontend/components/runs/RunStatusBadge.tsx` — *See [10-ux-spec.md#run-status-indicators](../spec/10-ux-spec.md)*:
-  - [ ] Status-specific styling:
-    - [ ] Pending: Gray, circle icon
-    - [ ] Submitted: Blue, half-filled icon
-    - [ ] Running: Blue, animated spinner
-    - [ ] Completed: Green, checkmark
-    - [ ] Failed: Red, X icon
-    - [ ] Cancelled: Gray, stop icon
-  - [ ] Tooltip with status description
+- [x] Create `frontend/components/runs/RunStatusBadge.tsx` — *See [10-ux-spec.md#run-status-indicators](../spec/10-ux-spec.md)*:
+  - [x] Status-specific styling:
+    - [x] Pending: Gray, circle icon
+    - [x] Submitted: Blue, half-filled icon
+    - [x] Running: Blue, animated spinner
+    - [x] Completed: Green, checkmark
+    - [x] Failed: Red, X icon
+    - [x] Cancelled: Gray, stop icon
+  - [x] Tooltip with status description
 
 ### useRuns Hook
 
 > **Spec References:**
 > - [04-frontend-spec.md#useruns](../spec/04-frontend-spec.md) - Hook specification
 
-- [ ] Create `frontend/hooks/useRuns.ts` — *See [04-frontend-spec.md#useruns](../spec/04-frontend-spec.md)*:
-  - [ ] TanStack Query wrapper for runs
-  - [ ] Pagination state management
-  - [ ] Filter state management
-  - [ ] Auto-refetch for active runs
-  - [ ] Return:
-    - [ ] `runs`: Run array
-    - [ ] `isLoading`
-    - [ ] `error`
-    - [ ] `pagination`
-    - [ ] `filters`
-    - [ ] `setFilters()`
+- [x] Create `frontend/hooks/useRuns.ts` — *See [04-frontend-spec.md#useruns](../spec/04-frontend-spec.md)*:
+  - [x] TanStack Query wrapper for runs
+  - [x] Pagination state management
+  - [x] Filter state management
+  - [x] Auto-refetch for active runs
+  - [x] Return:
+    - [x] `runs`: Run array
+    - [x] `isLoading`
+    - [x] `error`
+    - [x] `pagination`
+    - [x] `filters`
+    - [x] `setFilters()`
 
 ### Run Detail Page
 
-- [ ] Create `frontend/app/runs/[id]/page.tsx` — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*:
-  - [ ] Fetch run by ID
-  - [ ] Error handling for not found
-  - [ ] Loading skeleton — *See [10-ux-spec.md#loading-states](../spec/10-ux-spec.md)*
-  - [ ] RunDetail component
+- [x] Create `frontend/app/runs/[id]/page.tsx` — *See [04-frontend-spec.md#page-structure](../spec/04-frontend-spec.md)*:
+  - [x] Fetch run by ID
+  - [x] Error handling for not found
+  - [x] Loading skeleton — *See [10-ux-spec.md#loading-states](../spec/10-ux-spec.md)*
+  - [x] RunDetail component
 
 ### Run Detail Component
 
 > **Spec References:**
 > - [04-frontend-spec.md#rundetail](../spec/04-frontend-spec.md) - RunDetail specification
 
-- [ ] Create `frontend/components/runs/RunDetail.tsx` — *See [04-frontend-spec.md#rundetail](../spec/04-frontend-spec.md)*:
-  - [ ] Header section:
-    - [ ] Run ID with copy button
-    - [ ] Status badge
-    - [ ] Action buttons (Cancel, Re-run, Recover)
-  - [ ] Tabbed content:
-    - [ ] Overview tab
-    - [ ] Logs tab
-    - [ ] Files tab
-    - [ ] Parameters tab
+- [x] Create `frontend/components/runs/RunDetail.tsx` — *See [04-frontend-spec.md#rundetail](../spec/04-frontend-spec.md)*:
+  - [x] Header section:
+    - [x] Run ID with copy button
+    - [x] Status badge
+    - [x] Action buttons (Cancel, Re-run, Recover)
+  - [x] Tabbed content:
+    - [x] Overview tab
+    - [x] Logs tab
+    - [x] Files tab
+    - [x] Parameters tab
 
 ### Run Overview Tab
 
-- [ ] Create `frontend/components/runs/RunOverview.tsx`:
-  - [ ] Run metadata:
-    - [ ] Pipeline and version
-    - [ ] User who submitted
-    - [ ] Created, started, completed timestamps
-    - [ ] Duration
-    - [ ] Sample count
-  - [ ] Source information:
-    - [ ] NGS runs
-    - [ ] Project
-  - [ ] Error information (if failed) — *See [10-ux-spec.md#error-handling-ux](../spec/10-ux-spec.md)*:
-    - [ ] Error message
-    - [ ] Failed task
-    - [ ] Exit code
-  - [ ] Metrics (if completed):
-    - [ ] Total runtime
-    - [ ] Tasks completed
-    - [ ] CPU/memory usage
+- [x] Create `frontend/components/runs/RunOverview.tsx`:
+  - [x] Run metadata:
+    - [x] Pipeline and version
+    - [x] User who submitted
+    - [x] Created, started, completed timestamps
+    - [x] Duration
+    - [x] Sample count
+  - [x] Source information:
+    - [x] NGS runs
+    - [x] Project
+  - [x] Error information (if failed) — *See [10-ux-spec.md#error-handling-ux](../spec/10-ux-spec.md)*:
+    - [x] Error message
+    - [x] Failed task
+    - [x] Exit code
+  - [x] Metrics (if completed):
+    - [x] Total runtime
+    - [x] Tasks completed
+    - [x] CPU/memory usage
 
 ### Run Files Tab
 
-- [ ] Create `frontend/components/runs/RunFiles.tsx`:
-  - [ ] File browser tree — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
-    - [ ] inputs/ directory
-    - [ ] results/ directory (if completed)
-    - [ ] logs/ directory
-  - [ ] File list:
-    - [ ] File name
-    - [ ] Size
-    - [ ] Last modified
-    - [ ] Download button
-  - [ ] Generate signed URLs for download — *See [07-integration-spec.md#signed-url-generation](../spec/07-integration-spec.md)*
+- [x] Create `frontend/components/runs/RunFiles.tsx`:
+  - [x] File browser tree — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
+    - [x] inputs/ directory
+    - [x] results/ directory (if completed)
+    - [x] logs/ directory
+  - [x] File list:
+    - [x] File name
+    - [x] Size
+    - [x] Last modified
+    - [x] Download button
+  - [x] Generate signed URLs for download — *See [07-integration-spec.md#signed-url-generation](../spec/07-integration-spec.md)*
 
 ### Run Parameters Tab
 
-- [ ] Create `frontend/components/runs/RunParameters.tsx`:
-  - [ ] Display pipeline parameters as JSON/YAML
-  - [ ] Syntax highlighted view
-  - [ ] Copy button
-  - [ ] Expandable sections for nested params
+- [x] Create `frontend/components/runs/RunParameters.tsx`:
+  - [x] Display pipeline parameters as JSON/YAML
+  - [x] Syntax highlighted view
+  - [x] Copy button
+  - [x] Expandable sections for nested params
 
 ### SSE Integration for Real-time Updates
 
@@ -576,21 +576,21 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 > - [04-frontend-spec.md#userunevents](../spec/04-frontend-spec.md) - SSE hook
 > - [07-integration-spec.md#sse-integration](../spec/07-integration-spec.md) - SSE implementation
 
-- [ ] Create `frontend/hooks/useRunEvents.ts` — *See [04-frontend-spec.md#userunevents](../spec/04-frontend-spec.md)*:
-  - [ ] EventSource connection to `/api/runs/{id}/events`
-  - [ ] Handle SSE events — *See [07-integration-spec.md#sse-integration](../spec/07-integration-spec.md)*:
-    - [ ] "status" event: Update run status
-    - [ ] "done" event: Close connection
-  - [ ] Reconnection logic
-  - [ ] Return:
-    - [ ] `status`: Current status
-    - [ ] `isConnected`: Connection state
+- [x] Create `frontend/hooks/useRunEvents.ts` — *See [04-frontend-spec.md#userunevents](../spec/04-frontend-spec.md)*:
+  - [x] EventSource connection to `/api/runs/{id}/events`
+  - [x] Handle SSE events — *See [07-integration-spec.md#sse-integration](../spec/07-integration-spec.md)*:
+    - [x] "status" event: Update run status
+    - [x] "done" event: Close connection
+  - [x] Reconnection logic
+  - [x] Return:
+    - [x] `status`: Current status
+    - [x] `isConnected`: Connection state
 
-- [ ] Create `frontend/hooks/useRunStatus.ts` — *See [04-frontend-spec.md#userunstatus](../spec/04-frontend-spec.md)*:
-  - [ ] Polling fallback for run status
-  - [ ] Poll every 10 seconds for active runs
-  - [ ] Stop polling on terminal states
-  - [ ] Use with useRunEvents for reliability
+- [x] Create `frontend/hooks/useRunStatus.ts` — *See [04-frontend-spec.md#userunstatus](../spec/04-frontend-spec.md)*:
+  - [x] Polling fallback for run status
+  - [x] Poll every 10 seconds for active runs
+  - [x] Stop polling on terminal states
+  - [x] Use with useRunEvents for reliability
 
 ---
 
