@@ -28,7 +28,7 @@ pytest
 
 ## Configuration
 Settings are managed via `backend/settings.yaml` and env vars. Key env vars:
-- `DYNACONF` (development/production)
+- `DYNACONF` (dev/prod)
 - `DATABASE_URL` or DB_* settings
 - `BENCHLING_WAREHOUSE_PASSWORD`
 - `IAP_PROJECT_NUMBER`, `IAP_PROJECT_ID` (IAP JWT audience)

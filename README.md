@@ -4,7 +4,7 @@
 
 ### Environment Variables
 Set the following variables in your local shell or `.env` files:
-- `DYNACONF=development`
+- `DYNACONF=dev`
 - `BENCHLING_WAREHOUSE_PASSWORD` (required for Benchling queries)
 - `GOOGLE_API_KEY` (Gemini auth)
 - `DATABASE_URL` (preferred) or `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_HOST`
