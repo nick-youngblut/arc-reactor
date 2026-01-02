@@ -14,8 +14,8 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
     <div className={`flex flex-col gap-1.5 ${isUser ? 'items-end' : 'items-start'}`}>
       <div
         className={`max-w-[85%] rounded-3xl px-5 py-3.5 shadow-sm transition-all duration-300 hover:shadow-md ${isUser
-            ? 'bg-gradient-to-br from-arc-blue to-blue-600 text-white rounded-tr-none'
-            : 'bg-white border border-arc-gray-100 text-arc-night dark:bg-night dark:border-arc-gray-800 dark:text-white rounded-tl-none'
+          ? 'bg-gradient-to-br from-arc-blue to-blue-600 text-white rounded-tr-none'
+          : 'bg-white border border-arc-gray-100 text-arc-night dark:bg-arc-night dark:border-arc-gray-800 dark:text-white rounded-tl-none'
           }`}
       >
         <div className={`prose prose-sm max-w-none prose-p:my-1.5 prose-pre:bg-arc-gray-900/95 prose-pre:text-white prose-pre:rounded-xl ${isUser ? 'prose-invert text-white' : 'text-inherit'}`}>

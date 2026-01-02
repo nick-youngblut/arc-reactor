@@ -108,21 +108,21 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
               Samplesheet Editor
             </p>
           </div>
-          <h3 className="text-sm font-bold text-arc-night dark:text-white">
+          <h3 className="text-sm font-bold text-content">
             Metadata <span className="text-arc-gray-400">&</span> FASTQ paths
           </h3>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
-            className="rounded-xl border border-arc-gray-200/50 bg-white/50 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-arc-gray-600 transition-all hover:bg-white hover:text-arc-blue dark:border-arc-gray-800/50 dark:bg-night/50 dark:text-arc-gray-300 dark:hover:bg-night"
+            className="rounded-xl border border-arc-gray-200/50 bg-element/50 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-arc-gray-600 transition-all hover:bg-element hover:text-arc-blue dark:border-arc-gray-800/50 dark:text-arc-gray-300"
             onClick={handleExport}
           >
             Export CSV
           </button>
           <button
             type="button"
-            className="rounded-xl border border-arc-gray-200/50 bg-white/50 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-arc-gray-600 transition-all hover:bg-white hover:text-arc-blue dark:border-arc-gray-800/50 dark:bg-night/50 dark:text-arc-gray-300 dark:hover:bg-night"
+            className="rounded-xl border border-arc-gray-200/50 bg-element/50 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-arc-gray-600 transition-all hover:bg-element hover:text-arc-blue dark:border-arc-gray-800/50 dark:text-arc-gray-300"
             onClick={() => fileInputRef.current?.click()}
             disabled={readOnly}
           >
@@ -138,7 +138,7 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden rounded-2xl border border-arc-gray-200/70 bg-white/70 p-2 dark:border-arc-gray-800/70 dark:bg-slate-900/70">
+      <div className="flex-1 overflow-hidden rounded-2xl border border-arc-gray-200/70 bg-panel/70 p-2 dark:border-arc-gray-800/70">
         <HotTable
           ref={hotRef}
           data={rows}

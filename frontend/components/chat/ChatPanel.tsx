@@ -24,11 +24,11 @@ export function ChatPanel() {
               Arc Assistant
             </p>
           </div>
-          <h2 className="text-xl font-extrabold tracking-tight text-arc-night dark:text-white">AI Agent Chat</h2>
+          <h2 className="text-xl font-extrabold tracking-tight text-content">AI Agent Chat</h2>
         </div>
         <button
           type="button"
-          className="rounded-xl border border-arc-gray-200/50 bg-white/50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-arc-gray-500 transition-all hover:bg-arc-gray-50 hover:text-arc-clay dark:border-arc-gray-800/50 dark:bg-night/50 dark:text-arc-gray-400 dark:hover:bg-night"
+          className="rounded-xl border border-arc-gray-200/50 bg-element/50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-arc-gray-500 transition-all hover:bg-arc-gray-50 hover:text-arc-clay dark:border-arc-gray-800/50"
           onClick={() => {
             clearMessages();
             setInput('');

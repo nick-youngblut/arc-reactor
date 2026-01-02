@@ -66,7 +66,7 @@ export function FileEditorPanel() {
               File editors
             </p>
           </div>
-          <h2 className="text-xl font-extrabold tracking-tight text-arc-night dark:text-white">Workspace Files</h2>
+          <h2 className="text-xl font-extrabold tracking-tight text-content">Workspace Files</h2>
         </div>
         <button
           type="button"
@@ -76,7 +76,7 @@ export function FileEditorPanel() {
         </button>
       </header>
 
-      <div className="flex flex-wrap gap-1.5 rounded-2xl bg-arc-gray-50/50 p-1.5 dark:bg-night/50 border border-arc-gray-100 dark:border-arc-gray-800">
+      <div className="flex flex-wrap gap-1.5 rounded-2xl bg-panel p-1.5 border border-arc-gray-100 dark:border-arc-gray-800">
         {tabConfig.map((tab) => {
           const meta = tabMeta[tab.id];
           const isActive = activeTab === tab.id;
@@ -86,8 +86,8 @@ export function FileEditorPanel() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-300 ${isActive
-                  ? 'bg-white text-arc-blue shadow-md shadow-arc-night/5 dark:bg-night dark:text-white'
-                  : 'text-arc-gray-500 hover:bg-white/50 dark:hover:bg-night/30'
+                ? 'bg-element text-arc-blue shadow-md shadow-arc-night/5'
+                : 'text-arc-gray-500 hover:bg-element/50'
                 }`}
             >
               {tab.label}
@@ -113,7 +113,7 @@ export function FileEditorPanel() {
 
       <div className="flex-1 overflow-hidden">
         {!hasFiles ? (
-          <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-arc-gray-200/80 bg-white/60 p-6 text-center text-sm text-arc-gray-500 dark:border-arc-gray-800/80 dark:bg-slate-900/60 dark:text-arc-gray-300">
+          <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-arc-gray-200/80 bg-panel/60 p-6 text-center text-sm text-arc-gray-500 dark:border-arc-gray-800/80 dark:text-arc-gray-300">
             <span className="text-3xl">📄</span>
             <p className="max-w-xs">
               No files yet. Chat with Arc Assistant to generate your samplesheet and config files.

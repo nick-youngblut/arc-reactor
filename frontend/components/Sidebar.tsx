@@ -56,7 +56,7 @@ export function Sidebar() {
         className={`fixed left-0 top-0 z-40 flex h-full flex-col gap-6 border-r pb-6 pt-24 transition-all duration-300 lg:static lg:h-auto lg:translate-x-0 lg:pt-6 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           } ${sidebarCollapsed ? 'w-20 px-3' : 'w-72 px-6'}`}
         style={{
-          backgroundColor: 'rgb(var(--color-surface))',
+          backgroundColor: 'rgb(var(--color-panel))',
           borderColor: 'rgb(var(--color-border) / 0.5)'
         }}
       >
@@ -67,7 +67,7 @@ export function Sidebar() {
           <button
             type="button"
             onClick={toggleSidebarCollapsed}
-            className={`flex h-8 w-8 items-center justify-center rounded-lg border border-arc-gray-200/50 bg-white/50 text-arc-gray-400 transition-all hover:bg-white hover:text-arc-blue dark:border-arc-gray-700/50 dark:bg-night/50 ${sidebarCollapsed ? 'mx-auto' : ''}`}
+            className={`flex h-8 w-8 items-center justify-center rounded-lg border border-arc-gray-200/50 bg-element/50 text-arc-gray-400 transition-all hover:bg-element hover:text-arc-blue dark:border-arc-gray-700/50 ${sidebarCollapsed ? 'mx-auto' : ''}`}
             aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <svg
@@ -105,7 +105,7 @@ export function Sidebar() {
                 </div>
                 {!sidebarCollapsed && (
                   <div className="overflow-hidden whitespace-nowrap">
-                    <span className={`block text-sm font-bold ${isActive ? 'text-arc-night dark:text-white' : ''}`}>
+                    <span className={`block text-sm font-bold ${isActive ? 'text-content' : ''}`}>
                       {item.label}
                     </span>
                     <span className="block text-[11px] font-medium text-arc-gray-400 dark:text-arc-gray-500">
@@ -120,13 +120,13 @@ export function Sidebar() {
 
         <div className={`mt-auto transition-all duration-300 ${sidebarCollapsed ? 'opacity-0 scale-90' : 'opacity-100 scale-100'}`}>
           {!sidebarCollapsed && (
-            <div className="overflow-hidden rounded-2xl border border-arc-gray-200/50 bg-arctic/50 p-5 dark:border-arc-gray-800/50 dark:bg-night/50">
+            <div className="overflow-hidden rounded-2xl border border-arc-gray-200/50 bg-element/50 p-5 dark:border-arc-gray-800/50">
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-8 w-8 rounded-lg bg-arc-blue p-1.5 shadow-sm">
                   <img src="/arc-logo-white.png" alt="Arc" className="h-full w-full object-contain" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-arc-night dark:text-white leading-tight">Arc Institute</p>
+                  <p className="text-xs font-bold text-content leading-tight">Arc Institute</p>
                   <p className="text-[10px] font-semibold text-arc-blue uppercase tracking-wider">v1.2.4</p>
                 </div>
               </div>

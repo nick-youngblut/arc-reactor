@@ -28,7 +28,7 @@ export function ChatInput({ input, isLoading, onChange, onSubmit }: ChatInputPro
 
   return (
     <div className="space-y-3">
-      <div className="group relative overflow-hidden rounded-2xl border border-arc-gray-100 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all duration-300 focus-within:border-arc-blue/30 focus-within:shadow-md focus-within:ring-1 focus-within:ring-arc-blue/10 dark:border-arc-gray-800 dark:bg-night/60">
+      <div className="group relative overflow-hidden rounded-2xl border border-arc-gray-100 bg-element/60 p-4 shadow-sm backdrop-blur-md transition-all duration-300 focus-within:border-arc-blue/30 focus-within:shadow-md focus-within:ring-1 focus-within:ring-arc-blue/10 dark:border-arc-gray-800">
         <textarea
           ref={textareaRef}
           value={input}
@@ -36,7 +36,7 @@ export function ChatInput({ input, isLoading, onChange, onSubmit }: ChatInputPro
           onKeyDown={handleKeyDown}
           disabled={isLoading}
           placeholder="Ask Arc Reactor to build a samplesheet, validate inputs, or launch a pipeline run."
-          className="min-h-[44px] w-full resize-none border-0 bg-transparent text-sm font-medium text-arc-night outline-none placeholder:text-arc-gray-400 dark:text-white"
+          className="min-h-[44px] w-full resize-none border-0 bg-transparent text-sm font-medium text-content outline-none placeholder:text-arc-gray-400"
           rows={1}
         />
         <div className="mt-4 flex items-center justify-between">

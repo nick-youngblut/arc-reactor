@@ -34,7 +34,7 @@ export function SubmitPanel() {
   };
 
   return (
-    <section className="flex flex-col gap-5 rounded-2xl border border-arc-gray-100 bg-white/60 p-5 backdrop-blur-md shadow-lg shadow-arc-night/5 dark:border-arc-gray-800 dark:bg-night/60">
+    <section className="flex flex-col gap-5 rounded-2xl border border-arc-gray-100 bg-panel/60 p-5 backdrop-blur-md shadow-lg shadow-arc-night/5 dark:border-arc-gray-800">
       <div className="flex flex-wrap items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -60,7 +60,7 @@ export function SubmitPanel() {
                 Analysis Readiness
               </p>
             </div>
-            <p className="text-base font-extrabold tracking-tight text-arc-night dark:text-white">
+            <p className="text-base font-extrabold tracking-tight text-content">
               {isValid
                 ? 'Ready for submission'
                 : errorCount
@@ -76,7 +76,7 @@ export function SubmitPanel() {
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            className="rounded-xl border border-arc-gray-200/50 bg-white/50 px-5 py-2.5 text-xs font-bold text-arc-night transition-all hover:bg-white dark:border-arc-gray-700/50 dark:bg-night/50 dark:text-white dark:hover:bg-night"
+            className="rounded-xl border border-arc-gray-200/50 bg-element/50 px-5 py-2.5 text-xs font-bold text-content transition-all hover:bg-element dark:border-arc-gray-700/50"
             onClick={handleValidate}
           >
             Run Checks

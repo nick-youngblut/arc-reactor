@@ -35,7 +35,9 @@ module.exports = {
         'arc-gray-900': '#0F172A',
         surface: 'rgb(var(--color-surface) / <alpha-value>)',
         base: 'rgb(var(--color-bg) / <alpha-value>)',
-        content: 'rgb(var(--color-fg) / <alpha-value>)'
+        content: 'rgb(var(--color-fg) / <alpha-value>)',
+        panel: 'rgb(var(--color-panel) / <alpha-value>)',
+        element: 'rgb(var(--color-element) / <alpha-value>)'
       },
       fontFamily: {
         display: ['"Space Grotesk"', '"IBM Plex Sans"', 'system-ui', 'sans-serif'],

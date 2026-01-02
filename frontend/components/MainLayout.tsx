@@ -12,7 +12,7 @@ const bottomNav = [
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
+    <div className="min-h-screen bg-base transition-colors duration-300">
       <Header />
       <main className="w-full px-4 py-4 sm:px-6 sm:py-6">
         {children}

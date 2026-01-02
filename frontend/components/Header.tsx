@@ -36,7 +36,7 @@ export function Header() {
               />
             </div>
             <div className="hidden sm:block">
-              <p className="text-sm font-bold tracking-tight text-arc-night dark:text-white">Arc Reactor</p>
+              <p className="text-sm font-bold tracking-tight text-content">Arc Reactor</p>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-arc-blue">
                 Intelligence Layer
               </p>
@@ -51,7 +51,7 @@ export function Header() {
               href={link.href}
               className={`rounded-xl px-4 py-1.5 text-sm font-bold transition-all ${pathname?.startsWith(link.href)
                 ? 'bg-arc-blue text-white shadow-lg shadow-arc-blue/20'
-                : 'text-arc-gray-600 hover:bg-arc-gray-100 dark:text-arc-gray-300 dark:hover:bg-night'
+                : 'text-arc-gray-600 hover:bg-arc-gray-100 dark:text-arc-gray-300 dark:hover:bg-arc-night'
                 }`}
             >
               {link.label}
@@ -61,7 +61,7 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <button
-            className="hidden h-9 w-9 items-center justify-center rounded-xl border border-arc-gray-200/50 bg-white/50 text-arc-gray-600 backdrop-blur-sm transition-all hover:bg-white dark:border-arc-gray-700/50 dark:bg-night/50 dark:text-arc-gray-300 dark:hover:bg-night sm:flex"
+            className="hidden h-9 w-9 items-center justify-center rounded-xl border border-arc-gray-200/50 bg-element/50 text-arc-gray-600 backdrop-blur-sm transition-all hover:bg-element dark:border-arc-gray-700/50 dark:text-arc-gray-300 sm:flex"
             onClick={toggleTheme}
             type="button"
             title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
@@ -77,21 +77,21 @@ export function Header() {
             )}
           </button>
           <details className="group relative">
-            <summary className="flex cursor-pointer list-none items-center gap-2 rounded-xl border border-arc-gray-200/50 bg-white/50 p-1 pr-3 text-sm font-medium text-arc-gray-700 backdrop-blur-sm transition-all hover:bg-white dark:border-arc-gray-700/50 dark:bg-night/50 dark:text-arc-gray-100 dark:hover:bg-night">
+            <summary className="flex cursor-pointer list-none items-center gap-2 rounded-xl border border-arc-gray-200/50 bg-element/50 p-1 pr-3 text-sm font-medium text-arc-gray-700 backdrop-blur-sm transition-all hover:bg-element dark:border-arc-gray-700/50 dark:text-arc-gray-100">
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-arc-blue text-[10px] font-bold text-white shadow-sm shadow-arc-blue/20">
                 AN
               </span>
               <span className="hidden text-left sm:block">
-                <span className="block text-xs font-bold leading-tight text-arc-night dark:text-white">arc.user</span>
+                <span className="block text-xs font-bold leading-tight text-content">arc.user</span>
               </span>
               <svg className="h-4 w-4 text-arc-gray-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </summary>
-            <div className="absolute right-0 mt-3 w-60 origin-top-right overflow-hidden rounded-2xl border border-arc-gray-200/50 bg-white p-1.5 shadow-2xl shadow-arc-night/10 backdrop-blur-xl dark:border-arc-gray-800/50 dark:bg-night">
+            <div className="absolute right-0 mt-3 w-60 origin-top-right overflow-hidden rounded-2xl border border-arc-gray-200/50 bg-panel p-1.5 shadow-2xl shadow-arc-night/10 backdrop-blur-xl dark:border-arc-gray-800/50">
               <div className="px-3 py-2.5 border-b border-arc-gray-100 dark:border-arc-gray-800 mb-1">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-arc-gray-400">Biological intelligence</p>
-                <p className="text-sm font-bold truncate text-arc-night dark:text-white">arc.user@arcinstitute.org</p>
+                <p className="text-sm font-bold truncate text-content">arc.user@arcinstitute.org</p>
               </div>
               <Link
                 href="/settings"

@@ -36,7 +36,7 @@ export function ToolIndicator({ invocation }: { invocation: ToolInvocation }) {
   );
 
   return (
-    <div className={`overflow-hidden rounded-2xl border bg-white/50 backdrop-blur-sm transition-all duration-300 ${isExpanded ? 'shadow-lg border-arc-blue/20 shadow-arc-blue/5 ring-1 ring-arc-blue/5' : 'border-arc-gray-100 dark:border-arc-gray-800 shadow-sm'} dark:bg-night/50`}>
+    <div className={`overflow-hidden rounded-2xl border bg-white/50 backdrop-blur-sm transition-all duration-300 ${isExpanded ? 'shadow-lg border-arc-blue/20 shadow-arc-blue/5 ring-1 ring-arc-blue/5' : 'border-arc-gray-100 dark:border-arc-gray-800 shadow-sm'} dark:bg-arc-night/50`}>
       <button
         type="button"
         onClick={() => setIsExpanded((prev) => !prev)}

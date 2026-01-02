@@ -33,7 +33,7 @@
 @layer base {
   :root {
     color-scheme: light;
-    --color-bg: 247 249 251;
+    --color-bg: 255 255 255;
     /* Arctic */
     --color-fg: 12 32 67;
     /* Night */
@@ -41,6 +41,8 @@
     --color-border: 226 232 240;
     --color-accent: 0 115 230;
     /* Arc Blue */
+    --color-panel: 247 249 251;
+    --color-element: 255 255 255;
   }
 
   .dark {
@@ -53,6 +55,8 @@
     --color-border: 30 41 59;
     --color-accent: 0 115 230;
     /* Arc Blue */
+    --color-panel: 15 23 42;
+    --color-element: 30 41 59;
   }
 
   * {

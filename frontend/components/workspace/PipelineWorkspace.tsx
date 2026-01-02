@@ -31,14 +31,14 @@ export function PipelineWorkspace() {
               Pipeline workspace
             </p>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-arc-night dark:text-white">
+          <h1 className="text-3xl font-extrabold tracking-tight text-content">
             Configure <span className="text-arc-blue">&</span> run pipelines
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2 rounded-2xl bg-white/50 p-1.5 backdrop-blur-sm border border-arc-gray-100 dark:bg-night/50 dark:border-arc-gray-800 shadow-sm">
+          <div className="flex items-center gap-2 rounded-2xl bg-element/50 p-1.5 backdrop-blur-sm border border-arc-gray-100 dark:border-arc-gray-800 shadow-sm">
             <select
-              className="rounded-xl border-none bg-transparent px-4 py-1.5 text-sm font-bold text-arc-night focus:ring-0 dark:text-white"
+              className="rounded-xl border-none bg-transparent px-4 py-1.5 text-sm font-bold text-content focus:ring-0"
               value={pipeline.name}
               onChange={(event) => {
                 const next = pipelines.find((item) => item.name === event.target.value) ?? pipelines[0];
@@ -47,7 +47,7 @@ export function PipelineWorkspace() {
               }}
             >
               {pipelines.map((item) => (
-                <option key={item.name} value={item.name} className="dark:bg-night">
+                <option key={item.name} value={item.name} className="dark:bg-arc-night">
                   {item.name}
                 </option>
               ))}
@@ -59,7 +59,7 @@ export function PipelineWorkspace() {
               onChange={(event) => setVersion(event.target.value)}
             >
               {pipeline.versions.map((item) => (
-                <option key={item} value={item} className="dark:bg-night">
+                <option key={item} value={item} className="dark:bg-arc-night">
                   {item}
                 </option>
               ))}
@@ -69,10 +69,10 @@ export function PipelineWorkspace() {
       </header>
 
       <div className="grid flex-1 gap-8 lg:grid-cols-[2fr_3fr]">
-        <div className="arc-surface flex min-h-[580px] flex-col overflow-hidden border-arc-blue/10 bg-white/40 ring-1 ring-arc-night/5 dark:bg-night/40 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
+        <div className="arc-surface flex min-h-[580px] flex-col overflow-hidden border-arc-blue/10 bg-panel/40 ring-1 ring-arc-night/5 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
           <ChatPanel />
         </div>
-        <div className="arc-surface flex min-h-[580px] flex-col overflow-hidden border-arc-blue/10 bg-white/40 ring-1 ring-arc-night/5 dark:bg-night/40 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
+        <div className="arc-surface flex min-h-[580px] flex-col overflow-hidden border-arc-blue/10 bg-panel/40 ring-1 ring-arc-night/5 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
           <FileEditorPanel />
         </div>
       </div>
