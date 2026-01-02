@@ -24,17 +24,6 @@ export function PipelineWorkspace() {
   return (
     <section className="flex h-full flex-col gap-8 py-2">
       <header className="flex flex-wrap items-end justify-between gap-6 px-1">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <div className="h-1.5 w-6 rounded-full bg-arc-blue shadow-[0_0_12px_rgba(0,115,230,0.5)]"></div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-arc-gray-400">
-              Pipeline workspace
-            </p>
-          </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-content">
-            Configure <span className="text-arc-blue">&</span> run pipelines
-          </h1>
-        </div>
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 rounded-2xl bg-element/50 p-1.5 backdrop-blur-sm border border-arc-gray-100 dark:border-arc-gray-800 shadow-sm">
             <select
