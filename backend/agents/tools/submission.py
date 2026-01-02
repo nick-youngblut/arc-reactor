@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import logging
 from typing import Any
 
 from langchain_core.tools import tool
@@ -18,6 +19,9 @@ try:  # optional dependency
     from google.cloud import batch_v1
 except Exception:  # pragma: no cover - handled at runtime
     batch_v1 = None  # type: ignore
+
+
+logger = logging.getLogger(__name__)
 
 
 def _runtime_config(runtime: Any | None) -> dict[str, Any]:
@@ -163,7 +167,14 @@ def _submit_orchestrator_job(
         parent = f"projects/{project}/locations/{region}"
         response = client.create_job(parent=parent, job=job, job_id=f"nf-{run_id}")
         return response.name
-    except Exception:
+    except Exception as exc:
+        logger.exception(
+            "Batch job submission failed for run %s (pipeline=%s version=%s): %s",
+            run_id,
+            pipeline,
+            pipeline_version,
+            exc,
+        )
         return None
 
 
