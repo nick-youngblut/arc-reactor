@@ -19,11 +19,17 @@ export function Header() {
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   return (
-    <header className="sticky top-0 z-40 border-b border-arc-gray-200/50 bg-white/70 backdrop-blur-xl dark:border-arc-gray-800/50 dark:bg-night/70">
+    <header
+      className="sticky top-0 z-40 border-b backdrop-blur-xl transition-colors duration-300"
+      style={{
+        backgroundColor: 'rgb(var(--color-surface) / 0.7)',
+        borderColor: 'rgb(var(--color-border) / 0.5)'
+      }}
+    >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-4">
           <button
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-arc-gray-200/70 bg-white text-arc-gray-700 transition-all hover:bg-arc-gray-50 dark:border-arc-gray-700/70 dark:bg-slate-900 dark:text-arc-gray-200 lg:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-arc-gray-200/70 bg-white text-arc-gray-700 transition-all hover:bg-arc-gray-50 dark:border-arc-gray-700/50 dark:bg-arc-night dark:text-arc-gray-200 lg:hidden"
             onClick={toggleSidebar}
             type="button"
             aria-label="Toggle navigation"
@@ -36,7 +42,7 @@ export function Header() {
           <Link href="/workspace" className="flex items-center gap-3 group">
             <div className="relative h-10 w-10 overflow-hidden rounded-xl transition-transform group-hover:scale-105">
               <img
-                src="/arc-logo_blue-circle.png"
+                src={theme === 'dark' ? '/arc-logo-white.png' : '/arc-logo_blue-circle.png'}
                 alt="Arc Logo"
                 className="h-full w-full object-contain"
               />

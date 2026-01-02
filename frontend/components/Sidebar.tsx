@@ -53,10 +53,14 @@ export function Sidebar() {
         aria-hidden="true"
       />
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-full flex-col gap-6 border-r border-arc-gray-200/50 bg-white pb-6 pt-24 transition-all duration-300 dark:border-arc-gray-800/50 dark:bg-night lg:static lg:h-auto lg:translate-x-0 lg:border-none lg:bg-transparent lg:pt-6 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed left-0 top-0 z-40 flex h-full flex-col gap-6 border-r pb-6 pt-24 transition-all duration-300 lg:static lg:h-auto lg:translate-x-0 lg:pt-6 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           } ${sidebarCollapsed ? 'w-20 px-3' : 'w-72 px-6'}`}
+        style={{
+          backgroundColor: 'rgb(var(--color-surface))',
+          borderColor: 'rgb(var(--color-border) / 0.5)'
+        }}
       >
-        <div className="flex items-center justify-between border-b border-arc-gray-100 pb-4 dark:border-arc-gray-800">
+        <div className="flex items-center justify-between border-b pb-4" style={{ borderColor: 'rgb(var(--color-border) / 0.5)' }}>
           {!sidebarCollapsed && (
             <span className="text-[10px] font-bold uppercase tracking-widest text-arc-gray-400">Navigation</span>
           )}
