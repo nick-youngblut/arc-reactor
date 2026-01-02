@@ -1,13 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 const { heroui } = require('@heroui/theme');
 
-export default {
+module.exports = {
   content: [
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './hooks/**/*.{ts,tsx}',
-    './lib/**/*.{ts,tsx}',
-    './stores/**/*.{ts,tsx}'
+    './stores/**/*.{ts,tsx}',
+    './node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}'
   ],
   darkMode: 'class',
   theme: {
@@ -55,5 +55,5 @@ export default {
       }
     }
   },
-  plugins: [heroui(), require('@tailwindcss/forms'), require('@tailwindcss/typography')]
+  plugins: [heroui()]
 };

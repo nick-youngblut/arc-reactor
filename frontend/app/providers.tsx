@@ -4,7 +4,7 @@ import { HeroUIProvider } from '@heroui/react';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { QueryProvider } from '@/lib/queryClient';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (

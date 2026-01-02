@@ -24,12 +24,16 @@
   }
 
   * {
-    @apply border-arc-gray-200 dark:border-arc-gray-700;
+    border-color: rgb(var(--color-border) / 1);
   }
 
   body {
-    @apply min-h-screen bg-base text-content antialiased;
+    min-height: 100vh;
+    background-color: rgb(var(--color-bg) / 1);
+    color: rgb(var(--color-fg) / 1);
     font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1,
@@ -42,7 +46,16 @@
 
 @layer components {
   .arc-surface {
-    @apply rounded-2xl border border-arc-gray-200/70 bg-white/90 shadow-sm dark:border-arc-gray-700/70 dark:bg-slate-900/80;
+    border-radius: 1rem;
+    border-width: 1px;
+    border-color: rgba(226, 232, 240, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .dark .arc-surface {
+    border-color: rgba(51, 65, 85, 0.7);
+    background-color: rgba(15, 23, 42, 0.8);
   }
 
   .arc-glow {
