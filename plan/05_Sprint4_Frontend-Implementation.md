@@ -314,16 +314,16 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### File Editor Panel Component
 
-- [ ] Create `frontend/components/editors/FileEditorPanel.tsx`:
-  - [ ] Tabbed interface — *See [10-ux-spec.md#file-editor-states](../spec/10-ux-spec.md)*:
-    - [ ] Samplesheet tab
-    - [ ] Config tab
-  - [ ] Tab badges:
-    - [ ] Modified indicator (dot)
-    - [ ] Error indicator (red)
-    - [ ] Valid indicator (green check)
-  - [ ] Content area for editors
-  - [ ] "Ask AI to modify" button
+- [x] Create `frontend/components/editors/FileEditorPanel.tsx`:
+  - [x] Tabbed interface — *See [10-ux-spec.md#file-editor-states](../spec/10-ux-spec.md)*:
+    - [x] Samplesheet tab
+    - [x] Config tab
+  - [x] Tab badges:
+    - [x] Modified indicator (dot)
+    - [x] Error indicator (red)
+    - [x] Valid indicator (green check)
+  - [x] Content area for editors
+  - [x] "Ask AI to modify" button
 
 ### Samplesheet Editor Component
 
@@ -331,94 +331,94 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 > - [04-frontend-spec.md#samplesheeteditor](../spec/04-frontend-spec.md) - Handsontable configuration
 > - [10-ux-spec.md#file-editing](../spec/10-ux-spec.md) - Editing patterns
 
-- [ ] Create `frontend/components/editors/SamplesheetEditor.tsx` — *See [04-frontend-spec.md#samplesheeteditor](../spec/04-frontend-spec.md)*:
-  - [ ] Handsontable integration
-  - [ ] Configuration:
-    - [ ] Column headers from pipeline schema
-    - [ ] Column types (text, dropdown, numeric)
-    - [ ] Required column indicators
-  - [ ] Features — *See [10-ux-spec.md#file-editing](../spec/10-ux-spec.md)*:
-    - [ ] Cell editing with validation
-    - [ ] Copy/paste support
-    - [ ] Row add/remove
-    - [ ] Column resize
-    - [ ] Context menu
-  - [ ] Validation — *See [10-ux-spec.md#validation](../spec/10-ux-spec.md)*:
-    - [ ] Required fields not empty
-    - [ ] GCS path format validation
-    - [ ] Highlight invalid cells (red border)
-  - [ ] Export to CSV function
-  - [ ] Import from CSV function
+- [x] Create `frontend/components/editors/SamplesheetEditor.tsx` — *See [04-frontend-spec.md#samplesheeteditor](../spec/04-frontend-spec.md)*:
+  - [x] Handsontable integration
+  - [x] Configuration:
+    - [x] Column headers from pipeline schema
+    - [x] Column types (text, dropdown, numeric)
+    - [x] Required column indicators
+  - [x] Features — *See [10-ux-spec.md#file-editing](../spec/10-ux-spec.md)*:
+    - [x] Cell editing with validation
+    - [x] Copy/paste support
+    - [x] Row add/remove
+    - [x] Column resize
+    - [x] Context menu
+  - [x] Validation — *See [10-ux-spec.md#validation](../spec/10-ux-spec.md)*:
+    - [x] Required fields not empty
+    - [x] GCS path format validation
+    - [x] Highlight invalid cells (red border)
+  - [x] Export to CSV function
+  - [x] Import from CSV function
 
-- [ ] Create `frontend/lib/handsontable/columnConfig.ts`:
-  - [ ] Define column configurations per pipeline
-  - [ ] nf-core/scrnaseq columns — *See [03-backend-spec.md#pipelineregistry](../spec/03-backend-spec.md)*:
-    - [ ] `sample` (text, required)
-    - [ ] `fastq_1` (text, required, GCS path)
-    - [ ] `fastq_2` (text, required, GCS path)
-    - [ ] `expected_cells` (numeric, optional, default 10000)
+- [x] Create `frontend/lib/handsontable/columnConfig.ts`:
+  - [x] Define column configurations per pipeline
+  - [x] nf-core/scrnaseq columns — *See [03-backend-spec.md#pipelineregistry](../spec/03-backend-spec.md)*:
+    - [x] `sample` (text, required)
+    - [x] `fastq_1` (text, required, GCS path)
+    - [x] `fastq_2` (text, required, GCS path)
+    - [x] `expected_cells` (numeric, optional, default 10000)
 
-- [ ] Create `frontend/lib/handsontable/validators.ts`:
-  - [ ] `validateRequired()`: Cell not empty
-  - [ ] `validateGcsPath()`: gs:// format
-  - [ ] `validateNumeric()`: Positive integer
+- [x] Create `frontend/lib/handsontable/validators.ts`:
+  - [x] `validateRequired()`: Cell not empty
+  - [x] `validateGcsPath()`: gs:// format
+  - [x] `validateNumeric()`: Positive integer
 
 ### Config Editor Component
 
 > **Spec References:**
 > - [04-frontend-spec.md#configeditor](../spec/04-frontend-spec.md) - Monaco configuration
 
-- [ ] Create `frontend/components/editors/ConfigEditor.tsx` — *See [04-frontend-spec.md#configeditor](../spec/04-frontend-spec.md)*:
-  - [ ] Monaco Editor integration
-  - [ ] Configuration:
-    - [ ] Language: "groovy" or custom Nextflow mode
-    - [ ] Theme: Match app theme
-    - [ ] Line numbers: enabled
-    - [ ] Minimap: enabled
-    - [ ] Word wrap: off
-  - [ ] Features:
-    - [ ] Syntax highlighting
-    - [ ] Search/replace (Ctrl+F)
-    - [ ] Multiple cursors
-    - [ ] Bracket matching
-  - [ ] Read-only mode option
+- [x] Create `frontend/components/editors/ConfigEditor.tsx` — *See [04-frontend-spec.md#configeditor](../spec/04-frontend-spec.md)*:
+  - [x] Monaco Editor integration
+  - [x] Configuration:
+    - [x] Language: "groovy" or custom Nextflow mode
+    - [x] Theme: Match app theme
+    - [x] Line numbers: enabled
+    - [x] Minimap: enabled
+    - [x] Word wrap: off
+  - [x] Features:
+    - [x] Syntax highlighting
+    - [x] Search/replace (Ctrl+F)
+    - [x] Multiple cursors
+    - [x] Bracket matching
+  - [x] Read-only mode option
 
-- [ ] Create `frontend/lib/monaco/nextflowLanguage.ts`:
-  - [ ] Define Nextflow syntax highlighting:
-    - [ ] Keywords (params, process, workflow)
-    - [ ] Comments
-    - [ ] Strings
-    - [ ] Numbers
+- [x] Create `frontend/lib/monaco/nextflowLanguage.ts`:
+  - [x] Define Nextflow syntax highlighting:
+    - [x] Keywords (params, process, workflow)
+    - [x] Comments
+    - [x] Strings
+    - [x] Numbers
 
 ### Submit Panel Component
 
 > **Spec References:**
 > - [10-ux-spec.md#validation](../spec/10-ux-spec.md) - Validation display
 
-- [ ] Create `frontend/components/workspace/SubmitPanel.tsx` — *See [10-ux-spec.md#validation](../spec/10-ux-spec.md)*:
-  - [ ] Validation status display:
-    - [ ] Green checkmark if valid
-    - [ ] Error count if invalid
-    - [ ] Warning count with icon
-  - [ ] Error list (expandable):
-    - [ ] Error type and message
-    - [ ] Affected field/sample
-    - [ ] Fix action buttons
-  - [ ] Warning list (expandable)
-  - [ ] Validate button
-  - [ ] Submit Run button (disabled if errors)
+- [x] Create `frontend/components/workspace/SubmitPanel.tsx` — *See [10-ux-spec.md#validation](../spec/10-ux-spec.md)*:
+  - [x] Validation status display:
+    - [x] Green checkmark if valid
+    - [x] Error count if invalid
+    - [x] Warning count with icon
+  - [x] Error list (expandable):
+    - [x] Error type and message
+    - [x] Affected field/sample
+    - [x] Fix action buttons
+  - [x] Warning list (expandable)
+  - [x] Validate button
+  - [x] Submit Run button (disabled if errors)
 
 ### Validation Display Component
 
-- [ ] Create `frontend/components/workspace/ValidationDisplay.tsx`:
-  - [ ] Summarize validation results
-  - [ ] List errors with details — *See [10-ux-spec.md#error-handling-ux](../spec/10-ux-spec.md)*:
-    - [ ] Icon for error type
-    - [ ] Description
-    - [ ] Location (sample, field)
-    - [ ] Quick action (remove sample, fix value)
-  - [ ] List warnings
-  - [ ] Sample count and file verification summary
+- [x] Create `frontend/components/workspace/ValidationDisplay.tsx`:
+  - [x] Summarize validation results
+  - [x] List errors with details — *See [10-ux-spec.md#error-handling-ux](../spec/10-ux-spec.md)*:
+    - [x] Icon for error type
+    - [x] Description
+    - [x] Location (sample, field)
+    - [x] Quick action (remove sample, fix value)
+  - [x] List warnings
+  - [x] Sample count and file verification summary
 
 ---
 

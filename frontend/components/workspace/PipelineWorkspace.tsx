@@ -1,8 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ChatPanel } from '@/components/chat/ChatPanel';
+import { FileEditorPanel } from '@/components/editors/FileEditorPanel';
+import { SubmitPanel } from '@/components/workspace/SubmitPanel';
+import { useWorkspaceStore } from '@/stores/workspaceStore';
 
 const pipelines = [
   { name: 'nf-core/scrnaseq', versions: ['2.7.0', '2.6.1'] },
@@ -12,6 +15,11 @@ const pipelines = [
 export function PipelineWorkspace() {
   const [pipeline, setPipeline] = useState(pipelines[0]);
   const [version, setVersion] = useState(pipelines[0].versions[0]);
+  const setWorkspacePipeline = useWorkspaceStore((state) => state.setPipeline);
+
+  useEffect(() => {
+    setWorkspacePipeline(pipeline.name, version);
+  }, [pipeline.name, version, setWorkspacePipeline]);
 
   return (
     <section className="flex h-full flex-col gap-6">
@@ -56,23 +64,12 @@ export function PipelineWorkspace() {
         <div className="arc-surface flex min-h-[520px] flex-col p-6">
           <ChatPanel />
         </div>
-        <div className="arc-surface flex min-h-[520px] flex-col items-center justify-center border border-dashed border-arc-gray-200/80 bg-white/60 p-6 text-center text-sm text-arc-gray-500 dark:border-arc-gray-800/80 dark:bg-slate-900/60 dark:text-arc-gray-300">
-          File editor panel lands here in Phase 4.3.
+        <div className="arc-surface flex min-h-[520px] flex-col p-6">
+          <FileEditorPanel />
         </div>
       </div>
 
-      <footer className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-arc-gray-200/70 bg-white/70 px-4 py-3 text-sm text-arc-gray-600 dark:border-arc-gray-800/70 dark:bg-slate-900/70 dark:text-arc-gray-200">
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-arc-warning" />
-          Validation pending.
-        </div>
-        <button
-          type="button"
-          className="rounded-full bg-arc-blue px-5 py-2 text-xs font-semibold text-white transition hover:opacity-90"
-        >
-          Submit Run
-        </button>
-      </footer>
+      <SubmitPanel />
     </section>
   );
 }

@@ -61,6 +61,14 @@
   .arc-glow {
     box-shadow: 0 0 60px rgba(29, 78, 216, 0.22);
   }
+
+  .hot-invalid-cell {
+    box-shadow: inset 0 0 0 2px rgba(239, 68, 68, 0.9);
+  }
+
+  .handsontable {
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  }
 }
 
 @layer utilities {

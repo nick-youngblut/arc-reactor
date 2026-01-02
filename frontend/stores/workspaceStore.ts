@@ -13,6 +13,8 @@ interface WorkspaceState {
   config: string;
   validationResult: ValidationResult | null;
   isDirty: boolean;
+  samplesheetDirty: boolean;
+  configDirty: boolean;
   setPipeline: (pipeline: string | null, version?: string | null) => void;
   setSamplesheet: (value: string) => void;
   setConfig: (value: string) => void;
@@ -26,7 +28,9 @@ const initialState = {
   samplesheet: '',
   config: '',
   validationResult: null,
-  isDirty: false
+  isDirty: false,
+  samplesheetDirty: false,
+  configDirty: false
 };
 
 export const useWorkspaceStore = create<WorkspaceState>((set) => ({
@@ -35,10 +39,13 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
     set({
       selectedPipeline: pipeline,
       selectedVersion: version,
-      isDirty: false
+      isDirty: false,
+      samplesheetDirty: false,
+      configDirty: false
     }),
-  setSamplesheet: (value) => set({ samplesheet: value, isDirty: true }),
-  setConfig: (value) => set({ config: value, isDirty: true }),
+  setSamplesheet: (value) =>
+    set({ samplesheet: value, isDirty: true, samplesheetDirty: true }),
+  setConfig: (value) => set({ config: value, isDirty: true, configDirty: true }),
   clearWorkspace: () => set(initialState),
   setValidationResult: (result) => set({ validationResult: result })
 }));
