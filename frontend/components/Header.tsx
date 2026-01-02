@@ -38,7 +38,7 @@ export function Header() {
             <div className="hidden sm:block">
               <p className="text-sm font-bold tracking-tight text-content">Arc Reactor</p>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-arc-blue">
-                Intelligence Layer
+                Arc Institute
               </p>
             </div>
           </Link>

@@ -38,7 +38,7 @@ export function ChatPanel() {
         </button>
       </header>
 
-      <div className="flex-1">
+      <div className={`flex-1 ${messages.length === 0 ? 'hidden' : ''}`}>
         <MessageList messages={messages} onSelectPrompt={setInput} />
       </div>
 
@@ -48,7 +48,13 @@ export function ChatPanel() {
           Arc Assistant is responding...
         </div>
       ) : null}
-      <ChatInput input={input} isLoading={isLoading} onChange={setInput} onSubmit={handleSubmit} />
+      <ChatInput
+        input={input}
+        isLoading={isLoading}
+        onChange={setInput}
+        onSubmit={handleSubmit}
+        isExpanded={messages.length === 0}
+      />
     </section>
   );
 }

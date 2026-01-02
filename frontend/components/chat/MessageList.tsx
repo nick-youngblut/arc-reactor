@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ChatMessage } from '@/stores/chatStore';
 
 import { MessageBubble } from './MessageBubble';
-import { SuggestedPrompts } from './SuggestedPrompts';
+
 
 interface MessageListProps {
   messages: ChatMessage[];
@@ -41,14 +41,9 @@ export function MessageList({ messages, onSelectPrompt }: MessageListProps) {
       <div ref={containerRef} className="flex-1 space-y-4 overflow-y-auto pr-2">
         {showPrompts ? (
           <div
-            className={`arc-surface bg-white/60 p-6 transition-opacity duration-200 dark:bg-slate-900/60 ${
-              isFading ? 'opacity-0' : 'opacity-100'
-            }`}
+            className={`flex h-full flex-col items-center justify-center gap-6 p-6 transition-opacity duration-200 ${isFading ? 'opacity-0' : 'opacity-100'
+              }`}
           >
-            <p className="text-sm text-arc-gray-500 dark:text-arc-gray-300">
-              Ask Arc Reactor to build a samplesheet, validate inputs, or launch a pipeline run.
-            </p>
-            <SuggestedPrompts onSelect={onSelectPrompt} />
           </div>
         ) : (
           messages.map((message) => (
