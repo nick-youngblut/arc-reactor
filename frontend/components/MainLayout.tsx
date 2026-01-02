@@ -12,15 +12,11 @@ const bottomNav = [
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
       <Header />
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <main className="w-full">
-          <div className="arc-surface arc-glow min-h-[75vh] w-full p-6 sm:p-10 shadow-2xl">
-            {children}
-          </div>
-        </main>
-      </div>
+      <main className="w-full px-4 py-4 sm:px-6 sm:py-6">
+        {children}
+      </main>
       <BottomNav />
     </div>
   );
