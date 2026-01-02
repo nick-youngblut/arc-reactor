@@ -6,6 +6,12 @@ import os
 from pathlib import Path
 from typing import AsyncIterator
 
+# Load .env file before any other imports to ensure environment variables
+# are available to all modules, especially benchling-py which needs them
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse

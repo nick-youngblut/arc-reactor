@@ -22,7 +22,7 @@ default:
   gemini_cb_failure_threshold: 3
   gemini_cb_recovery_timeout: 60
 
-dev:
+test:
   debug: true
   gcp_project: "multi-omics-dev"
   nextflow_bucket: "arc-reactor-runs-dev"
