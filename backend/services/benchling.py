@@ -11,6 +11,7 @@ The BenchlingSession exposes:
 - session.entities -> API EntityOperations (for create/update/delete)
 - session.warehouse.entity -> Warehouse EntityOperations (for queries)
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -39,7 +40,6 @@ class BenchlingService:
         - warehouse.dropdown: DropdownOperations
         - warehouse.folder: FolderOperations
         - entities: API EntityOperations (CRUD via Benchling API)
-        - upsert: UpsertOperations (bulk create/update)
         - navigator: RelationshipNavigator
         - api_client: Full APIClient access
     """
@@ -93,19 +93,10 @@ class BenchlingService:
         Methods:
             - list_entities(schema_id, page_size, max_pages)
             - get_entity(entity_id)
-            - create_entity(schema_id, name, fields)
-            - update_entity(entity_id, fields)
-            - bulk_create_entities(entities)
-            - bulk_update_entities(updates, batch_size, schema_name)
 
         Note: This is different from warehouse.entity which is for SQL queries.
         """
         return self._session.entities
-
-    @property
-    def upsert(self):
-        """Access UpsertOperations for bulk create/update operations."""
-        return self._session.upsert
 
     @property
     def navigator(self) -> RelationshipNavigator:
@@ -166,59 +157,6 @@ class BenchlingService:
         @self._breaker
         def _run() -> dict[str, Any] | None:
             return self._session.entities.get_entity(entity_id)
-
-        return await asyncio.to_thread(_run)
-
-    async def update_entity(
-        self,
-        entity_id: str,
-        fields: dict[str, Any],
-    ) -> dict[str, Any]:
-        """Update an entity's fields via the Benchling API.
-
-        Args:
-            entity_id: Benchling entity ID.
-            fields: Fields to update. Values are auto-wrapped to {"value": x} format.
-
-        Returns:
-            Updated entity data.
-
-        Note:
-            Field names should be API display names, not system names.
-            Use convert_fields_to_api_format() to convert system names first.
-        """
-
-        @self._breaker
-        def _run() -> dict[str, Any]:
-            return self._session.entities.update_entity(entity_id, fields=fields)
-
-        return await asyncio.to_thread(_run)
-
-    async def bulk_update_entities(
-        self,
-        updates: list[dict[str, Any]],
-        batch_size: int | None = None,
-        schema_name: str | None = None,
-    ) -> list[dict[str, Any]]:
-        """Bulk update multiple entities via the Benchling API.
-
-        Args:
-            updates: List of updates in format:
-                [{"entityId": "ent_123", "fields": {"FieldName": value}}, ...]
-            batch_size: Number of entities per batch (default from config).
-            schema_name: Schema name for field validation.
-
-        Returns:
-            List of update results.
-        """
-
-        @self._breaker
-        def _run() -> list[dict[str, Any]]:
-            return self._session.entities.bulk_update_entities(
-                updates,
-                batch_size=batch_size,
-                schema_name=schema_name,
-            )
 
         return await asyncio.to_thread(_run)
 

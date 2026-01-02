@@ -11,7 +11,10 @@ from backend.utils.errors import BenchlingError
 
 router = APIRouter(tags=["benchling"])
 
-_METADATA_CACHE: dict[str, Any] = {"expires_at": datetime.min.replace(tzinfo=timezone.utc), "data": {}}
+_METADATA_CACHE: dict[str, Any] = {
+    "expires_at": datetime.min.replace(tzinfo=timezone.utc),
+    "data": {},
+}
 
 
 @router.get("/benchling/runs")
@@ -41,7 +44,7 @@ async def list_ngs_runs(
         LIMIT :limit OFFSET :offset
     """
     try:
-        runs = await benchling.query(sql, params)
+        runs = await benchling.query(sql, params, return_format="dict")
     except Exception as exc:
         raise BenchlingError("Benchling query failed", detail=str(exc)) from exc
 
@@ -75,7 +78,7 @@ async def get_run_samples(
           AND lps.archived$ = FALSE
     """
     try:
-        rows = await benchling.query(sql, {"name": name})
+        rows = await benchling.query(sql, {"name": name}, return_format="dict")
     except Exception as exc:
         raise BenchlingError("Benchling query failed", detail=str(exc)) from exc
 
@@ -106,9 +109,9 @@ async def get_benchling_metadata(
         ORDER BY project
     """
     try:
-        instruments = await benchling.query(sql_instruments)
-        reagents = await benchling.query(sql_reagent)
-        projects = await benchling.query(sql_projects)
+        instruments = await benchling.query(sql_instruments, return_format="dict")
+        reagents = await benchling.query(sql_reagent, return_format="dict")
+        projects = await benchling.query(sql_projects, return_format="dict")
     except Exception as exc:
         raise BenchlingError("Benchling query failed", detail=str(exc)) from exc
 
@@ -122,3 +125,60 @@ async def get_benchling_metadata(
     _METADATA_CACHE["data"] = data
     _METADATA_CACHE["expires_at"] = now + timedelta(minutes=5)
     return data
+
+
+@router.get("/benchling/entities/{entity_id}")
+async def get_entity(
+    entity_id: str,
+    benchling: BenchlingService = Depends(get_benchling_service),
+) -> dict[str, Any]:
+    try:
+        entity = await benchling.get_entity(entity_id)
+    except Exception as exc:
+        raise BenchlingError("Benchling entity fetch failed", detail=str(exc)) from exc
+
+    return {"entity": entity}
+
+
+@router.get("/benchling/entities/{entity_id}/relationships")
+async def get_entity_relationships(
+    entity_id: str,
+    relationship_field: str | None = Query(default=None),
+    benchling: BenchlingService = Depends(get_benchling_service),
+) -> dict[str, Any]:
+    try:
+        related = await benchling.get_related_entities(
+            entity_id=entity_id,
+            relationship_field=relationship_field,
+            return_format="dict",
+        )
+    except Exception as exc:
+        raise BenchlingError("Benchling relationships query failed", detail=str(exc)) from exc
+
+    return {"entity_id": entity_id, "relationships": related}
+
+
+@router.get("/benchling/entities/{entity_id}/lineage")
+async def get_entity_lineage(
+    entity_id: str,
+    relationship_field: str = Query(...),
+    max_depth: int = Query(default=10, ge=1, le=50),
+    include_path: bool = Query(default=True),
+    benchling: BenchlingService = Depends(get_benchling_service),
+) -> dict[str, Any]:
+    try:
+        lineage = await benchling.get_ancestors(
+            entity_id=entity_id,
+            relationship_field=relationship_field,
+            max_depth=max_depth,
+            include_path=include_path,
+            return_format="tree",
+        )
+    except Exception as exc:
+        raise BenchlingError("Benchling lineage query failed", detail=str(exc)) from exc
+
+    return {
+        "entity_id": entity_id,
+        "relationship_field": relationship_field,
+        "lineage": lineage,
+    }
