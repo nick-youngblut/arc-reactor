@@ -1,35 +1,5 @@
 @import "tailwindcss";
 
-@theme {
-  --color-arc-blue: #0073E6;
-  --color-arc-night: #0C2043;
-  --color-arc-arctic: #F7F9FB;
-  --color-arc-fog: #F7F8F9;
-  --color-arc-marigold: #F39A22;
-  --color-arc-clay: #BD5D32;
-  --color-arc-moss: #455F29;
-  --color-arc-evergreen: #197A57;
-  --color-arc-twilight: #595F89;
-  --color-arc-slate: #433F45;
-
-  --color-arc-gray-50: #F8FAFC;
-  --color-arc-gray-100: #F1F5F9;
-  --color-arc-gray-200: #E2E8F0;
-  --color-arc-gray-300: #CBD5E1;
-  --color-arc-gray-400: #94A3B8;
-  --color-arc-gray-500: #64748B;
-  --color-arc-gray-600: #475569;
-  --color-arc-gray-700: #334155;
-  --color-arc-gray-800: #1F2937;
-  --color-arc-gray-900: #0F172A;
-
-  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
-  --font-body: "IBM Plex Sans", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-
-  --shadow-glow: 0 0 30px rgba(0, 115, 230, 0.25);
-}
-
 @layer base {
   :root {
     color-scheme: light;
