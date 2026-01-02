@@ -22,7 +22,28 @@ def _has_database_config() -> bool:
 
 
 def _has_benchling_config() -> bool:
-    return bool(os.getenv("BENCHLING_WAREHOUSE_PASSWORD"))
+    dynaconf_env = os.getenv("DYNACONF")
+    prod_vars = [
+        "BENCHLING_PROD_API_KEY",
+        "BENCHLING_PROD_DATABASE_URI",
+        "BENCHLING_PROD_APP_CLIENT_ID",
+        "BENCHLING_PROD_APP_CLIENT_SECRET",
+    ]
+    test_vars = [
+        "BENCHLING_TEST_API_KEY",
+        "BENCHLING_TEST_DATABASE_URI",
+        "BENCHLING_TEST_APP_CLIENT_ID",
+        "BENCHLING_TEST_APP_CLIENT_SECRET",
+    ]
+
+    has_prod = all(os.getenv(var) for var in prod_vars)
+    has_test = all(os.getenv(var) for var in test_vars)
+
+    if dynaconf_env == "prod":
+        return has_prod
+    if dynaconf_env in {"test", "dev"}:
+        return has_test
+    return has_prod or has_test
 
 
 def _has_gcs_config() -> bool:
@@ -36,12 +57,26 @@ def _has_gemini_config() -> bool:
 @pytest.mark.asyncio
 async def test_benchling_connection() -> None:
     if not _has_benchling_config():
-        pytest.skip("Missing Benchling warehouse credentials")
+        pytest.skip("Missing Benchling credentials")
 
     breakers = create_breakers(settings)
-    service = BenchlingService.create(settings, breakers)
+    service = BenchlingService.create(breakers)
+
     assert await service.health_check() is True
-    await service.close()
+
+    rows = await service.query("SELECT 1 AS ok", return_format="dict")
+    assert rows and rows[0].get("ok") == 1
+
+    frame = await service.query("SELECT 1 AS ok", return_format="dataframe")
+    assert getattr(frame, "shape", (0, 0))[0] >= 1
+
+    converted = await service.convert_fields_to_api_format(
+        "ngs_run_output_sample",
+        {"link_to_fastq_file": "gs://example.fastq.gz"},
+    )
+    assert "Link to FASTQ File" in converted
+
+    service.close()
 
 
 @pytest.mark.asyncio
