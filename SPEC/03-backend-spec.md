@@ -97,8 +97,7 @@ default:
   orchestrator_image: "gcr.io/arc-ctc-project/nextflow-orchestrator:latest"
   
   # Benchling Configuration
-  benchling_warehouse_host: "benchling-warehouse.arcinstitute.org"
-  benchling_warehouse_db: "benchling"
+  # Benchling settings are sourced via benchling-py Dynaconf (DYNACONF env var)
   
   # AI Configuration (Google Gemini)
   gemini_model: "gemini-3-flash-preview"
@@ -119,11 +118,11 @@ default:
     - "https://arc-reactor.arcinstitute.org"
     - "http://localhost:3000"
 
-development:
+dev:
   debug: true
   nextflow_bucket: "arc-reactor-runs-dev"
 
-production:
+prod:
   debug: false
 ```
 
@@ -131,9 +130,16 @@ production:
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `DYNACONF` | Environment name (development/production) | Yes |
+| `DYNACONF` | Benchling config environment (`test`, `dev`, `prod`) | Yes |
 | `GOOGLE_API_KEY` | Google AI API key | Yes* |
-| `BENCHLING_WAREHOUSE_PASSWORD` | Benchling warehouse credentials | Yes |
+| `BENCHLING_TEST_API_KEY` | Benchling test API key | Yes (test/dev) |
+| `BENCHLING_TEST_DATABASE_URI` | Benchling test DB URI | Yes (test/dev) |
+| `BENCHLING_TEST_APP_CLIENT_ID` | Benchling test OAuth client ID | Yes (test/dev) |
+| `BENCHLING_TEST_APP_CLIENT_SECRET` | Benchling test OAuth client secret | Yes (test/dev) |
+| `BENCHLING_PROD_API_KEY` | Benchling prod API key | Yes (prod) |
+| `BENCHLING_PROD_DATABASE_URI` | Benchling prod DB URI | Yes (prod) |
+| `BENCHLING_PROD_APP_CLIENT_ID` | Benchling prod OAuth client ID | Yes (prod) |
+| `BENCHLING_PROD_APP_CLIENT_SECRET` | Benchling prod OAuth client secret | Yes (prod) |
 | `GCP_PROJECT` | GCP project ID (override) | No |
 
 *`GOOGLE_API_KEY` is required to use Gemini.
@@ -212,6 +218,9 @@ recovery eligibility rules.
 | `GET /api/benchling/runs` | GET | List NGS runs | Required |
 | `GET /api/benchling/runs/{name}/samples` | GET | Get samples for run | Required |
 | `GET /api/benchling/metadata` | GET | Get metadata options | Required |
+| `GET /api/benchling/entities/{entity_id}` | GET | Get entity by ID | Required |
+| `GET /api/benchling/entities/{entity_id}/relationships` | GET | Get related entities | Required |
+| `GET /api/benchling/entities/{entity_id}/lineage` | GET | Get ancestor lineage | Required |
 
 ## Frontend Integration
 
@@ -371,24 +380,27 @@ class GeneratedFile(BaseModel):
 
 ### BenchlingService
 
-Handles all queries to the Benchling data warehouse.
+Handles read-only Benchling access via `benchling-py`'s `BenchlingSession`.
+All synchronous calls are wrapped in `asyncio.to_thread()` for FastAPI compatibility.
 
 **Key Methods:**
 
 | Method | Description | Returns |
 |--------|-------------|---------|
-| `get_lib_prep_samples()` | Get all library prep samples with metadata | DataFrame |
-| `get_run_paths()` | Get NGS run paths and instruments | DataFrame |
-| `get_run_metadata()` | Get detailed metadata for a run | dict |
-| `get_recent_runs()` | Get recent NGS runs | DataFrame |
-| `get_projects()` | Get distinct projects | list[dict] |
-| `get_instruments()` | Get available instruments | list[str] |
+| `query()` | Execute SQL in Benchling warehouse (return_format selectable) | list[dict] / DataFrame / str |
+| `get_entity()` | Fetch entity via Benchling API (read-only) | dict |
+| `convert_fields_to_api_format()` | Convert system field names to API display names | dict |
+| `get_ancestors()` | Traverse lineage via relationship fields | DataFrame / dict |
+| `get_descendants()` | Traverse descendant relationships | DataFrame / dict |
+| `get_related_entities()` | Resolve entity_link relationships | dict |
+| `health_check()` | Validate warehouse connectivity | bool |
 
 **Query Patterns:**
 
 - All queries filter for `archived$ = FALSE`
 - Complex queries use CTEs for readability
 - Results cached for 5 minutes (metadata lookups)
+- API routes should use `return_format="dict"`; agent tools should use `return_format="toon"`
 
 ### BatchService
 

@@ -150,21 +150,24 @@ When a user wants to process their sequencing data:
 
 ## Benchling Service
 
-All Benchling tools communicate with the data warehouse through a shared service. The service
-is initialized at application startup and injected into tools via FastAPI dependencies.
+All Benchling tools communicate with a shared `BenchlingService` that wraps
+`benchling-py`'s `BenchlingSession`. The service is initialized at application startup and
+injected into tools via dependencies. Calls are read-only and executed with `asyncio.to_thread()`.
 
 ```python
-from benchling_py import WarehouseClient
+from benchling_py import BenchlingSession
 
 class BenchlingService:
-    """Service for Benchling data warehouse operations."""
-    
     def __init__(self):
-        self._client = WarehouseClient()
-    
-    @property
-    def warehouse(self) -> WarehouseClient:
-        return self._client
+        self._session = BenchlingSession()
+
+    async def query(self, sql: str, params: dict | None = None, return_format: str = "dict"):
+        return await asyncio.to_thread(
+            self._session.warehouse.query,
+            sql=sql,
+            params=params,
+            return_format=return_format,
+        )
 ```
 
 ---
@@ -379,10 +382,10 @@ def search_ngs_runs(
     
     params["limit"] = min(limit, 500)
     
-    result = benchling_service.warehouse.query(
+    result = await benchling_service.query(
         sql=sql,
         params=params,
-        return_format="dataframe",
+        return_format="dict",
     )
     
     return format_ngs_run_results(result)
@@ -543,10 +546,10 @@ def get_ngs_run_samples(
     SELECT * FROM run_info, samples
     """
     
-    result = benchling_service.warehouse.query(
+    result = await benchling_service.query(
         sql=sql,
         params=params,
-        return_format="dataframe",
+        return_format="dict",
     )
     
     return format_run_samples_result(result)
@@ -709,10 +712,10 @@ def get_fastq_paths(
     ORDER BY lps.sample_id
     """
     
-    result = benchling_service.warehouse.query(
+    result = await benchling_service.query(
         sql=sql,
         params=sample_params,
-        return_format="dataframe",
+        return_format="dict",
     )
     
     if validate_exists:
@@ -820,6 +823,48 @@ NGS Library Prep Sample: LPS-001
 │           ├── fastq_r1: gs://arc-ngs-data/.../LPS-001_R1.fastq.gz
 │           └── fastq_r2: gs://arc-ngs-data/.../LPS-001_R2.fastq.gz
 └── Protocol: 10X Library Prep Protocol v3
+```
+
+### trace_sample_lineage
+
+Trace ancestor lineage for a specific entity via a relationship field.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `entity_id` | string | Yes | Benchling entity ID |
+| `relationship_field` | string | Yes | Relationship field (e.g., `parent_sample`) |
+| `max_depth` | integer | No | Maximum traversal depth (default: 10) |
+| `include_path` | boolean | No | Include traversal path (default: true) |
+
+**Returns (TOON table):**
+```
+Lineage for ent_123:
+
+ancestor_id | depth | path
+------------|-------|-------------------------
+ent_999     | 1     | ent_123 -> ent_999
+```
+
+### find_sample_descendants
+
+Trace descendant relationships for a specific entity.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `entity_id` | string | Yes | Benchling entity ID |
+| `relationship_field` | string | No | Relationship field (default: `parent_sample`) |
+| `max_depth` | integer | No | Maximum traversal depth (default: 10) |
+| `include_path` | boolean | No | Include traversal path (default: true) |
+
+**Returns (TOON table):**
+```
+Descendants for ent_456:
+
+descendant_id | depth | path
+--------------|-------|-------------------------
+ent_789       | 1     | ent_456 -> ent_789
 ```
 
 ### list_entries
@@ -1180,10 +1225,10 @@ def execute_warehouse_query(
     if "LIMIT" not in normalized:
         sql = f"{sql.rstrip(';')} LIMIT {effective_limit}"
     
-    result = benchling_service.warehouse.query(
+    result = await benchling_service.query(
         sql=sql,
         params=params or {},
-        return_format="dataframe",
+        return_format="dict",
     )
     
     return format_query_results(result)

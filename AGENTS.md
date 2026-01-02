@@ -35,3 +35,4 @@
 
 ## Security & Configuration Tips
 - Do not commit secrets. Use `backend/.env` and `frontend/.env.local`; keep keys in your local environment/secret store. Copy templates if provided.
+- Benchling config uses `DYNACONF` plus `BENCHLING_{TEST,PROD}_*` environment variables (benchling-py Dynaconf settings).

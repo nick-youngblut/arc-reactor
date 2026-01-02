@@ -84,7 +84,14 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 
 | Secret | Environments |
 |--------|--------------|
-| `benchling-warehouse-password` | Both |
+| `benchling-prod-api-key` | Prod |
+| `benchling-prod-database-uri` | Prod |
+| `benchling-prod-app-client-id` | Prod |
+| `benchling-prod-app-client-secret` | Prod |
+| `benchling-test-api-key` | Dev/Test |
+| `benchling-test-database-uri` | Dev/Test |
+| `benchling-test-app-client-id` | Dev/Test |
+| `benchling-test-app-client-secret` | Dev/Test |
 | `google-api-key` | Both |
 
 ## Container Build
@@ -266,7 +273,7 @@ jobs:
             echo "env=prod" >> $GITHUB_OUTPUT
             echo "service=arc-reactor" >> $GITHUB_OUTPUT
           else
-            echo "env=dev" >> $GITHUB_OUTPUT
+            echo "env=test" >> $GITHUB_OUTPUT
             echo "service=arc-reactor-dev" >> $GITHUB_OUTPUT
           fi
           
@@ -302,7 +309,7 @@ jobs:
             echo "env=prod" >> $GITHUB_OUTPUT
             echo "service=arc-reactor" >> $GITHUB_OUTPUT
           else
-            echo "env=dev" >> $GITHUB_OUTPUT
+            echo "env=test" >> $GITHUB_OUTPUT
             echo "service=arc-reactor-dev" >> $GITHUB_OUTPUT
           fi
           
@@ -320,8 +327,15 @@ jobs:
             --timeout=3600
             --concurrency=80
             --service-account=arc-reactor@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
-            --set-env-vars=ENV_FOR_DYNACONF=${{ steps.env.outputs.env }}
-            --set-secrets=BENCHLING_WAREHOUSE_PASSWORD=benchling-warehouse-password:latest
+            --set-env-vars=DYNACONF=${{ steps.env.outputs.env }}
+            --set-secrets=BENCHLING_PROD_API_KEY=benchling-prod-api-key:latest
+            --set-secrets=BENCHLING_PROD_DATABASE_URI=benchling-prod-database-uri:latest
+            --set-secrets=BENCHLING_PROD_APP_CLIENT_ID=benchling-prod-app-client-id:latest
+            --set-secrets=BENCHLING_PROD_APP_CLIENT_SECRET=benchling-prod-app-client-secret:latest
+            --set-secrets=BENCHLING_TEST_API_KEY=benchling-test-api-key:latest
+            --set-secrets=BENCHLING_TEST_DATABASE_URI=benchling-test-database-uri:latest
+            --set-secrets=BENCHLING_TEST_APP_CLIENT_ID=benchling-test-app-client-id:latest
+            --set-secrets=BENCHLING_TEST_APP_CLIENT_SECRET=benchling-test-app-client-secret:latest
             --set-secrets=GOOGLE_API_KEY=google-api-key:latest
             --vpc-connector=projects/${{ env.PROJECT_ID }}/locations/${{ env.REGION }}/connectors/serverless-connector
             --ingress=internal-and-cloud-load-balancing
@@ -329,11 +343,11 @@ jobs:
 
 ## Environment Configuration
 
-### Production (`ENV_FOR_DYNACONF=prod`)
+### Production (`DYNACONF=prod`)
 
 ```yaml
-# settings.yaml - production section
-production:
+# settings.yaml - prod section
+prod:
   debug: false
   gcp_project: "arc-ctc-project"
   gcp_region: "us-west1"
@@ -341,11 +355,11 @@ production:
   log_level: "INFO"
 ```
 
-### Dev (`ENV_FOR_DYNACONF=dev`)
+### Dev/Test (`DYNACONF=test`)
 
 ```yaml
-# settings.yaml - dev section
-dev:
+# settings.yaml - test section
+test:
   debug: true
   gcp_project: "arc-ctc-project"
   gcp_region: "us-west1"
@@ -377,15 +391,85 @@ resource "google_cloud_run_v2_service" "app" {
       }
       
       env {
-        name  = "ENV_FOR_DYNACONF"
+        name  = "DYNACONF"
         value = var.environment
       }
       
       env {
-        name = "BENCHLING_WAREHOUSE_PASSWORD"
+        name = "BENCHLING_PROD_API_KEY"
         value_source {
           secret_key_ref {
-            secret  = google_secret_manager_secret.benchling_password.id
+            secret  = google_secret_manager_secret.benchling_prod_api_key.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_PROD_DATABASE_URI"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_prod_database_uri.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_PROD_APP_CLIENT_ID"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_prod_app_client_id.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_PROD_APP_CLIENT_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_prod_app_client_secret.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_TEST_API_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_test_api_key.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_TEST_DATABASE_URI"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_test_database_uri.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_TEST_APP_CLIENT_ID"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_test_app_client_id.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_TEST_APP_CLIENT_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_test_app_client_secret.id
             version = "latest"
           }
         }

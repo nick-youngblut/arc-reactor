@@ -32,6 +32,22 @@ specifications and implementation examples must reference the values here.
 |----------|-------------|----------|
 | `GOOGLE_API_KEY` | Google AI API key (Gemini Developer API) | Yes |
 
+## Benchling Configuration
+
+Benchling configuration is sourced via `benchling-py`'s Dynaconf settings.
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DYNACONF` | Benchling tenant selector (`test`, `dev`, `prod`) | Yes |
+| `BENCHLING_TEST_API_KEY` | Benchling test API key | Yes (test/dev) |
+| `BENCHLING_TEST_DATABASE_URI` | Benchling test DB URI | Yes (test/dev) |
+| `BENCHLING_TEST_APP_CLIENT_ID` | Benchling test OAuth client ID | Yes (test/dev) |
+| `BENCHLING_TEST_APP_CLIENT_SECRET` | Benchling test OAuth client secret | Yes (test/dev) |
+| `BENCHLING_PROD_API_KEY` | Benchling prod API key | Yes (prod) |
+| `BENCHLING_PROD_DATABASE_URI` | Benchling prod DB URI | Yes (prod) |
+| `BENCHLING_PROD_APP_CLIENT_ID` | Benchling prod OAuth client ID | Yes (prod) |
+| `BENCHLING_PROD_APP_CLIENT_SECRET` | Benchling prod OAuth client secret | Yes (prod) |
+
 ## Usage Guidance
 
 - Reference this document from other specs instead of duplicating values.

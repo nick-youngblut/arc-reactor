@@ -82,8 +82,8 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
   - [x] `nextflow_bucket`: Bucket name for runs — *See [06-data-model-spec.md#google-cloud-storage](../spec/06-data-model-spec.md)*
   - [x] `nextflow_service_account`: Service account email — *See [08-security-spec.md#service-account-permissions](../spec/08-security-spec.md)*
   - [x] `orchestrator_image`: Container image URI
-  - [x] `benchling_warehouse_host`: Benchling DB host — *See [07-integration-spec.md#benchling-integration](../spec/07-integration-spec.md)*
-  - [x] `benchling_warehouse_db`: Database name
+  - [x] Benchling Dynaconf environment (`DYNACONF`) — *See [07-integration-spec.md#benchling-integration](../spec/07-integration-spec.md)*
+  - [x] Benchling credentials via `BENCHLING_{TEST,PROD}_*` env vars
   - [x] `gemini_model`: "gemini-3-flash-preview" — *See [11-conf-spec.md#ai-model-configuration](../spec/11-conf-spec.md)*
   - [x] `gemini_thinking_level`: "low" — *See [11-conf-spec.md#thinking-level-options](../spec/11-conf-spec.md)*
   - [x] `frontend_out_dir`: Path to static frontend build
@@ -276,8 +276,9 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > **Spec References:**
 > - [08-security-spec.md#secret-management](../spec/08-security-spec.md) - Secret storage
 
-- [x] Create secret for Benchling warehouse password:
-  - [x] Secret name: `benchling-warehouse-password`
+- [x] Create Benchling secrets for prod/test tenants:
+  - [x] `benchling-prod-api-key`, `benchling-prod-database-uri`, `benchling-prod-app-client-id`, `benchling-prod-app-client-secret`
+  - [x] `benchling-test-api-key`, `benchling-test-database-uri`, `benchling-test-app-client-id`, `benchling-test-app-client-secret`
   - [x] Add secret version with actual password
 - [x] Create secret for Google API key — *See [11-conf-spec.md#environment-variables](../spec/11-conf-spec.md)*:
   - [x] Secret name: `google-api-key`

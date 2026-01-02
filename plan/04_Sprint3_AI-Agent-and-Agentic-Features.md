@@ -261,6 +261,8 @@ This sprint implements the core AI agent with LangChain/DeepAgents, including al
 > - [05-agentic-features-spec.md#benchling-discovery-tools](../spec/05-agentic-features-spec.md) - Entity discovery tools
 > - [05-agentic-features-spec.md#schema-metadata-tools](../spec/05-agentic-features-spec.md) - Schema tools
 
+- [x] Benchling tools should use `BenchlingService.query(..., return_format="dict")` and format output as TOON for the agent.
+
 ### Entity Discovery Tools
 
 - [x] Create `backend/agents/tools/benchling_discovery.py`:

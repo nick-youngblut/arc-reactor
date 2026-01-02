@@ -15,39 +15,33 @@ The platform integrates with several external systems:
 
 ### Connection Method
 
-The platform connects to Benchling's data warehouse via a read-only PostgreSQL connection.
+The platform connects to Benchling via `benchling-py`'s `BenchlingSession`, which
+wraps both the Benchling API client and the Benchling data warehouse (PostgreSQL).
+All access is read-only in Arc Reactor.
 
 ```
-┌─────────────────┐         ┌─────────────────┐
-│  Arc Nextflow   │         │  Benchling      │
-│  Platform       │ ──SQL──▶│  Data Warehouse │
-│                 │         │  (PostgreSQL)   │
-└─────────────────┘         └─────────────────┘
+┌─────────────────┐         ┌──────────────────────┐
+│  Arc Nextflow   │         │  Benchling           │
+│  Platform       │ ──API──▶│  API + Data Warehouse│
+│                 │ ──SQL──▶│  (PostgreSQL)        │
+└─────────────────┘         └──────────────────────┘
 ```
 
 ### Configuration
 
-| Parameter | Description | Source |
-|-----------|-------------|--------|
-| Host | Warehouse hostname | Environment variable |
-| Port | PostgreSQL port (5432) | Default |
-| Database | Database name | Environment variable |
-| Username | Read-only user | Secret Manager |
-| Password | User password | Secret Manager |
-| SSL Mode | `require` | Default |
+Benchling credentials are provided through `benchling-py`'s Dynaconf settings.
+The `DYNACONF` environment variable selects the tenant.
+
+| Environment | Required Variables |
+|-------------|-------------------|
+| `DYNACONF=prod` | `BENCHLING_PROD_API_KEY`, `BENCHLING_PROD_DATABASE_URI`, `BENCHLING_PROD_APP_CLIENT_ID`, `BENCHLING_PROD_APP_CLIENT_SECRET` |
+| `DYNACONF=test` | `BENCHLING_TEST_API_KEY`, `BENCHLING_TEST_DATABASE_URI`, `BENCHLING_TEST_APP_CLIENT_ID`, `BENCHLING_TEST_APP_CLIENT_SECRET` |
+| `DYNACONF=dev` | Same as `test` |
 
 ### Connection Pool
 
-```python
-# Async SQLAlchemy with connection pooling
-engine = create_async_engine(
-    warehouse_url,
-    pool_size=5,
-    max_overflow=10,
-    pool_timeout=30,
-    pool_recycle=1800,  # Recycle connections every 30 min
-)
-```
+Benchling-py manages connection pooling internally via SQLAlchemy engine reuse.
+Pool size and timeouts are configured in benchling-py's settings.
 
 ### Query Patterns
 
