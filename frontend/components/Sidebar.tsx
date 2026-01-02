@@ -53,9 +53,30 @@ export function Sidebar() {
         aria-hidden="true"
       />
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-full flex-col gap-8 border-r border-arc-gray-200/50 bg-white pb-6 pt-24 transition-all duration-300 dark:border-arc-gray-800/50 dark:bg-night lg:static lg:h-auto lg:translate-x-0 lg:border-none lg:bg-transparent lg:pt-6 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed left-0 top-0 z-40 flex h-full flex-col gap-6 border-r border-arc-gray-200/50 bg-white pb-6 pt-24 transition-all duration-300 dark:border-arc-gray-800/50 dark:bg-night lg:static lg:h-auto lg:translate-x-0 lg:border-none lg:bg-transparent lg:pt-6 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           } ${sidebarCollapsed ? 'w-20 px-3' : 'w-72 px-6'}`}
       >
+        <div className="flex items-center justify-between border-b border-arc-gray-100 pb-4 dark:border-arc-gray-800">
+          {!sidebarCollapsed && (
+            <span className="text-[10px] font-bold uppercase tracking-widest text-arc-gray-400">Navigation</span>
+          )}
+          <button
+            type="button"
+            onClick={toggleSidebarCollapsed}
+            className={`flex h-8 w-8 items-center justify-center rounded-lg border border-arc-gray-200/50 bg-white/50 text-arc-gray-400 transition-all hover:bg-white hover:text-arc-blue dark:border-arc-gray-700/50 dark:bg-night/50 ${sidebarCollapsed ? 'mx-auto' : ''}`}
+            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <svg
+              className={`h-4 w-4 transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        </div>
+
         <div className="space-y-2">
           {navItems.map((item) => {
             const isActive = pathname?.startsWith(item.href);
@@ -114,23 +135,6 @@ export function Sidebar() {
           )}
         </div>
 
-        <div className="flex justify-end border-t border-arc-gray-100 pt-4 dark:border-arc-gray-800">
-          <button
-            type="button"
-            onClick={toggleSidebarCollapsed}
-            className={`flex h-8 w-8 items-center justify-center rounded-lg border border-arc-gray-200/50 bg-white/50 text-arc-gray-400 transition-all hover:bg-white hover:text-arc-blue dark:border-arc-gray-700/50 dark:bg-night/50 ${sidebarCollapsed ? 'mx-auto' : ''}`}
-            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <svg
-              className={`h-4 w-4 transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-        </div>
       </aside>
     </>
   );
