@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 import logging
+import os
 from pathlib import Path
 from typing import AsyncIterator
 
@@ -42,7 +43,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("Starting Arc Reactor services")
     breakers = create_breakers(settings)
     app.state.breakers = breakers
-    app.state.benchling_service = BenchlingService.create(settings, breakers)
+    try:
+        app.state.benchling_service = BenchlingService.create(breakers)
+        tenant = os.getenv("DYNACONF", "test/dev")
+        logger.info("Benchling service initialized (tenant: %s)", tenant)
+    except Exception as exc:
+        logger.error("Failed to initialize Benchling service: %s", exc)
+        raise
     app.state.database_service = DatabaseService.create(settings)
     app.state.storage_service = StorageService.create(settings)
     try:
@@ -54,7 +61,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
 
     logger.info("Shutting down Arc Reactor services")
-    await app.state.benchling_service.close()
+    app.state.benchling_service.close()
+    # BenchlingService.close_all_engines()
     await app.state.database_service.close()
     app.state.storage_service = None
     app.state.gemini_service = None
