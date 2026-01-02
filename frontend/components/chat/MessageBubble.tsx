@@ -9,28 +9,33 @@ import { ToolIndicator } from './ToolIndicator';
 
 export function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'user';
-  const bubbleStyles = isUser
-    ? 'ml-auto bg-arc-blue text-white'
-    : 'mr-auto bg-white text-arc-gray-700 dark:bg-slate-900 dark:text-arc-gray-100';
 
   return (
-    <div className={`max-w-[85%] space-y-2 rounded-2xl px-4 py-3 shadow-sm ${bubbleStyles}`}>
-      <div className="prose prose-sm max-w-none text-inherit prose-p:my-2 prose-pre:bg-arc-gray-900/90 prose-pre:text-arc-gray-100">
-        {message.isStreaming ? (
-          <StreamingMessage text={message.content} isStreaming />
-        ) : (
-          <ReactMarkdown>{message.content || ' '}</ReactMarkdown>
+    <div className={`flex flex-col gap-1.5 ${isUser ? 'items-end' : 'items-start'}`}>
+      <div
+        className={`max-w-[85%] rounded-3xl px-5 py-3.5 shadow-sm transition-all duration-300 hover:shadow-md ${isUser
+            ? 'bg-gradient-to-br from-arc-blue to-blue-600 text-white rounded-tr-none'
+            : 'bg-white border border-arc-gray-100 text-arc-night dark:bg-night dark:border-arc-gray-800 dark:text-white rounded-tl-none'
+          }`}
+      >
+        <div className={`prose prose-sm max-w-none prose-p:my-1.5 prose-pre:bg-arc-gray-900/95 prose-pre:text-white prose-pre:rounded-xl ${isUser ? 'prose-invert text-white' : 'text-inherit'}`}>
+          {message.isStreaming ? (
+            <StreamingMessage text={message.content} isStreaming />
+          ) : (
+            <ReactMarkdown>{message.content || ' '}</ReactMarkdown>
+          )}
+        </div>
+
+        {message.toolInvocations && message.toolInvocations.length > 0 && (
+          <div className="mt-4 space-y-2 border-t border-arc-gray-100/20 pt-3 dark:border-white/10">
+            {message.toolInvocations.map((invocation) => (
+              <ToolIndicator key={invocation.toolCallId} invocation={invocation} />
+            ))}
+          </div>
         )}
       </div>
-      {message.toolInvocations && message.toolInvocations.length > 0 ? (
-        <div className="space-y-2">
-          {message.toolInvocations.map((invocation) => (
-            <ToolIndicator key={invocation.toolCallId} invocation={invocation} />
-          ))}
-        </div>
-      ) : null}
-      <p className="text-[10px] uppercase tracking-[0.2em] text-arc-gray-400">
-        {new Date(message.createdAt).toLocaleTimeString([], {
+      <p className="px-2 text-[10px] font-bold uppercase tracking-widest text-arc-gray-400 opacity-60">
+        {isUser ? 'You' : 'Arc Assistant'} • {new Date(message.createdAt).toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit'
         })}

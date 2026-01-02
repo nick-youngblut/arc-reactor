@@ -21,7 +21,7 @@ interface SamplesheetEditorProps {
 }
 
 export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) {
-  const hotRef = useRef<HotTable>(null);
+  const hotRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isLocalUpdate = useRef(false);
 
@@ -62,7 +62,8 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
 
   const handleDataChange = (_changes: unknown, source?: string) => {
     if (source === 'loadData') return;
-    const data = hotRef.current?.hotInstance.getSourceData() as SamplesheetRow[] | undefined;
+    const hot = (hotRef.current as any)?.hotInstance;
+    const data = hot?.getSourceData() as SamplesheetRow[] | undefined;
     if (!data) return;
     setRows(data);
 
@@ -98,27 +99,30 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
   const invalidCount = invalidCells.size;
 
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="flex h-full flex-col gap-5">
+      <div className="flex flex-wrap items-end justify-between gap-4 px-1">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-arc-gray-400">
-            Samplesheet
-          </p>
-          <p className="text-xs text-arc-gray-500 dark:text-arc-gray-300">
-            Edit sample metadata and FASTQ paths.
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="h-1.5 w-4 rounded-full bg-arc-blue"></div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-arc-gray-400">
+              Samplesheet Editor
+            </p>
+          </div>
+          <h3 className="text-sm font-bold text-arc-night dark:text-white">
+            Metadata <span className="text-arc-gray-400">&</span> FASTQ paths
+          </h3>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
-            className="rounded-full border border-arc-gray-200/70 px-3 py-1.5 text-xs font-semibold text-arc-gray-600 transition hover:bg-arc-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-arc-gray-800/70 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800"
+            className="rounded-xl border border-arc-gray-200/50 bg-white/50 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-arc-gray-600 transition-all hover:bg-white hover:text-arc-blue dark:border-arc-gray-800/50 dark:bg-night/50 dark:text-arc-gray-300 dark:hover:bg-night"
             onClick={handleExport}
           >
             Export CSV
           </button>
           <button
             type="button"
-            className="rounded-full border border-arc-gray-200/70 px-3 py-1.5 text-xs font-semibold text-arc-gray-600 transition hover:bg-arc-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-arc-gray-800/70 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800"
+            className="rounded-xl border border-arc-gray-200/50 bg-white/50 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-arc-gray-600 transition-all hover:bg-white hover:text-arc-blue dark:border-arc-gray-800/50 dark:bg-night/50 dark:text-arc-gray-300 dark:hover:bg-night"
             onClick={() => fileInputRef.current?.click()}
             disabled={readOnly}
           >

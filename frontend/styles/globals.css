@@ -1,26 +1,58 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap');
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --color-arc-blue: #0073E6;
+  --color-arc-night: #0C2043;
+  --color-arc-arctic: #F7F9FB;
+  --color-arc-fog: #F7F8F9;
+  --color-arc-marigold: #F39A22;
+  --color-arc-clay: #BD5D32;
+  --color-arc-moss: #455F29;
+  --color-arc-evergreen: #197A57;
+  --color-arc-twilight: #595F89;
+  --color-arc-slate: #433F45;
+
+  --color-arc-gray-50: #F8FAFC;
+  --color-arc-gray-100: #F1F5F9;
+  --color-arc-gray-200: #E2E8F0;
+  --color-arc-gray-300: #CBD5E1;
+  --color-arc-gray-400: #94A3B8;
+  --color-arc-gray-500: #64748B;
+  --color-arc-gray-600: #475569;
+  --color-arc-gray-700: #334155;
+  --color-arc-gray-800: #1F2937;
+  --color-arc-gray-900: #0F172A;
+
+  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --shadow-glow: 0 0 30px rgba(0, 115, 230, 0.25);
+}
 
 @layer base {
   :root {
     color-scheme: light;
-    --color-bg: 248 250 252;
-    --color-fg: 15 23 42;
+    --color-bg: 247 249 251;
+    /* Arctic */
+    --color-fg: 12 32 67;
+    /* Night */
     --color-surface: 255 255 255;
     --color-border: 226 232 240;
-    --color-accent: 29 78 216;
+    --color-accent: 0 115 230;
+    /* Arc Blue */
   }
 
   .dark {
     color-scheme: dark;
-    --color-bg: 10 15 26;
-    --color-fg: 226 232 240;
-    --color-surface: 17 24 39;
+    --color-bg: 12 32 67;
+    /* Night */
+    --color-fg: 247 249 251;
+    /* Arctic */
+    --color-surface: 15 23 42;
     --color-border: 30 41 59;
-    --color-accent: 59 130 246;
+    --color-accent: 0 115 230;
+    /* Arc Blue */
   }
 
   * {
@@ -41,25 +73,35 @@
   h3,
   h4 {
     font-family: 'Space Grotesk', 'IBM Plex Sans', system-ui, sans-serif;
+    letter-spacing: -0.02em;
   }
 }
 
 @layer components {
   .arc-surface {
-    border-radius: 1rem;
+    border-radius: 1.25rem;
     border-width: 1px;
     border-color: rgba(226, 232, 240, 0.7);
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    box-shadow:
+      0 4px 6px -1px rgb(0 0 0 / 0.05),
+      0 2px 4px -2px rgb(0 0 0 / 0.05),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark .arc-surface {
     border-color: rgba(51, 65, 85, 0.7);
     background-color: rgba(15, 23, 42, 0.8);
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.2),
+      0 4px 6px -4px rgb(0 0 0 / 0.2),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   }
 
   .arc-glow {
-    box-shadow: 0 0 60px rgba(29, 78, 216, 0.22);
+    box-shadow: 0 0 40px rgba(0, 115, 230, 0.2);
   }
 
   .hot-invalid-cell {
@@ -69,20 +111,47 @@
   .handsontable {
     font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   }
+
+  .arc-button-primary {
+    @apply relative overflow-hidden rounded-full px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition-all active:scale-95 disabled:pointer-events-none disabled:opacity-50;
+    background-color: rgb(var(--color-accent) / 1);
+    box-shadow: 0 10px 15px -3px rgb(var(--color-accent) / 0.2), 0 4px 6px -4px rgb(var(--color-accent) / 0.2);
+  }
+
+  .arc-button-primary:hover {
+    background-color: rgb(var(--color-accent) / 0.9);
+  }
+
+  .arc-input {
+    @apply rounded-xl px-4 py-2 text-sm backdrop-blur-sm transition-all focus:ring-2;
+    border: 1px solid rgb(var(--color-border) / 1);
+    background-color: rgb(255 255 255 / 0.5);
+    caret-color: rgb(var(--color-accent) / 1);
+  }
+
+  .dark .arc-input {
+    background-color: rgb(15 23 42 / 0.5);
+    border-color: rgb(30 41 59 / 1);
+  }
+
+  .arc-input:focus {
+    border-color: rgb(var(--color-accent) / 1);
+    --tw-ring-color: rgb(var(--color-accent) / 0.2);
+  }
 }
 
 @layer utilities {
   .bg-arc-radial {
     background:
-      radial-gradient(circle at 20% 20%, rgba(29, 78, 216, 0.18), transparent 45%),
-      radial-gradient(circle at 80% 0%, rgba(20, 184, 166, 0.16), transparent 35%),
-      linear-gradient(180deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.9));
+      radial-gradient(circle at 10% 10%, rgba(0, 115, 230, 0.1), transparent 40%),
+      radial-gradient(circle at 90% 90%, rgba(20, 184, 166, 0.08), transparent 40%),
+      linear-gradient(180deg, rgba(247, 249, 251, 1), rgba(241, 245, 249, 0.95));
   }
 
   .bg-arc-radial-dark {
     background:
-      radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.2), transparent 45%),
-      radial-gradient(circle at 80% 0%, rgba(45, 212, 191, 0.16), transparent 35%),
-      linear-gradient(180deg, rgba(10, 15, 26, 0.98), rgba(15, 23, 42, 0.9));
+      radial-gradient(circle at 10% 10%, rgba(0, 115, 230, 0.15), transparent 40%),
+      radial-gradient(circle at 90% 90%, rgba(45, 212, 191, 0.12), transparent 40%),
+      linear-gradient(180deg, rgba(12, 32, 67, 1), rgba(15, 23, 42, 0.95));
   }
 }

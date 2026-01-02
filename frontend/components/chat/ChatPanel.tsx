@@ -15,17 +15,20 @@ export function ChatPanel() {
   };
 
   return (
-    <section className="flex h-full flex-col gap-4">
-      <header className="flex items-center justify-between">
+    <section className="flex h-full flex-col gap-5 p-6">
+      <header className="flex items-center justify-between border-b border-arc-gray-100 pb-4 dark:border-arc-gray-800">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-arc-gray-400">
-            Chat
-          </p>
-          <h2 className="text-lg font-semibold text-content">Arc Assistant</h2>
+          <div className="flex items-center gap-2 mb-0.5">
+            <div className="h-2 w-2 rounded-full bg-arc-blue animate-pulse"></div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-arc-gray-400">
+              Arc Assistant
+            </p>
+          </div>
+          <h2 className="text-xl font-extrabold tracking-tight text-arc-night dark:text-white">AI Agent Chat</h2>
         </div>
         <button
           type="button"
-          className="rounded-full border border-arc-gray-200/70 px-3 py-1.5 text-xs font-semibold text-arc-gray-600 transition hover:bg-arc-gray-100 dark:border-arc-gray-800/70 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800"
+          className="rounded-xl border border-arc-gray-200/50 bg-white/50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-arc-gray-500 transition-all hover:bg-arc-gray-50 hover:text-arc-clay dark:border-arc-gray-800/50 dark:bg-night/50 dark:text-arc-gray-400 dark:hover:bg-night"
           onClick={() => {
             clearMessages();
             setInput('');

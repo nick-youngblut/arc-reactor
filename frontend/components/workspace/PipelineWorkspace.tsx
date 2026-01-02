@@ -22,49 +22,57 @@ export function PipelineWorkspace() {
   }, [pipeline.name, version, setWorkspacePipeline]);
 
   return (
-    <section className="flex h-full flex-col gap-6">
-      <header className="flex flex-wrap items-center justify-between gap-4">
+    <section className="flex h-full flex-col gap-8 py-2">
+      <header className="flex flex-wrap items-end justify-between gap-6 px-1">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-arc-gray-400">
-            Pipeline workspace
-          </p>
-          <h1 className="text-2xl font-semibold text-content">Configure & run pipelines</h1>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="h-1.5 w-6 rounded-full bg-arc-blue shadow-[0_0_12px_rgba(0,115,230,0.5)]"></div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-arc-gray-400">
+              Pipeline workspace
+            </p>
+          </div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-arc-night dark:text-white">
+            Configure <span className="text-arc-blue">&</span> run pipelines
+          </h1>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <select
-            className="rounded-full border border-arc-gray-200/70 bg-white px-4 py-2 text-sm text-arc-gray-700 shadow-sm dark:border-arc-gray-800/70 dark:bg-slate-900 dark:text-arc-gray-100"
-            value={pipeline.name}
-            onChange={(event) => {
-              const next = pipelines.find((item) => item.name === event.target.value) ?? pipelines[0];
-              setPipeline(next);
-              setVersion(next.versions[0]);
-            }}
-          >
-            {pipelines.map((item) => (
-              <option key={item.name} value={item.name}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-          <select
-            className="rounded-full border border-arc-gray-200/70 bg-white px-4 py-2 text-sm text-arc-gray-700 shadow-sm dark:border-arc-gray-800/70 dark:bg-slate-900 dark:text-arc-gray-100"
-            value={version}
-            onChange={(event) => setVersion(event.target.value)}
-          >
-            {pipeline.versions.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2 rounded-2xl bg-white/50 p-1.5 backdrop-blur-sm border border-arc-gray-100 dark:bg-night/50 dark:border-arc-gray-800 shadow-sm">
+            <select
+              className="rounded-xl border-none bg-transparent px-4 py-1.5 text-sm font-bold text-arc-night focus:ring-0 dark:text-white"
+              value={pipeline.name}
+              onChange={(event) => {
+                const next = pipelines.find((item) => item.name === event.target.value) ?? pipelines[0];
+                setPipeline(next);
+                setVersion(next.versions[0]);
+              }}
+            >
+              {pipelines.map((item) => (
+                <option key={item.name} value={item.name} className="dark:bg-night">
+                  {item.name}
+                </option>
+              ))}
+            </select>
+            <div className="h-4 w-px bg-arc-gray-200 dark:bg-arc-gray-800"></div>
+            <select
+              className="rounded-xl border-none bg-transparent px-4 py-1.5 text-sm font-bold text-arc-blue focus:ring-0"
+              value={version}
+              onChange={(event) => setVersion(event.target.value)}
+            >
+              {pipeline.versions.map((item) => (
+                <option key={item} value={item} className="dark:bg-night">
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </header>
 
-      <div className="grid flex-1 gap-6 lg:grid-cols-[2fr_3fr]">
-        <div className="arc-surface flex min-h-[520px] flex-col p-6">
+      <div className="grid flex-1 gap-8 lg:grid-cols-[2fr_3fr]">
+        <div className="arc-surface flex min-h-[580px] flex-col overflow-hidden border-arc-blue/10 bg-white/40 ring-1 ring-arc-night/5 dark:bg-night/40 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
           <ChatPanel />
         </div>
-        <div className="arc-surface flex min-h-[520px] flex-col p-6">
+        <div className="arc-surface flex min-h-[580px] flex-col overflow-hidden border-arc-blue/10 bg-white/40 ring-1 ring-arc-night/5 dark:bg-night/40 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
           <FileEditorPanel />
         </div>
       </div>

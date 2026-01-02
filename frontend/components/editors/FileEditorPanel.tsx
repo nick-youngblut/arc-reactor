@@ -57,23 +57,26 @@ export function FileEditorPanel() {
   };
 
   return (
-    <section className="flex h-full flex-col gap-4">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+    <section className="flex h-full flex-col gap-5 p-6">
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-arc-gray-100 pb-4 dark:border-arc-gray-800">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-arc-gray-400">
-            File editors
-          </p>
-          <h2 className="text-lg font-semibold text-content">Samplesheet & config</h2>
+          <div className="flex items-center gap-2 mb-0.5">
+            <div className="h-1.5 w-4 rounded-full bg-arc-blue"></div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-arc-gray-400">
+              File editors
+            </p>
+          </div>
+          <h2 className="text-xl font-extrabold tracking-tight text-arc-night dark:text-white">Workspace Files</h2>
         </div>
         <button
           type="button"
-          className="rounded-full bg-arc-blue px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+          className="arc-button-primary"
         >
           Ask AI to modify
         </button>
       </header>
 
-      <div className="flex flex-wrap gap-2 rounded-full border border-arc-gray-200/70 bg-white/70 p-1 text-xs font-semibold text-arc-gray-500 dark:border-arc-gray-800/70 dark:bg-slate-900/70">
+      <div className="flex flex-wrap gap-1.5 rounded-2xl bg-arc-gray-50/50 p-1.5 dark:bg-night/50 border border-arc-gray-100 dark:border-arc-gray-800">
         {tabConfig.map((tab) => {
           const meta = tabMeta[tab.id];
           const isActive = activeTab === tab.id;
@@ -82,28 +85,27 @@ export function FileEditorPanel() {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 transition ${
-                isActive
-                  ? 'bg-arc-blue text-white shadow-sm'
-                  : 'text-arc-gray-500 hover:bg-arc-gray-100 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800'
-              }`}
+              className={`flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-300 ${isActive
+                  ? 'bg-white text-arc-blue shadow-md shadow-arc-night/5 dark:bg-night dark:text-white'
+                  : 'text-arc-gray-500 hover:bg-white/50 dark:hover:bg-night/30'
+                }`}
             >
               {tab.label}
-              <span className="flex items-center gap-1">
+              <div className="flex items-center gap-1">
                 {meta.dirty ? (
-                  <span className="h-1.5 w-1.5 rounded-full bg-arc-warning" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-arc-marigold shadow-[0_0_8px_rgba(243,154,34,0.5)]" />
                 ) : null}
                 {meta.errors ? (
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-arc-error/15 text-[10px] text-arc-error">
+                  <div className="flex h-4 w-4 items-center justify-center rounded-md bg-arc-clay/15 text-[9px] font-black text-arc-clay ring-1 ring-arc-clay/20">
                     !
-                  </span>
+                  </div>
                 ) : null}
                 {!meta.errors && meta.valid ? (
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-arc-success/15 text-[10px] text-arc-success">
+                  <div className="flex h-4 w-4 items-center justify-center rounded-md bg-arc-evergreen/15 text-[9px] font-black text-arc-evergreen ring-1 ring-arc-evergreen/20">
                     ✓
-                  </span>
+                  </div>
                 ) : null}
-              </span>
+              </div>
             </button>
           );
         })}
