@@ -130,7 +130,7 @@ Static export served by FastAPI, providing the user interface.
 | **Rendering** | Static export (no SSR) |
 | **Routing** | App Router with client-side navigation |
 | **State** | TanStack Query + Zustand |
-| **Styling** | Tailwind CSS + HeroUI |
+| **Styling** | Tailwind CSS |
 
 ### AI/Agent Layer
 

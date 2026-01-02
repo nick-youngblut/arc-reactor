@@ -449,7 +449,7 @@ This sprint implements security hardening, comprehensive testing, performance op
 > - [10-ux-spec.md#feedback-mechanisms](../spec/10-ux-spec.md) - Feedback patterns
 
 - [ ] Set up toast notification system — *See [10-ux-spec.md#feedback-mechanisms](../spec/10-ux-spec.md)*:
-  - [ ] Use HeroUI toast or react-hot-toast
+  - [ ] Use react-hot-toast
   - [ ] Configure global toast provider
 
 - [ ] Implement notifications:

@@ -17,7 +17,7 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 > **Spec References:**
 > - [04-frontend-spec.md#root-layout](../spec/04-frontend-spec.md) - Layout structure
 > - [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md) - Zustand and TanStack Query
-> - [04-frontend-spec.md#styling](../spec/04-frontend-spec.md) - Tailwind CSS and HeroUI
+> - [04-frontend-spec.md#styling](../spec/04-frontend-spec.md) - Tailwind CSS
 
 ### Root Layout & Providers
 
@@ -25,7 +25,6 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
   - [x] Configure HTML structure with proper lang attribute
   - [x] Add metadata (title, description, favicon)
   - [x] Wrap with QueryClientProvider (TanStack Query) — *See [04-frontend-spec.md#tanstack-query](../spec/04-frontend-spec.md)*
-  - [x] Wrap with HeroUI provider
   - [x] Add ThemeProvider for dark/light mode
   - [x] Add global error boundary
 
@@ -87,20 +86,13 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
     - [x] Neutral grays
   - [x] Configure dark mode (class-based)
   - [x] Add custom spacing and typography
-  - [x] Configure HeroUI plugin
+  - [x] Configure Tailwind plugins
 
 - [x] Update `frontend/styles/globals.css`:
   - [x] Tailwind directives
   - [x] Base styles and resets
   - [x] Custom utility classes
   - [x] CSS variables for theming
-
-### HeroUI Configuration
-
-- [x] Create `frontend/lib/heroui.ts`:
-  - [x] Configure HeroUI theme
-  - [x] Set default component variants
-  - [x] Configure modal/toast defaults
 
 ### Zustand Stores
 
@@ -741,10 +733,9 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ## Key Deliverables Checklist
 
-- [ ] Root layout with providers (QueryClient, HeroUI, Theme)
+- [ ] Root layout with providers (QueryClient, Theme)
 - [ ] Header, Sidebar, and MainLayout components
 - [ ] Tailwind CSS with Arc brand colors
-- [ ] HeroUI component library configured
 - [ ] Zustand stores (workspace, chat, UI)
 - [ ] TanStack Query with API client
 - [ ] PipelineWorkspace with two-panel layout

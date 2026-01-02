@@ -101,7 +101,7 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
 > **Spec References:**
 > - [04-frontend-spec.md#framework](../spec/04-frontend-spec.md) - Next.js 14 with App Router
 > - [04-frontend-spec.md#static-export](../spec/04-frontend-spec.md) - Static export configuration
-> - [04-frontend-spec.md#styling](../spec/04-frontend-spec.md) - Tailwind CSS and HeroUI
+> - [04-frontend-spec.md#styling](../spec/04-frontend-spec.md) - Tailwind CSS
 
 - [x] Initialize Next.js 14 project with TypeScript in `frontend/`
 - [x] Configure `next.config.js`:
@@ -113,7 +113,7 @@ This sprint establishes the foundational infrastructure, project scaffolding, CI
   - [x] Configure content paths for purging
   - [x] Add Tailwind plugins: `@tailwindcss/forms`, `@tailwindcss/typography`
   - [x] Create `globals.css` with Tailwind directives and base styles
-- [x] Install HeroUI component library — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*
+- [x] Configure Tailwind CSS styling — *See [04-frontend-spec.md#styling](../spec/04-frontend-spec.md)*
 - [x] Install additional dependencies:
   - [x] `@tanstack/react-query` for server state — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*
   - [x] `zustand` for client state — *See [04-frontend-spec.md#state-management](../spec/04-frontend-spec.md)*

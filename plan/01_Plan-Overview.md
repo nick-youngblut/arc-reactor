@@ -180,7 +180,7 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
 - Implement root layout with providers per [04-frontend-spec.md](../spec/04-frontend-spec.md)
 - Create layout components (Header, Sidebar, Footer)
 - Set up Tailwind CSS with Arc brand colors
-- Configure HeroUI component library
+- Configure Tailwind CSS styling utilities
 - Implement Zustand stores (workspace, chat, UI)
 - Set up TanStack Query with API client
 
