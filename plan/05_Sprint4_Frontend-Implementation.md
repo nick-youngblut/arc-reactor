@@ -176,17 +176,17 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### PipelineWorkspace Container
 
-- [ ] Create `frontend/components/workspace/PipelineWorkspace.tsx` — *See [04-frontend-spec.md#pipelineworkspace](../spec/04-frontend-spec.md)*:
-  - [ ] Two-column layout — *See [10-ux-spec.md#workspace-layout](../spec/10-ux-spec.md)*:
-    - [ ] Left: ChatPanel (40% width)
-    - [ ] Right: FileEditorPanel (60% width)
-  - [ ] Pipeline selector in header:
-    - [ ] Dropdown for pipeline selection
-    - [ ] Version dropdown
-  - [ ] Status bar at bottom:
-    - [ ] Validation status indicators
-    - [ ] Submit Run button
-  - [ ] Responsive: Stack panels on smaller screens
+- [x] Create `frontend/components/workspace/PipelineWorkspace.tsx` — *See [04-frontend-spec.md#pipelineworkspace](../spec/04-frontend-spec.md)*:
+  - [x] Two-column layout — *See [10-ux-spec.md#workspace-layout](../spec/10-ux-spec.md)*:
+    - [x] Left: ChatPanel (40% width)
+    - [x] Right: FileEditorPanel (60% width)
+  - [x] Pipeline selector in header:
+    - [x] Dropdown for pipeline selection
+    - [x] Version dropdown
+  - [x] Status bar at bottom:
+    - [x] Validation status indicators
+    - [x] Submit Run button
+  - [x] Responsive: Stack panels on smaller screens
 
 ### Chat Panel Component
 
@@ -194,19 +194,19 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 > - [04-frontend-spec.md#chatpanel](../spec/04-frontend-spec.md) - Complete chat specification
 > - [10-ux-spec.md#chat-panel-states](../spec/10-ux-spec.md) - Chat states
 
-- [ ] Create `frontend/components/chat/ChatPanel.tsx` — *See [04-frontend-spec.md#chatpanel](../spec/04-frontend-spec.md)*:
-  - [ ] Panel header with title and clear button
-  - [ ] MessageList component
-  - [ ] ChatInput at bottom
-  - [ ] Loading state indicator — *See [10-ux-spec.md#loading-states](../spec/10-ux-spec.md)*
+- [x] Create `frontend/components/chat/ChatPanel.tsx` — *See [04-frontend-spec.md#chatpanel](../spec/04-frontend-spec.md)*:
+  - [x] Panel header with title and clear button
+  - [x] MessageList component
+  - [x] ChatInput at bottom
+  - [x] Loading state indicator — *See [10-ux-spec.md#loading-states](../spec/10-ux-spec.md)*
 
 ### Message List Component
 
-- [ ] Create `frontend/components/chat/MessageList.tsx`:
-  - [ ] Scrollable message container
-  - [ ] Auto-scroll to bottom on new messages
-  - [ ] Map messages to MessageBubble components
-  - [ ] Handle empty state with welcome message — *See [10-ux-spec.md#empty-states](../spec/10-ux-spec.md)*
+- [x] Create `frontend/components/chat/MessageList.tsx`:
+  - [x] Scrollable message container
+  - [x] Auto-scroll to bottom on new messages
+  - [x] Map messages to MessageBubble components
+  - [x] Handle empty state with welcome message — *See [10-ux-spec.md#empty-states](../spec/10-ux-spec.md)*
 
 ### Message Bubble Component
 
@@ -214,14 +214,14 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 > - [04-frontend-spec.md#messagebubble](../spec/04-frontend-spec.md) - Message rendering
 > - [04-frontend-spec.md#tool-indicator](../spec/04-frontend-spec.md) - Tool call display
 
-- [ ] Create `frontend/components/chat/MessageBubble.tsx` — *See [04-frontend-spec.md#messagebubble](../spec/04-frontend-spec.md)*:
-  - [ ] Differentiate user vs assistant messages:
-    - [ ] User: Right-aligned, primary color
-    - [ ] Assistant: Left-aligned, secondary color
-  - [ ] Render markdown content
-  - [ ] Support streaming text display
-  - [ ] Render tool calls as ToolIndicator — *See [04-frontend-spec.md#tool-indicator](../spec/04-frontend-spec.md)*
-  - [ ] Display message timestamp
+- [x] Create `frontend/components/chat/MessageBubble.tsx` — *See [04-frontend-spec.md#messagebubble](../spec/04-frontend-spec.md)*:
+  - [x] Differentiate user vs assistant messages:
+    - [x] User: Right-aligned, primary color
+    - [x] Assistant: Left-aligned, secondary color
+  - [x] Render markdown content
+  - [x] Support streaming text display
+  - [x] Render tool calls as ToolIndicator — *See [04-frontend-spec.md#tool-indicator](../spec/04-frontend-spec.md)*
+  - [x] Display message timestamp
 
 ### Tool Indicator Component
 
@@ -229,51 +229,51 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 > - [04-frontend-spec.md#toolindicator](../spec/04-frontend-spec.md) - Tool call display
 > - [05-agentic-features-spec.md#tool-output-handling](../spec/05-agentic-features-spec.md) - Tool output format
 
-- [ ] Create `frontend/components/chat/ToolIndicator.tsx` — *See [04-frontend-spec.md#toolindicator](../spec/04-frontend-spec.md)*:
-  - [ ] Collapsible accordion for tool calls
-  - [ ] Tool name badge with icon
-  - [ ] Status indicator (pending, running, completed, error)
-  - [ ] Expandable details:
-    - [ ] Tool parameters (formatted JSON/YAML)
-    - [ ] Tool result summary
-  - [ ] Distinct styling per tool category
+- [x] Create `frontend/components/chat/ToolIndicator.tsx` — *See [04-frontend-spec.md#toolindicator](../spec/04-frontend-spec.md)*:
+  - [x] Collapsible accordion for tool calls
+  - [x] Tool name badge with icon
+  - [x] Status indicator (pending, running, completed, error)
+  - [x] Expandable details:
+    - [x] Tool parameters (formatted JSON/YAML)
+    - [x] Tool result summary
+  - [x] Distinct styling per tool category
 
 ### Streaming Message Display
 
-- [ ] Create `frontend/components/chat/StreamingMessage.tsx`:
-  - [ ] Accept streaming text content
-  - [ ] Display with typing cursor effect
-  - [ ] Handle markdown rendering incrementally
-  - [ ] Smooth text reveal animation
+- [x] Create `frontend/components/chat/StreamingMessage.tsx`:
+  - [x] Accept streaming text content
+  - [x] Display with typing cursor effect
+  - [x] Handle markdown rendering incrementally
+  - [x] Smooth text reveal animation
 
 ### Suggested Prompts Component
 
 > **Spec References:**
 > - [10-ux-spec.md#onboarding](../spec/10-ux-spec.md) - First-time user experience
 
-- [ ] Create `frontend/components/chat/SuggestedPrompts.tsx` — *See [10-ux-spec.md#onboarding](../spec/10-ux-spec.md)*:
-  - [ ] Display when chat is empty
-  - [ ] Predefined prompt suggestions:
-    - [ ] "Find my samples from last week"
-    - [ ] "Search for SspArc0050"
-    - [ ] "Run scRNA-seq analysis"
-    - [ ] "Show available pipelines"
-  - [ ] Click to populate chat input
-  - [ ] Fade out after first message
+- [x] Create `frontend/components/chat/SuggestedPrompts.tsx` — *See [10-ux-spec.md#onboarding](../spec/10-ux-spec.md)*:
+  - [x] Display when chat is empty
+  - [x] Predefined prompt suggestions:
+    - [x] "Find my samples from last week"
+    - [x] "Search for SspArc0050"
+    - [x] "Run scRNA-seq analysis"
+    - [x] "Show available pipelines"
+  - [x] Click to populate chat input
+  - [x] Fade out after first message
 
 ### Chat Input Component
 
 > **Spec References:**
 > - [10-ux-spec.md#chat-interaction](../spec/10-ux-spec.md) - Chat input behavior
 
-- [ ] Create `frontend/components/chat/ChatInput.tsx` — *See [10-ux-spec.md#chat-interaction](../spec/10-ux-spec.md)*:
-  - [ ] Textarea with auto-resize
-  - [ ] Submit button
-  - [ ] Keyboard handling — *See [10-ux-spec.md#keyboard-navigation](../spec/10-ux-spec.md)*:
-    - [ ] Enter to send
-    - [ ] Shift+Enter for newline
-  - [ ] Disabled state while loading
-  - [ ] Character count indicator
+- [x] Create `frontend/components/chat/ChatInput.tsx` — *See [10-ux-spec.md#chat-interaction](../spec/10-ux-spec.md)*:
+  - [x] Textarea with auto-resize
+  - [x] Submit button
+  - [x] Keyboard handling — *See [10-ux-spec.md#keyboard-navigation](../spec/10-ux-spec.md)*:
+    - [x] Enter to send
+    - [x] Shift+Enter for newline
+  - [x] Disabled state while loading
+  - [x] Character count indicator
 
 ### useAgentChat Hook
 
@@ -281,27 +281,27 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 > - [04-frontend-spec.md#useagentchat](../spec/04-frontend-spec.md) - Chat hook specification
 > - [04-frontend-spec.md#ai-sdk-protocol](../spec/04-frontend-spec.md) - Streaming protocol
 
-- [ ] Create `frontend/hooks/useAgentChat.ts` — *See [04-frontend-spec.md#useagentchat](../spec/04-frontend-spec.md)*:
-  - [ ] Integrate with Vercel AI SDK `useChat` or custom implementation
-  - [ ] WebSocket connection management:
-    - [ ] Connect on mount
-    - [ ] Reconnect on disconnect
-    - [ ] Handle connection errors
-  - [ ] Message handling — *See [04-frontend-spec.md#ai-sdk-protocol](../spec/04-frontend-spec.md)*:
-    - [ ] Parse AI SDK streaming format
-    - [ ] Handle text chunks (type 0)
-    - [ ] Handle tool calls (type 9)
-    - [ ] Handle tool results (type a)
-    - [ ] Handle finish (type d)
-  - [ ] State management:
-    - [ ] Update chat store on messages
-    - [ ] Update workspace store on file generation
-  - [ ] Return:
-    - [ ] `messages`: Message array
-    - [ ] `sendMessage()`: Send function
-    - [ ] `isLoading`: Loading state
-    - [ ] `error`: Error state
-    - [ ] `stop()`: Cancel response
+- [x] Create `frontend/hooks/useAgentChat.ts` — *See [04-frontend-spec.md#useagentchat](../spec/04-frontend-spec.md)*:
+  - [x] Integrate with Vercel AI SDK `useChat` or custom implementation
+  - [x] WebSocket connection management:
+    - [x] Connect on mount
+    - [x] Reconnect on disconnect
+    - [x] Handle connection errors
+  - [x] Message handling — *See [04-frontend-spec.md#ai-sdk-protocol](../spec/04-frontend-spec.md)*:
+    - [x] Parse AI SDK streaming format
+    - [x] Handle text chunks (type 0)
+    - [x] Handle tool calls (type 9)
+    - [x] Handle tool results (type a)
+    - [x] Handle finish (type d)
+  - [x] State management:
+    - [x] Update chat store on messages
+    - [x] Update workspace store on file generation
+  - [x] Return:
+    - [x] `messages`: Message array
+    - [x] `sendMessage()`: Send function
+    - [x] `isLoading`: Loading state
+    - [x] `error`: Error state
+    - [x] `stop()`: Cancel response
 
 ---
 
