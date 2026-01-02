@@ -86,7 +86,7 @@ export function FileEditorPanel() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-300 ${isActive
-                ? 'bg-element text-arc-blue shadow-md shadow-arc-night/5'
+                ? 'bg-arc-blue text-white shadow-md shadow-arc-blue/20'
                 : 'text-arc-gray-500 hover:bg-element/50'
                 }`}
             >

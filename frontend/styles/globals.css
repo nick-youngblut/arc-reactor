@@ -3,30 +3,39 @@
 @layer base {
   :root {
     color-scheme: light;
-    --color-bg: 255 255 255;
+    --color-bg: 247 249 251;
     /* Arctic */
     --color-fg: 12 32 67;
     /* Night */
     --color-surface: 255 255 255;
+    /* White */
     --color-border: 226 232 240;
+    /* Neutral Gray (Standard) */
     --color-accent: 0 115 230;
     /* Arc Blue */
-    --color-panel: 247 249 251;
-    --color-element: 255 255 255;
+    --color-panel: 255 255 255;
+    /* White */
+    --color-element: 247 248 249;
+    /* Fog */
   }
 
   .dark {
     color-scheme: dark;
     --color-bg: 12 32 67;
     /* Night */
+    /* Arctic */
     --color-fg: 247 249 251;
     /* Arctic */
-    --color-surface: 15 23 42;
-    --color-border: 30 41 59;
+    --color-surface: 67 63 69;
+    /* Slate */
+    --color-border: 89 95 137;
+    /* Twilight */
     --color-accent: 0 115 230;
     /* Arc Blue */
-    --color-panel: 15 23 42;
-    --color-element: 30 41 59;
+    --color-panel: 67 63 69;
+    /* Slate */
+    --color-element: 89 95 137;
+    /* Twilight */
   }
 
   * {
@@ -127,5 +136,86 @@
       radial-gradient(circle at 10% 10%, rgba(0, 115, 230, 0.15), transparent 40%),
       radial-gradient(circle at 90% 90%, rgba(45, 212, 191, 0.12), transparent 40%),
       linear-gradient(180deg, rgba(12, 32, 67, 1), rgba(15, 23, 42, 0.95));
+  }
+
+  /* Explicit Brand Palette Utilities to ensure availability */
+  .bg-arc-blue {
+    background-color: #0073E6;
+  }
+
+  .text-arc-blue {
+    color: #0073E6;
+  }
+
+  .bg-arc-night {
+    background-color: #0C2043;
+  }
+
+  .text-arc-night {
+    color: #0C2043;
+  }
+
+  .bg-arc-arctic {
+    background-color: #F7F9FB;
+  }
+
+  .text-arc-arctic {
+    color: #F7F9FB;
+  }
+
+  .bg-arc-fog {
+    background-color: #F7F8F9;
+  }
+
+  .text-arc-fog {
+    color: #F7F8F9;
+  }
+
+  .bg-arc-marigold {
+    background-color: #F39A22;
+  }
+
+  .text-arc-marigold {
+    color: #F39A22;
+  }
+
+  .bg-arc-clay {
+    background-color: #BD5D32;
+  }
+
+  .text-arc-clay {
+    color: #BD5D32;
+  }
+
+  .bg-arc-moss {
+    background-color: #455F29;
+  }
+
+  .text-arc-moss {
+    color: #455F29;
+  }
+
+  .bg-arc-evergreen {
+    background-color: #197A57;
+  }
+
+  .text-arc-evergreen {
+    color: #197A57;
+  }
+
+  .bg-arc-twilight {
+    background-color: #595F89;
+  }
+
+  .text-arc-twilight {
+    color: #595F89;
+  }
+
+  .bg-arc-slate {
+    background-color: #433F45;
+  }
+
+  .text-arc-slate {
+    color: #433F45;
   }
 }
