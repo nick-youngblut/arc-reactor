@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 
 import { Header } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
+import { useUiStore } from '@/stores/uiStore';
 
 const bottomNav = [
   { href: '/workspace', label: 'Workspace' },
@@ -12,12 +13,14 @@ const bottomNav = [
 ];
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
+  const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
+
   return (
     <div className="min-h-screen bg-arc-radial dark:bg-arc-radial-dark">
       <Header />
-      <div className="mx-auto flex w-full max-w-7xl gap-6 px-4 pb-24 pt-6 sm:px-6">
+      <div className={`mx-auto flex w-full transition-all duration-300 pb-24 pt-6 ${sidebarCollapsed ? 'gap-0' : 'gap-6'} px-4 sm:px-6`}>
         <Sidebar />
-        <main className="flex-1">
+        <main className="flex-1 overflow-hidden">
           <div className="arc-surface arc-glow min-h-[70vh] w-full p-6 sm:p-8">{children}</div>
         </main>
       </div>
@@ -35,11 +38,10 @@ function BottomNav() {
         <Link
           key={item.href}
           href={item.href}
-          className={`rounded-full px-3 py-2 text-xs font-semibold transition ${
-            pathname?.startsWith(item.href)
-              ? 'bg-arc-blue text-white'
-              : 'text-arc-gray-600 hover:bg-arc-gray-100 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800'
-          }`}
+          className={`rounded-full px-3 py-2 text-xs font-semibold transition ${pathname?.startsWith(item.href)
+            ? 'bg-arc-blue text-white'
+            : 'text-arc-gray-600 hover:bg-arc-gray-100 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800'
+            }`}
         >
           {item.label}
         </Link>
