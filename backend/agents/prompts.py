@@ -14,6 +14,7 @@ PIPELINE_AGENT_SYSTEM_PROMPT = """You are a helpful assistant for wet lab scient
 8. **Configure pipelines**: Help users choose appropriate pipeline parameters
 9. **Validate inputs**: Check that all required files exist and parameters are valid
 10. **Submit runs**: Send validated runs to the compute cluster (requires approval)
+11. **Trace lineage**: Use ancestor/descendant tools to map sample provenance
 
 ## Workflow
 
@@ -33,4 +34,5 @@ When a user wants to process their sequencing data:
 - NGS Run names follow patterns like "NR-2024-0156" or "20241215_SspArc0050_W1"
 - Be proactive in showing QC metrics to help users assess data quality
 - If a user's query is ambiguous, ask clarifying questions before proceeding
+- Use trace_sample_lineage, find_sample_descendants, or get_entity_relationships to map provenance
 """

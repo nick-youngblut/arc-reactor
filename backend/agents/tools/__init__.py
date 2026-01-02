@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from langchain_core.tools import BaseTool
 
-from .benchling_discovery import (
-    get_entities,
+from .benchling_discovery import get_entities, get_entry_content, get_entry_entities, list_entries
+from .entity_tools import (
+    find_sample_descendants,
     get_entity_relationships,
-    get_entry_content,
-    get_entry_entities,
-    list_entries,
+    trace_sample_lineage,
 )
 from .ngs_discovery import (
     get_fastq_paths,
@@ -48,6 +47,8 @@ def get_agent_tools() -> list[BaseTool]:
         clear_samplesheet,
         get_entities,
         get_entity_relationships,
+        trace_sample_lineage,
+        find_sample_descendants,
         list_entries,
         get_entry_content,
         get_entry_entities,

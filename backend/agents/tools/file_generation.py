@@ -173,7 +173,7 @@ async def generate_samplesheet(
     """
 
     params["limit"] = ensure_limit(None, default=500)
-    rows = await benchling.query(sql, params)
+    rows = await benchling.query(sql, params, return_format="dict")
     if not rows:
         return "No samples found for the requested run."
 

@@ -175,7 +175,7 @@ async def search_ngs_runs(
 
     params["limit"] = ensure_limit(limit)
 
-    rows = await benchling.query(sql, params)
+    rows = await benchling.query(sql, params, return_format="dict")
     return format_ngs_run_results(rows)
 
 
@@ -302,7 +302,7 @@ async def get_ngs_run_samples(
 
     params["limit"] = ensure_limit(limit, default=100)
 
-    rows = await benchling.query(sql, params)
+    rows = await benchling.query(sql, params, return_format="dict")
     if not rows:
         return "No samples found for the requested run."
 
@@ -389,7 +389,7 @@ async def get_ngs_run_qc(
         GROUP BY
             nr."name$", ps."name$", ni."name$", nro.completion_date
         """
-        summary_rows = await benchling.query(summary_sql, params)
+        summary_rows = await benchling.query(summary_sql, params, return_format="dict")
         if not summary_rows:
             return "No QC data found for the requested run."
         summary = summary_rows[0]
@@ -414,7 +414,7 @@ async def get_ngs_run_qc(
         GROUP BY nrod.lane
         ORDER BY nrod.lane
         """
-        lane_rows = await benchling.query(lane_sql, params)
+        lane_rows = await benchling.query(lane_sql, params, return_format="dict")
         for lane in lane_rows:
             lane["status"] = q30_status(lane.get("avg_q30"))
         return format_qc_summary(summary, lane_rows)
@@ -439,7 +439,7 @@ async def get_ngs_run_qc(
         GROUP BY nrod.lane, nrod.read
         ORDER BY nrod.lane, nrod.read
         """
-        rows = await benchling.query(sql, params)
+        rows = await benchling.query(sql, params, return_format="dict")
         for row in rows:
             row["status"] = q30_status(row.get("avg_q30"))
         return format_table(rows)
@@ -466,7 +466,7 @@ async def get_ngs_run_qc(
         GROUP BY lps.sample_id
         ORDER BY lps.sample_id
         """
-        rows = await benchling.query(sql, params)
+        rows = await benchling.query(sql, params, return_format="dict")
         for row in rows:
             row["status"] = q30_status(row.get("avg_q30"))
         return format_table(rows)
@@ -530,7 +530,7 @@ async def get_fastq_paths(
     ORDER BY lps.sample_id
     """
 
-    rows = await benchling.query(sql, sample_params)
+    rows = await benchling.query(sql, sample_params, return_format="dict")
 
     if verify_exists and context.storage is not None:
         paths: list[str] = []

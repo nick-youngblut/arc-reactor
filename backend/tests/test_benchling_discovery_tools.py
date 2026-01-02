@@ -23,7 +23,7 @@ class _BenchlingStub:
         self.last_sql: str | None = None
         self.last_params: dict | None = None
 
-    async def query(self, sql: str, params: dict | None = None):
+    async def query(self, sql: str, params: dict | None = None, return_format: str | None = None):
         self.last_sql = sql
         self.last_params = params or {}
 

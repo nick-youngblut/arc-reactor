@@ -59,7 +59,7 @@ async def get_schemas(
             WHERE schema."archived$" = false
             ORDER BY schema.name
         """
-        rows = await benchling.query(sql, {})
+        rows = await benchling.query(sql, {}, return_format="dict")
         if not rows:
             return "No schemas found."
         names = ", ".join(row["schema_name"] for row in rows if row.get("schema_name"))
@@ -84,7 +84,7 @@ async def get_schemas(
         ORDER BY schema.name
     """
 
-    rows = await benchling.query(sql, params)
+    rows = await benchling.query(sql, params, return_format="dict")
     if not rows:
         return "No schemas found for the requested names."
     return format_table(rows)
@@ -128,7 +128,7 @@ async def get_schema_field_info(
         ORDER BY sf.display_name
     """
 
-    rows = await benchling.query(sql, {"schema_name": schema_name})
+    rows = await benchling.query(sql, {"schema_name": schema_name}, return_format="dict")
     if not rows:
         return f"No schema found with name: {schema_name}."
     return format_table(rows)
@@ -162,7 +162,7 @@ async def get_dropdown_values(
         ORDER BY dopt.name
     """
 
-    rows = await benchling.query(sql, {"dropdown_name": dropdown_name})
+    rows = await benchling.query(sql, {"dropdown_name": dropdown_name}, return_format="dict")
     if not rows:
         return f"No dropdown found with name: {dropdown_name}."
     return ", ".join(row["option_name"] for row in rows if row.get("option_name"))
@@ -200,7 +200,7 @@ async def list_projects(
 
     sql += " ORDER BY project.name"
 
-    rows = await benchling.query(sql, params)
+    rows = await benchling.query(sql, params, return_format="dict")
     if not rows:
         return "No projects found."
     return format_table(rows)
@@ -244,7 +244,7 @@ async def execute_warehouse_query(
     benchling = context.benchling
 
     safe_params = params if isinstance(params, dict) else {}
-    rows = await benchling.query(sql_with_limit, safe_params)
+    rows = await benchling.query(sql_with_limit, safe_params, return_format="dict")
     count = len(rows)
     if not rows:
         return "Query results (0 rows)."

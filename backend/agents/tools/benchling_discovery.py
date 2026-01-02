@@ -122,7 +122,7 @@ async def _get_table_columns(benchling, table_name: str) -> set[str]:
         FROM information_schema.columns
         WHERE table_name = :table_name
     """
-    rows = await benchling.query(sql, {"table_name": table_name})
+    rows = await benchling.query(sql, {"table_name": table_name}, return_format="dict")
     return {row["column_name"] for row in rows if row.get("column_name")}
 
 
@@ -190,7 +190,7 @@ async def _resolve_entities(
         params["schema_name"] = schema_name
     sql += " ORDER BY s.name, e.name"
 
-    return await benchling.query(sql, params)
+    return await benchling.query(sql, params, return_format="dict")
 
 
 async def _get_entity_link_fields(
@@ -219,7 +219,7 @@ async def _get_entity_link_fields(
         params.update(clause_params)
     sql += " ORDER BY sf.display_name"
 
-    return await benchling.query(sql, params)
+    return await benchling.query(sql, params, return_format="dict")
 
 
 async def _fetch_entity_info_map(
@@ -243,7 +243,7 @@ async def _fetch_entity_info_map(
           AND s."archived$" = false
           AND e.id IN ({clause})
     """
-    rows = await benchling.query(sql, params)
+    rows = await benchling.query(sql, params, return_format="dict")
     return {row["entity_id"]: row for row in rows if row.get("entity_id")}
 
 
@@ -293,7 +293,11 @@ async def _get_forward_links(
                   AND "{system_name}" IS NOT NULL
             """
 
-        results = await benchling.query(sql, {"entity_id": entity_id, "link_field": display_name})
+        results = await benchling.query(
+            sql,
+            {"entity_id": entity_id, "link_field": display_name},
+            return_format="dict",
+        )
         for row in results:
             linked_id = row.get("linked_entity_id")
             if linked_id:
@@ -354,7 +358,7 @@ async def _get_reverse_links(
         params.update(clause_params)
     sql += " ORDER BY source.name, sf.display_name"
 
-    referring_fields = await benchling.query(sql, params)
+    referring_fields = await benchling.query(sql, params, return_format="dict")
     if not referring_fields:
         return []
 
@@ -384,7 +388,11 @@ async def _get_reverse_links(
                   AND "archived$" = false
             """
 
-        results = await benchling.query(field_sql, {"entity_id": target_entity["entity_id"]})
+        results = await benchling.query(
+            field_sql,
+            {"entity_id": target_entity["entity_id"]},
+            return_format="dict",
+        )
         for row in results:
             linked_id = row.get("linked_entity_id")
             if linked_id:
@@ -692,7 +700,7 @@ async def get_entities(
     query += " LIMIT :limit"
     params["limit"] = ensure_limit(limit, default=40)
 
-    rows = await benchling.query(query, params)
+    rows = await benchling.query(query, params, return_format="dict")
     if not rows:
         return "No entities found."
 
@@ -892,7 +900,7 @@ async def list_entries(
     query += " LIMIT :limit"
     params["limit"] = ensure_limit(limit, default=50)
 
-    rows = await benchling.query(query, params)
+    rows = await benchling.query(query, params, return_format="dict")
     if not rows:
         return "No entries found."
     return format_table(rows)
@@ -933,7 +941,7 @@ async def get_entry_content(
         FROM entry$raw entry
         WHERE entry.name IN ({clause})
     """
-    rows = await benchling.query(sql, params)
+    rows = await benchling.query(sql, params, return_format="dict")
     if not rows:
         return "No entry content found."
 
@@ -999,7 +1007,7 @@ async def get_entry_entities(
         LIMIT :limit
     """
     params = {"entry_name": entry_name, "limit": ensure_limit(limit, default=40)}
-    rows = await benchling.query(sql, params)
+    rows = await benchling.query(sql, params, return_format="dict")
     if not rows:
         return "No entities found for the requested entry."
     return format_table(rows)

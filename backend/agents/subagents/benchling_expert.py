@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from backend.agents.tools import (
     execute_warehouse_query,
+    find_sample_descendants,
     get_entities,
     get_entity_relationships,
     get_entry_entities,
     get_ngs_run_samples,
     list_entries,
     search_ngs_runs,
+    trace_sample_lineage,
 )
 
 BENCHLING_EXPERT_PROMPT = """You are an expert at querying Arc Institute's Benchling database.
@@ -19,7 +21,7 @@ You have deep knowledge of:
 
 When given a complex query:
 1. Break it down into simpler sub-queries
-2. Use get_entity_relationships for lineage traversal
+2. Use get_entity_relationships, trace_sample_lineage, or find_sample_descendants for lineage traversal
 3. Combine and reconcile results
 4. Present a clear summary
 
@@ -44,6 +46,8 @@ def create_benchling_expert(model):
             get_ngs_run_samples,
             get_entities,
             get_entity_relationships,
+            trace_sample_lineage,
+            find_sample_descendants,
             list_entries,
             get_entry_entities,
             execute_warehouse_query,

@@ -13,7 +13,7 @@ from backend.agents.tools.pipeline_tools import get_pipeline_schema, list_pipeli
 
 
 class _BenchlingStub:
-    async def query(self, sql: str, params: dict | None = None):
+    async def query(self, sql: str, params: dict | None = None, return_format: str | None = None):
         if "ngs_run_pooling_v2$raw" in sql:
             return [
                 {

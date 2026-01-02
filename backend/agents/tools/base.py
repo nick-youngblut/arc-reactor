@@ -66,9 +66,11 @@ def q30_status(q30_value: float | None) -> str:
     return "FAIL"
 
 
-def format_table(rows: Sequence[Mapping[str, Any]]) -> str:
+def format_table(rows: Sequence[Mapping[str, Any]] | str) -> str:
     if not rows:
         return "No results found."
+    if isinstance(rows, str):
+        return rows
     return toon_encode([dict(row) for row in rows])
 
 
@@ -154,7 +156,7 @@ def _runtime_configurable(runtime: ToolRuntime | None) -> dict[str, Any]:
 @lru_cache(maxsize=1)
 def _default_benchling_service() -> BenchlingService:
     breakers = create_breakers(settings)
-    return BenchlingService.create(settings, breakers)
+    return BenchlingService.create(breakers)
 
 
 @lru_cache(maxsize=1)
