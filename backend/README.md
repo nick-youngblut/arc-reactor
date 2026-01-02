@@ -28,11 +28,23 @@ pytest
 
 ## Configuration
 Settings are managed via `backend/settings.yaml` and env vars. Key env vars:
-- `DYNACONF` (dev/prod)
+- `DYNACONF` (dev/prod/test)
+- `GOOGLE_API_KEY` (Gemini auth)
 - `DATABASE_URL` or DB_* settings
-- `BENCHLING_WAREHOUSE_PASSWORD`
 - `IAP_PROJECT_NUMBER`, `IAP_PROJECT_ID` (IAP JWT audience)
 - `IAP_ALLOWED_DOMAIN` (optional)
+
+Benchling (based on `DYNACONF`):
+- `DYNACONF=prod`:
+  - `BENCHLING_PROD_API_KEY`
+  - `BENCHLING_PROD_DATABASE_URI`
+  - `BENCHLING_PROD_APP_CLIENT_ID`
+  - `BENCHLING_PROD_APP_CLIENT_SECRET`
+- `DYNACONF=dev` or `DYNACONF=test`:
+  - `BENCHLING_TEST_API_KEY`
+  - `BENCHLING_TEST_DATABASE_URI`
+  - `BENCHLING_TEST_APP_CLIENT_ID`
+  - `BENCHLING_TEST_APP_CLIENT_SECRET`
 
 ## Migrations
 ```bash
