@@ -603,78 +603,78 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 
 ### Run Logs Tab Component
 
-- [ ] Create `frontend/components/runs/RunLogs.tsx` — *See [04-frontend-spec.md#runlogs](../spec/04-frontend-spec.md)*:
-  - [ ] Tab navigation:
-    - [ ] Workflow Log
-    - [ ] Task Logs
-  - [ ] Download logs button
+- [x] Create `frontend/components/runs/RunLogs.tsx` — *See [04-frontend-spec.md#runlogs](../spec/04-frontend-spec.md)*:
+  - [x] Tab navigation:
+    - [x] Workflow Log
+    - [x] Task Logs
+  - [x] Download logs button
 
 ### Workflow Log Viewer Component
 
 > **Spec References:**
 > - [10-ux-spec.md#log-viewer](../spec/10-ux-spec.md) - Log viewer design
 
-- [ ] Create `frontend/components/logs/WorkflowLogViewer.tsx` — *See [10-ux-spec.md#log-viewer](../spec/10-ux-spec.md)*:
-  - [ ] Virtualized log display (react-window)
-  - [ ] Auto-scroll to bottom option
-  - [ ] Search/filter functionality — *See [10-ux-spec.md#log-viewer](../spec/10-ux-spec.md)*:
-    - [ ] Text search input
-    - [ ] Severity filter (INFO, WARN, ERROR)
-  - [ ] LogLine component for each entry
-  - [ ] Streaming support for active runs
+- [x] Create `frontend/components/logs/WorkflowLogViewer.tsx` — *See [10-ux-spec.md#log-viewer](../spec/10-ux-spec.md)*:
+  - [x] Virtualized log display (react-window)
+  - [x] Auto-scroll to bottom option
+  - [x] Search/filter functionality — *See [10-ux-spec.md#log-viewer](../spec/10-ux-spec.md)*:
+    - [x] Text search input
+    - [x] Severity filter (INFO, WARN, ERROR)
+  - [x] LogLine component for each entry
+  - [x] Streaming support for active runs
 
 ### Log Line Component
 
-- [ ] Create `frontend/components/logs/LogLine.tsx`:
-  - [ ] Timestamp display
-  - [ ] Log level badge (color-coded)
-  - [ ] Message content with:
-    - [ ] Syntax highlighting for paths
-    - [ ] Monospace font
-    - [ ] Wrap on small screens
+- [x] Create `frontend/components/logs/LogLine.tsx`:
+  - [x] Timestamp display
+  - [x] Log level badge (color-coded)
+  - [x] Message content with:
+    - [x] Syntax highlighting for paths
+    - [x] Monospace font
+    - [x] Wrap on small screens
 
 ### Task List Sidebar
 
-- [ ] Create `frontend/components/logs/TaskList.tsx`:
-  - [ ] List of tasks from trace.txt — *See [03-backend-spec.md#task-list](../spec/03-backend-spec.md)*
-  - [ ] Task item display:
-    - [ ] Task name
-    - [ ] Process name
-    - [ ] Status icon
-    - [ ] Duration
-  - [ ] Click to select task
-  - [ ] Active task highlighting
-  - [ ] Group by process (collapsible)
+- [x] Create `frontend/components/logs/TaskList.tsx`:
+  - [x] List of tasks from trace.txt — *See [03-backend-spec.md#task-list](../spec/03-backend-spec.md)*
+  - [x] Task item display:
+    - [x] Task name
+    - [x] Process name
+    - [x] Status icon
+    - [x] Duration
+  - [x] Click to select task
+  - [x] Active task highlighting
+  - [x] Group by process (collapsible)
 
 ### Task Log Viewer Component
 
-- [ ] Create `frontend/components/logs/TaskLogViewer.tsx`:
-  - [ ] Selected task header:
-    - [ ] Task name and process
-    - [ ] Status and duration
-    - [ ] Resource usage
-  - [ ] Tabbed stdout/stderr display
-  - [ ] LogLine rendering for content
-  - [ ] Loading state while fetching
+- [x] Create `frontend/components/logs/TaskLogViewer.tsx`:
+  - [x] Selected task header:
+    - [x] Task name and process
+    - [x] Status and duration
+    - [x] Resource usage
+  - [x] Tabbed stdout/stderr display
+  - [x] LogLine rendering for content
+  - [x] Loading state while fetching
 
 ### Log Search Component
 
-- [ ] Create `frontend/components/logs/LogSearch.tsx`:
-  - [ ] Search input field
-  - [ ] Match count indicator
-  - [ ] Next/previous match buttons
-  - [ ] Highlight matches in log view
+- [x] Create `frontend/components/logs/LogSearch.tsx`:
+  - [x] Search input field
+  - [x] Match count indicator
+  - [x] Next/previous match buttons
+  - [x] Highlight matches in log view
 
 ### Log Download Component
 
-- [ ] Create `frontend/components/logs/LogDownload.tsx`:
-  - [ ] Download all logs as ZIP
-  - [ ] Progress indicator
-  - [ ] Include — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
-    - [ ] nextflow.log
-    - [ ] trace.txt
-    - [ ] timeline.html
-    - [ ] report.html
+- [x] Create `frontend/components/logs/LogDownload.tsx`:
+  - [x] Download all logs as ZIP
+  - [x] Progress indicator
+  - [x] Include — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
+    - [x] nextflow.log
+    - [x] trace.txt
+    - [x] timeline.html
+    - [x] report.html
 
 ### Recovery Modal Component
 
@@ -682,60 +682,60 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
 > - [12-recovery-spec.md#frontend-workflow](../spec/12-recovery-spec.md) - Complete recovery UI spec
 > - [12-recovery-spec.md#recovery-confirmation](../spec/12-recovery-spec.md) - Confirmation requirements
 
-- [ ] Create `frontend/components/runs/RecoveryModal.tsx` — *See [12-recovery-spec.md#frontend-workflow](../spec/12-recovery-spec.md)*:
-  - [ ] Modal dialog for recovery confirmation
-  - [ ] Header: "Recover run with `-resume`"
-  - [ ] Explanation text:
-    - [ ] "This will re-run the workflow and reuse completed tasks from the previous work directory."
-  - [ ] Confirmation checkbox — *See [12-recovery-spec.md#recovery-confirmation](../spec/12-recovery-spec.md)*
-  - [ ] Optional fields:
-    - [ ] Notes textarea
-    - [ ] Override parameters (advanced toggle)
-    - [ ] Override config (advanced toggle)
-  - [ ] Cancel and Confirm buttons
+- [x] Create `frontend/components/runs/RecoveryModal.tsx` — *See [12-recovery-spec.md#frontend-workflow](../spec/12-recovery-spec.md)*:
+  - [x] Modal dialog for recovery confirmation
+  - [x] Header: "Recover run with `-resume`"
+  - [x] Explanation text:
+    - [x] "This will re-run the workflow and reuse completed tasks from the previous work directory."
+  - [x] Confirmation checkbox — *See [12-recovery-spec.md#recovery-confirmation](../spec/12-recovery-spec.md)*
+  - [x] Optional fields:
+    - [x] Notes textarea
+    - [x] Override parameters (advanced toggle)
+    - [x] Override config (advanced toggle)
+  - [x] Cancel and Confirm buttons
 
-- [ ] Create `frontend/components/runs/RecoveryAdvancedOptions.tsx`:
-  - [ ] Expandable section for advanced options
-  - [ ] Parameter override form:
-    - [ ] Key-value pairs
-    - [ ] Add/remove rows
-  - [ ] Config override editor:
-    - [ ] Monaco editor for config changes
-    - [ ] Show diff from original
+- [x] Create `frontend/components/runs/RecoveryAdvancedOptions.tsx`:
+  - [x] Expandable section for advanced options
+  - [x] Parameter override form:
+    - [x] Key-value pairs
+    - [x] Add/remove rows
+  - [x] Config override editor:
+    - [x] Monaco editor for config changes
+    - [x] Show diff from original
 
 ### usePipelines Hook
 
 > **Spec References:**
 > - [04-frontend-spec.md#usepipelines](../spec/04-frontend-spec.md) - Hook specification
 
-- [ ] Create `frontend/hooks/usePipelines.ts` — *See [04-frontend-spec.md#usepipelines](../spec/04-frontend-spec.md)*:
-  - [ ] TanStack Query wrapper for pipelines
-  - [ ] Cache pipeline schema
-  - [ ] Return:
-    - [ ] `pipelines`: Pipeline list
-    - [ ] `getPipeline(name)`: Get specific pipeline
-    - [ ] `isLoading`
-    - [ ] `error`
+- [x] Create `frontend/hooks/usePipelines.ts` — *See [04-frontend-spec.md#usepipelines](../spec/04-frontend-spec.md)*:
+  - [x] TanStack Query wrapper for pipelines
+  - [x] Cache pipeline schema
+  - [x] Return:
+    - [x] `pipelines`: Pipeline list
+    - [x] `getPipeline(name)`: Get specific pipeline
+    - [x] `isLoading`
+    - [x] `error`
 
 ### Responsive Design Implementation
 
 > **Spec References:**
 > - [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md) - Responsive breakpoints
 
-- [ ] Implement responsive layouts — *See [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md)*:
-  - [ ] Desktop (1200px+):
-    - [ ] Full two-panel workspace
-    - [ ] Sidebar always visible
-    - [ ] Side-by-side chat and editor
-  - [ ] Tablet (768px-1199px):
-    - [ ] Collapsible sidebar
-    - [ ] Stacked/tabbed chat and editor
-    - [ ] Touch-friendly targets
-  - [ ] Mobile (<768px):
-    - [ ] Single panel view
-    - [ ] Bottom navigation
-    - [ ] Simplified samplesheet (view-only)
-    - [ ] Full chat functionality
+- [x] Implement responsive layouts — *See [10-ux-spec.md#responsive-behavior](../spec/10-ux-spec.md)*:
+  - [x] Desktop (1200px+):
+    - [x] Full two-panel workspace
+    - [x] Sidebar always visible
+    - [x] Side-by-side chat and editor
+  - [x] Tablet (768px-1199px):
+    - [x] Collapsible sidebar
+    - [x] Stacked/tabbed chat and editor
+    - [x] Touch-friendly targets
+  - [x] Mobile (<768px):
+    - [x] Single panel view
+    - [x] Bottom navigation
+    - [x] Simplified samplesheet (view-only)
+    - [x] Full chat functionality
 
 ---
 
@@ -770,8 +770,8 @@ This sprint builds the complete frontend UI with chat interface, file editors, r
   - [ ] Files tab
   - [ ] Parameters tab
 - [ ] Run status badges and real-time updates (SSE)
-- [ ] WorkflowLogViewer with streaming
-- [ ] TaskList and TaskLogViewer
-- [ ] Log search and download
-- [ ] RecoveryModal with advanced options
-- [ ] Responsive design (desktop, tablet, mobile)
+- [x] WorkflowLogViewer with streaming
+- [x] TaskList and TaskLogViewer
+- [x] Log search and download
+- [x] RecoveryModal with advanced options
+- [x] Responsive design (desktop, tablet, mobile)

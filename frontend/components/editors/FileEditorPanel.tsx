@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { SamplesheetEditor } from '@/components/editors/SamplesheetEditor';
 import { ConfigEditor } from '@/components/editors/ConfigEditor';
@@ -22,6 +22,14 @@ export function FileEditorPanel() {
   const samplesheetDirty = useWorkspaceStore((state) => state.samplesheetDirty);
   const configDirty = useWorkspaceStore((state) => state.configDirty);
   const selectedPipeline = useWorkspaceStore((state) => state.selectedPipeline);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth < 768);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   const samplesheetColumns = useMemo(
     () => getSamplesheetColumns(selectedPipeline).map((column) => column.key),
@@ -110,9 +118,9 @@ export function FileEditorPanel() {
             </p>
           </div>
         ) : activeTab === 'config' ? (
-          <ConfigEditor />
+          <ConfigEditor readOnly={isMobile} />
         ) : (
-          <SamplesheetEditor />
+          <SamplesheetEditor readOnly={isMobile} />
         )}
       </div>
     </section>

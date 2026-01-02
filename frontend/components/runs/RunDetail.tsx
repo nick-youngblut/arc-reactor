@@ -7,6 +7,8 @@ import { RunStatusBadge } from '@/components/runs/RunStatusBadge';
 import { RunOverview } from '@/components/runs/RunOverview';
 import { RunFiles } from '@/components/runs/RunFiles';
 import { RunParameters } from '@/components/runs/RunParameters';
+import { RunLogs } from '@/components/runs/RunLogs';
+import { RecoveryModal } from '@/components/runs/RecoveryModal';
 
 const tabs = [
   { id: 'overview', label: 'Overview' },
@@ -25,6 +27,7 @@ interface RunDetailProps {
 export function RunDetail({ run, statusOverride }: RunDetailProps) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [copied, setCopied] = useState(false);
+  const [showRecovery, setShowRecovery] = useState(false);
   const status = statusOverride ?? run.status;
 
   const handleCopy = async () => {
@@ -59,12 +62,15 @@ export function RunDetail({ run, statusOverride }: RunDetailProps) {
           >
             Re-run
           </button>
-          <button
-            type="button"
-            className="rounded-full border border-arc-gray-200/70 px-4 py-2 text-xs font-semibold text-arc-gray-600 hover:bg-arc-gray-100 dark:border-arc-gray-800/70 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800"
-          >
-            Recover
-          </button>
+          {status === 'failed' || status === 'cancelled' ? (
+            <button
+              type="button"
+              onClick={() => setShowRecovery(true)}
+              className="rounded-full border border-arc-gray-200/70 px-4 py-2 text-xs font-semibold text-arc-gray-600 hover:bg-arc-gray-100 dark:border-arc-gray-800/70 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800"
+            >
+              Recover
+            </button>
+          ) : null}
           {status === 'running' || status === 'submitted' ? (
             <button
               type="button"
@@ -97,12 +103,14 @@ export function RunDetail({ run, statusOverride }: RunDetailProps) {
         {activeTab === 'overview' ? <RunOverview run={run} /> : null}
         {activeTab === 'files' ? <RunFiles run={run} /> : null}
         {activeTab === 'parameters' ? <RunParameters run={run} /> : null}
-        {activeTab === 'logs' ? (
-          <div className="rounded-2xl border border-dashed border-arc-gray-200/80 bg-white/60 p-8 text-center text-sm text-arc-gray-500 dark:border-arc-gray-800/80 dark:bg-slate-900/60 dark:text-arc-gray-300">
-            Log viewer arrives in Phase 4.5.
-          </div>
-        ) : null}
+        {activeTab === 'logs' ? <RunLogs runId={run.id} /> : null}
       </div>
+
+      <RecoveryModal
+        open={showRecovery}
+        onClose={() => setShowRecovery(false)}
+        onConfirm={() => setShowRecovery(false)}
+      />
     </section>
   );
 }
