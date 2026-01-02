@@ -4,8 +4,6 @@ default:
 
   gcp_region: "us-west1"
 
-  # Benchling configuration handled by benchling-py via DYNACONF.
-
   db_name: "arc_reactor"
   db_user: "arc_reactor"
   db_host: "127.0.0.1"
