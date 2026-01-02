@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, dev]
 
 env:
   PROJECT_ID: arc-ctc-project
@@ -27,7 +27,7 @@ jobs:
             echo "env_name=production" >> "$GITHUB_OUTPUT"
             echo "service_name=arc-reactor" >> "$GITHUB_OUTPUT"
           else
-            echo "env_name=development" >> "$GITHUB_OUTPUT"
+            echo "env_name=dev" >> "$GITHUB_OUTPUT"
             echo "service_name=arc-reactor-dev" >> "$GITHUB_OUTPUT"
           fi
 
