@@ -14,7 +14,6 @@ export function Header() {
   const pathname = usePathname();
   const theme = useUiStore((state) => state.theme);
   const setTheme = useUiStore((state) => state.setTheme);
-  const toggleSidebar = useUiStore((state) => state.toggleSidebar);
 
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
@@ -28,17 +27,6 @@ export function Header() {
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-4">
-          <button
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-arc-gray-200/70 bg-white text-arc-gray-700 transition-all hover:bg-arc-gray-50 dark:border-arc-gray-700/50 dark:bg-arc-night dark:text-arc-gray-200 lg:hidden"
-            onClick={toggleSidebar}
-            type="button"
-            aria-label="Toggle navigation"
-          >
-            <span className="sr-only">Toggle sidebar</span>
-            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path d="M3 5h14v2H3V5zm0 6h14v2H3v-2zm0 6h14v2H3v-2z" />
-            </svg>
-          </button>
           <Link href="/workspace" className="flex items-center gap-3 group">
             <div className="relative h-10 w-10 overflow-hidden rounded-xl transition-transform group-hover:scale-105">
               <img

@@ -4,8 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { Header } from '@/components/Header';
-import { Sidebar } from '@/components/Sidebar';
-import { useUiStore } from '@/stores/uiStore';
 
 const bottomNav = [
   { href: '/workspace', label: 'Workspace' },
@@ -13,15 +11,14 @@ const bottomNav = [
 ];
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
-  const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
-
   return (
-    <div className="min-h-screen bg-arc-radial dark:bg-arc-radial-dark">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       <Header />
-      <div className={`mx-auto flex w-full transition-all duration-300 pb-24 pt-6 ${sidebarCollapsed ? 'gap-0' : 'gap-6'} px-4 sm:px-6`}>
-        <Sidebar />
-        <main className="flex-1 overflow-hidden">
-          <div className="arc-surface arc-glow min-h-[70vh] w-full p-6 sm:p-8">{children}</div>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <main className="w-full">
+          <div className="arc-surface arc-glow min-h-[75vh] w-full p-6 sm:p-10 shadow-2xl">
+            {children}
+          </div>
         </main>
       </div>
       <BottomNav />
