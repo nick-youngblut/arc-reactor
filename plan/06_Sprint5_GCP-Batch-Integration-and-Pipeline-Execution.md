@@ -22,10 +22,10 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### BatchService Implementation
 
-- [ ] Create `backend/services/batch.py` — *See [03-backend-spec.md#batchservice](../spec/03-backend-spec.md)*:
-  - [ ] Import `google.cloud.batch_v1`
-  - [ ] Implement `BatchService` class
-  - [ ] Initialize BatchServiceClient
+- [x] Create `backend/services/batch.py` — *See [03-backend-spec.md#batchservice](../spec/03-backend-spec.md)*:
+  - [x] Import `google.cloud.batch_v1`
+  - [x] Implement `BatchService` class
+  - [x] Initialize BatchServiceClient
 
 ### Job Submission
 
@@ -33,119 +33,119 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 > - [07-integration-spec.md#job-submission](../spec/07-integration-spec.md) - Job specification
 > - [07-integration-spec.md#orchestrator-job-specification](../spec/07-integration-spec.md) - Orchestrator config
 
-- [ ] Implement `submit_orchestrator_job()` method — *See [07-integration-spec.md#job-submission](../spec/07-integration-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `run_id`: Run identifier
-    - [ ] `pipeline`: Pipeline name
-    - [ ] `pipeline_version`: Pipeline version
-    - [ ] `config_gcs_path`: GCS path to config
-    - [ ] `params_gcs_path`: GCS path to params
-    - [ ] `work_dir`: GCS work directory
-    - [ ] `is_recovery`: Boolean for resume mode — *See [12-recovery-spec.md#orchestrator-behavior](../spec/12-recovery-spec.md)*
-  - [ ] Build TaskSpec — *See [07-integration-spec.md#orchestrator-job-specification](../spec/07-integration-spec.md)*:
-    - [ ] Container image: orchestrator image from settings
-    - [ ] Environment variables:
-      - [ ] `RUN_ID`
-      - [ ] `PIPELINE`
-      - [ ] `PIPELINE_VERSION`
-      - [ ] `CONFIG_GCS_PATH`
-      - [ ] `PARAMS_GCS_PATH`
-      - [ ] `WORK_DIR`
-      - [ ] `DATABASE_URL` (Cloud SQL private IP) — *See [07-integration-spec.md#batch-to-cloud-sql](../spec/07-integration-spec.md)*
-      - [ ] `IS_RECOVERY` (for -resume flag)
-    - [ ] Compute resources:
-      - [ ] CPU: 2000 milli (2 vCPU)
-      - [ ] Memory: 4096 MiB (4 GB)
-    - [ ] Max run duration: 604800s (7 days)
-    - [ ] Max retry count: 2
-  - [ ] Build TaskGroup with single task
-  - [ ] Build AllocationPolicy:
-    - [ ] Machine type: `e2-standard-2`
-    - [ ] Provisioning model: SPOT — *See [09-deployment-spec.md#cost-optimization](../spec/09-deployment-spec.md)*
-    - [ ] Service account: orchestrator service account — *See [08-security-spec.md#batch-orchestrator-service-account](../spec/08-security-spec.md)*
-  - [ ] Build LogsPolicy:
-    - [ ] Destination: CLOUD_LOGGING
-  - [ ] Build Job with labels — *See [07-integration-spec.md#required-labels-on-batch-jobs](../spec/07-integration-spec.md)*:
-    - [ ] `run-id`: run identifier
-    - [ ] `app`: "arc-reactor"
-  - [ ] Create job request:
-    - [ ] Parent: `projects/{project}/locations/{region}`
-    - [ ] Job ID: `nf-{run_id}`
-  - [ ] Submit job and return job name
+- [x] Implement `submit_orchestrator_job()` method — *See [07-integration-spec.md#job-submission](../spec/07-integration-spec.md)*:
+  - [x] Parameters:
+    - [x] `run_id`: Run identifier
+    - [x] `pipeline`: Pipeline name
+    - [x] `pipeline_version`: Pipeline version
+    - [x] `config_gcs_path`: GCS path to config
+    - [x] `params_gcs_path`: GCS path to params
+    - [x] `work_dir`: GCS work directory
+    - [x] `is_recovery`: Boolean for resume mode — *See [12-recovery-spec.md#orchestrator-behavior](../spec/12-recovery-spec.md)*
+  - [x] Build TaskSpec — *See [07-integration-spec.md#orchestrator-job-specification](../spec/07-integration-spec.md)*:
+    - [x] Container image: orchestrator image from settings
+    - [x] Environment variables:
+      - [x] `RUN_ID`
+      - [x] `PIPELINE`
+      - [x] `PIPELINE_VERSION`
+      - [x] `CONFIG_GCS_PATH`
+      - [x] `PARAMS_GCS_PATH`
+      - [x] `WORK_DIR`
+      - [x] `DATABASE_URL` (Cloud SQL private IP) — *See [07-integration-spec.md#batch-to-cloud-sql](../spec/07-integration-spec.md)*
+      - [x] `IS_RECOVERY` (for -resume flag)
+    - [x] Compute resources:
+      - [x] CPU: 2000 milli (2 vCPU)
+      - [x] Memory: 4096 MiB (4 GB)
+    - [x] Max run duration: 604800s (7 days)
+    - [x] Max retry count: 2
+  - [x] Build TaskGroup with single task
+  - [x] Build AllocationPolicy:
+    - [x] Machine type: `e2-standard-2`
+    - [x] Provisioning model: SPOT — *See [09-deployment-spec.md#cost-optimization](../spec/09-deployment-spec.md)*
+    - [x] Service account: orchestrator service account — *See [08-security-spec.md#batch-orchestrator-service-account](../spec/08-security-spec.md)*
+  - [x] Build LogsPolicy:
+    - [x] Destination: CLOUD_LOGGING
+  - [x] Build Job with labels — *See [07-integration-spec.md#required-labels-on-batch-jobs](../spec/07-integration-spec.md)*:
+    - [x] `run-id`: run identifier
+    - [x] `app`: "arc-reactor"
+  - [x] Create job request:
+    - [x] Parent: `projects/{project}/locations/{region}`
+    - [x] Job ID: `nf-{run_id}`
+  - [x] Submit job and return job name
 
 ### Job Status Monitoring
 
 > **Spec References:**
 > - [07-integration-spec.md#status-monitoring](../spec/07-integration-spec.md) - Status polling
 
-- [ ] Implement `get_job_status()` method — *See [07-integration-spec.md#status-monitoring](../spec/07-integration-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `job_name`: Full job resource name
-  - [ ] Fetch job from Batch API
-  - [ ] Extract status information:
-    - [ ] State (QUEUED, SCHEDULED, RUNNING, SUCCEEDED, FAILED, etc.)
-    - [ ] Status events with type and description
-  - [ ] Map Batch states to run status — *See [06-data-model-spec.md#run-status-values](../spec/06-data-model-spec.md)*:
-    - [ ] QUEUED/SCHEDULED → submitted
-    - [ ] RUNNING → running
-    - [ ] SUCCEEDED → completed
-    - [ ] FAILED/CANCELLED → failed/cancelled
-  - [ ] Return status dict
+- [x] Implement `get_job_status()` method — *See [07-integration-spec.md#status-monitoring](../spec/07-integration-spec.md)*:
+  - [x] Parameters:
+    - [x] `job_name`: Full job resource name
+  - [x] Fetch job from Batch API
+  - [x] Extract status information:
+    - [x] State (QUEUED, SCHEDULED, RUNNING, SUCCEEDED, FAILED, etc.)
+    - [x] Status events with type and description
+  - [x] Map Batch states to run status — *See [06-data-model-spec.md#run-status-values](../spec/06-data-model-spec.md)*:
+    - [x] QUEUED/SCHEDULED → submitted
+    - [x] RUNNING → running
+    - [x] SUCCEEDED → completed
+    - [x] FAILED/CANCELLED → failed/cancelled
+  - [x] Return status dict
 
-- [ ] Implement `poll_job_until_terminal()` method:
-  - [ ] Poll job status at interval
-  - [ ] Return when terminal state reached
-  - [ ] Timeout after configurable duration
+- [x] Implement `poll_job_until_terminal()` method:
+  - [x] Poll job status at interval
+  - [x] Return when terminal state reached
+  - [x] Timeout after configurable duration
 
 ### Job Cancellation
 
 > **Spec References:**
 > - [07-integration-spec.md#job-cancellation](../spec/07-integration-spec.md) - Cancellation process
 
-- [ ] Implement `cancel_job()` method — *See [07-integration-spec.md#job-cancellation](../spec/07-integration-spec.md)*:
-  - [ ] Parameters:
-    - [ ] `job_name`: Full job resource name
-  - [ ] Create DeleteJobRequest
-  - [ ] Execute deletion
-  - [ ] Handle already-deleted gracefully
-  - [ ] Return success boolean
+- [x] Implement `cancel_job()` method — *See [07-integration-spec.md#job-cancellation](../spec/07-integration-spec.md)*:
+  - [x] Parameters:
+    - [x] `job_name`: Full job resource name
+  - [x] Create DeleteJobRequest
+  - [x] Execute deletion
+  - [x] Handle already-deleted gracefully
+  - [x] Return success boolean
 
 ### Job Label Strategy
 
 > **Spec References:**
 > - [07-integration-spec.md#required-labels-on-batch-jobs](../spec/07-integration-spec.md) - Label requirements
 
-- [ ] Define standard labels for all Batch jobs — *See [07-integration-spec.md#required-labels-on-batch-jobs](../spec/07-integration-spec.md)*:
-  - [ ] `run-id`: Arc Reactor run identifier
-  - [ ] `app`: "arc-reactor"
-  - [ ] `pipeline`: Pipeline name
-  - [ ] `user-email`: Submitting user (sanitized)
-- [ ] Document label format in code comments
-- [ ] Use labels for Cloud Logging queries — *See [07-integration-spec.md#query-patterns](../spec/07-integration-spec.md)*
+- [x] Define standard labels for all Batch jobs — *See [07-integration-spec.md#required-labels-on-batch-jobs](../spec/07-integration-spec.md)*:
+  - [x] `run-id`: Arc Reactor run identifier
+  - [x] `app`: "arc-reactor"
+  - [x] `pipeline`: Pipeline name
+  - [x] `user-email`: Submitting user (sanitized)
+- [x] Document label format in code comments
+- [x] Use labels for Cloud Logging queries — *See [07-integration-spec.md#query-patterns](../spec/07-integration-spec.md)*
 
 ### BatchService Error Handling
 
 > **Spec References:**
 > - [07-integration-spec.md#error-handling-matrix](../spec/07-integration-spec.md) - Error types and handling
 
-- [ ] Implement error handling for common failures — *See [07-integration-spec.md#error-handling-matrix](../spec/07-integration-spec.md)*:
-  - [ ] Quota exceeded: Raise appropriate exception
-  - [ ] Permission denied: Log and raise
-  - [ ] Job creation failed: Retry with backoff
-  - [ ] Network errors: Retry with backoff
-- [ ] Create custom exception classes:
-  - [ ] `BatchQuotaExceededError`
-  - [ ] `BatchJobCreationError`
-  - [ ] `BatchJobNotFoundError`
+- [x] Implement error handling for common failures — *See [07-integration-spec.md#error-handling-matrix](../spec/07-integration-spec.md)*:
+  - [x] Quota exceeded: Raise appropriate exception
+  - [x] Permission denied: Log and raise
+  - [x] Job creation failed: Retry with backoff
+  - [x] Network errors: Retry with backoff
+- [x] Create custom exception classes:
+  - [x] `BatchQuotaExceededError`
+  - [x] `BatchJobCreationError`
+  - [x] `BatchJobNotFoundError`
 
 ### BatchService Unit Tests
 
-- [ ] Create `backend/tests/test_batch_service.py`:
-  - [ ] Mock BatchServiceClient
-  - [ ] Test job submission with valid params
-  - [ ] Test job status retrieval
-  - [ ] Test job cancellation
-  - [ ] Test error handling scenarios
+- [x] Create `backend/tests/test_batch_service.py`:
+  - [x] Mock BatchServiceClient
+  - [x] Test job submission with valid params
+  - [x] Test job status retrieval
+  - [x] Test job cancellation
+  - [x] Test error handling scenarios
 
 ---
 
@@ -158,33 +158,33 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 
 ### Orchestrator Directory Structure
 
-- [ ] Create `orchestrator/` directory:
-  - [ ] `Dockerfile.orchestrator`
-  - [ ] `entrypoint.sh`
-  - [ ] `update_status.py`
-  - [ ] `nextflow.config.template`
+- [x] Create `orchestrator/` directory:
+  - [x] `Dockerfile.orchestrator`
+  - [x] `entrypoint.sh`
+  - [x] `update_status.py`
+  - [x] `nextflow.config.template`
 
 ### Orchestrator Dockerfile
 
 > **Spec References:**
 > - [09-deployment-spec.md#nextflow-orchestrator-dockerfile](../spec/09-deployment-spec.md) - Complete Dockerfile
 
-- [ ] Create `orchestrator/Dockerfile.orchestrator` — *See [09-deployment-spec.md#nextflow-orchestrator-dockerfile](../spec/09-deployment-spec.md)*:
-  - [ ] Base image: `nextflow/nextflow:24.04.4`
-  - [ ] Install system dependencies:
-    - [ ] curl
-    - [ ] python3
-    - [ ] python3-pip
-  - [ ] Install Google Cloud SDK:
-    - [ ] Add to PATH
-  - [ ] Install Python dependencies:
-    - [ ] asyncpg (for PostgreSQL)
-    - [ ] psycopg2-binary (sync fallback)
-  - [ ] Copy scripts:
-    - [ ] `entrypoint.sh` to `/entrypoint.sh`
-    - [ ] `update_status.py` to `/update_status.py`
-  - [ ] Make scripts executable
-  - [ ] Set entrypoint to `/entrypoint.sh`
+- [x] Create `orchestrator/Dockerfile.orchestrator` — *See [09-deployment-spec.md#nextflow-orchestrator-dockerfile](../spec/09-deployment-spec.md)*:
+  - [x] Base image: `nextflow/nextflow:24.04.4`
+  - [x] Install system dependencies:
+    - [x] curl
+    - [x] python3
+    - [x] python3-pip
+  - [x] Install Google Cloud SDK:
+    - [x] Add to PATH
+  - [x] Install Python dependencies:
+    - [x] asyncpg (for PostgreSQL)
+    - [x] psycopg2-binary (sync fallback)
+  - [x] Copy scripts:
+    - [x] `entrypoint.sh` to `/entrypoint.sh`
+    - [x] `update_status.py` to `/update_status.py`
+  - [x] Make scripts executable
+  - [x] Set entrypoint to `/entrypoint.sh`
 
 ### Entrypoint Script
 
@@ -192,38 +192,38 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 > - [07-integration-spec.md#orchestrator-job-specification](../spec/07-integration-spec.md) - Environment variables
 > - [12-recovery-spec.md#orchestrator-behavior](../spec/12-recovery-spec.md) - Resume flag handling
 
-- [ ] Create `orchestrator/entrypoint.sh`:
-  - [ ] Parse environment variables:
-    - [ ] `RUN_ID`
-    - [ ] `PIPELINE`
-    - [ ] `PIPELINE_VERSION`
-    - [ ] `CONFIG_GCS_PATH`
-    - [ ] `PARAMS_GCS_PATH`
-    - [ ] `WORK_DIR`
-    - [ ] `IS_RECOVERY` — *See [12-recovery-spec.md#orchestrator-behavior](../spec/12-recovery-spec.md)*
-  - [ ] Log startup information
-  - [ ] Create local work directory
-  - [ ] Download config and params from GCS:
-    - [ ] `gsutil cp $CONFIG_GCS_PATH /config/nextflow.config`
-    - [ ] `gsutil cp $PARAMS_GCS_PATH /config/params.yaml`
-  - [ ] Build Nextflow command:
-    - [ ] `nextflow run ${PIPELINE}`
-    - [ ] `-r ${PIPELINE_VERSION}`
-    - [ ] `-c /config/nextflow.config`
-    - [ ] `-params-file /config/params.yaml`
-    - [ ] `-work-dir ${WORK_DIR}`
-    - [ ] `-with-trace`
-    - [ ] `-with-timeline`
-    - [ ] `-with-report`
-    - [ ] Add `-resume` if `IS_RECOVERY=true` — *See [12-recovery-spec.md#nextflow-resume](../spec/12-recovery-spec.md)*
-  - [ ] Execute Nextflow
-  - [ ] Capture exit code
-  - [ ] Upload logs to GCS — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
-    - [ ] `.nextflow.log` → `logs/nextflow.log`
-    - [ ] `trace.txt` → `logs/trace.txt`
-    - [ ] `timeline.html` → `logs/timeline.html`
-    - [ ] `report.html` → `logs/report.html`
-  - [ ] Exit with Nextflow exit code
+- [x] Create `orchestrator/entrypoint.sh`:
+  - [x] Parse environment variables:
+    - [x] `RUN_ID`
+    - [x] `PIPELINE`
+    - [x] `PIPELINE_VERSION`
+    - [x] `CONFIG_GCS_PATH`
+    - [x] `PARAMS_GCS_PATH`
+    - [x] `WORK_DIR`
+    - [x] `IS_RECOVERY` — *See [12-recovery-spec.md#orchestrator-behavior](../spec/12-recovery-spec.md)*
+  - [x] Log startup information
+  - [x] Create local work directory
+  - [x] Download config and params from GCS:
+    - [x] `gsutil cp $CONFIG_GCS_PATH /config/nextflow.config`
+    - [x] `gsutil cp $PARAMS_GCS_PATH /config/params.yaml`
+  - [x] Build Nextflow command:
+    - [x] `nextflow run ${PIPELINE}`
+    - [x] `-r ${PIPELINE_VERSION}`
+    - [x] `-c /config/nextflow.config`
+    - [x] `-params-file /config/params.yaml`
+    - [x] `-work-dir ${WORK_DIR}`
+    - [x] `-with-trace`
+    - [x] `-with-timeline`
+    - [x] `-with-report`
+    - [x] Add `-resume` if `IS_RECOVERY=true` — *See [12-recovery-spec.md#nextflow-resume](../spec/12-recovery-spec.md)*
+  - [x] Execute Nextflow
+  - [x] Capture exit code
+  - [x] Upload logs to GCS — *See [06-data-model-spec.md#bucket-structure](../spec/06-data-model-spec.md)*:
+    - [x] `.nextflow.log` → `logs/nextflow.log`
+    - [x] `trace.txt` → `logs/trace.txt`
+    - [x] `timeline.html` → `logs/timeline.html`
+    - [x] `report.html` → `logs/report.html`
+  - [x] Exit with Nextflow exit code
 
 ### Status Update Script
 
@@ -231,36 +231,36 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 > - [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md) - Update process
 > - [07-integration-spec.md#orchestrator-status-updates](../spec/07-integration-spec.md) - Implementation details
 
-- [ ] Create `orchestrator/update_status.py` — *See [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md)*:
-  - [ ] Parse command line arguments:
-    - [ ] `run_id` (positional)
-    - [ ] `status` (positional)
-    - [ ] `--started_at` (optional)
-    - [ ] `--completed_at` (optional)
-    - [ ] `--failed_at` (optional)
-    - [ ] `--error_message` (optional)
-    - [ ] `--error_task` (optional)
-    - [ ] `--exit_code` (optional)
-    - [ ] `--metrics` (optional, JSON string)
-  - [ ] Read DATABASE_URL from environment — *See [07-integration-spec.md#batch-to-cloud-sql](../spec/07-integration-spec.md)*
-  - [ ] Connect to PostgreSQL (sync connection)
-  - [ ] Build UPDATE query:
-    - [ ] Update `status` column
-    - [ ] Update `updated_at` to NOW()
-    - [ ] Update timestamp columns based on status
-    - [ ] Update error fields if provided — *See [06-data-model-spec.md#error-fields](../spec/06-data-model-spec.md)*
-    - [ ] Update metrics if provided — *See [06-data-model-spec.md#metrics-jsonb](../spec/06-data-model-spec.md)*
-  - [ ] Execute query with parameterized values — *See [08-security-spec.md#sql-injection-prevention](../spec/08-security-spec.md)*
-  - [ ] Log success/failure
-  - [ ] Exit with appropriate code
+- [x] Create `orchestrator/update_status.py` — *See [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md)*:
+  - [x] Parse command line arguments:
+    - [x] `run_id` (positional)
+    - [x] `status` (positional)
+    - [x] `--started_at` (optional)
+    - [x] `--completed_at` (optional)
+    - [x] `--failed_at` (optional)
+    - [x] `--error_message` (optional)
+    - [x] `--error_task` (optional)
+    - [x] `--exit_code` (optional)
+    - [x] `--metrics` (optional, JSON string)
+  - [x] Read DATABASE_URL from environment — *See [07-integration-spec.md#batch-to-cloud-sql](../spec/07-integration-spec.md)*
+  - [x] Connect to PostgreSQL (sync connection)
+  - [x] Build UPDATE query:
+    - [x] Update `status` column
+    - [x] Update `updated_at` to NOW()
+    - [x] Update timestamp columns based on status
+    - [x] Update error fields if provided — *See [06-data-model-spec.md#error-fields](../spec/06-data-model-spec.md)*
+    - [x] Update metrics if provided — *See [06-data-model-spec.md#metrics-jsonb](../spec/06-data-model-spec.md)*
+  - [x] Execute query with parameterized values — *See [08-security-spec.md#sql-injection-prevention](../spec/08-security-spec.md)*
+  - [x] Log success/failure
+  - [x] Exit with appropriate code
 
 ### Nextflow Hooks Configuration
 
 > **Spec References:**
 > - [07-integration-spec.md#orchestrator-status-updates](../spec/07-integration-spec.md) - Hook implementation
 
-- [ ] Create `orchestrator/nextflow.config.template` — *See [07-integration-spec.md#orchestrator-status-updates](../spec/07-integration-spec.md)*:
-  - [ ] Include workflow hooks:
+- [x] Create `orchestrator/nextflow.config.template` — *See [07-integration-spec.md#orchestrator-status-updates](../spec/07-integration-spec.md)*:
+  - [x] Include workflow hooks:
     ```groovy
     workflow.onStart {
       "python3 /update_status.py ${params.run_id} running --started_at '${new Date().toInstant().toString()}'".execute()
@@ -289,8 +289,8 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 > **Spec References:**
 > - [07-integration-spec.md#nextflow-gcp-batch-executor](../spec/07-integration-spec.md) - Executor configuration
 
-- [ ] Document Nextflow executor configuration — *See [07-integration-spec.md#nextflow-gcp-batch-executor](../spec/07-integration-spec.md)*:
-  - [ ] Process block:
+- [x] Document Nextflow executor configuration — *See [07-integration-spec.md#nextflow-gcp-batch-executor](../spec/07-integration-spec.md)*:
+  - [x] Process block:
     ```groovy
     process {
       executor = 'google-batch'
@@ -300,7 +300,7 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
       resourceLimits = [cpus: 36, memory: 500.GB, time: 48.h]
     }
     ```
-  - [ ] Google block:
+  - [x] Google block:
     ```groovy
     google {
       project = '<PROJECT_ID>'
@@ -319,21 +319,21 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 > **Spec References:**
 > - [09-deployment-spec.md#container-build](../spec/09-deployment-spec.md) - Build process
 
-- [ ] Create build script `scripts/build-orchestrator.sh` — *See [09-deployment-spec.md#container-build](../spec/09-deployment-spec.md)*:
-  - [ ] Build Docker image:
-    - [ ] `docker build -f orchestrator/Dockerfile.orchestrator -t ${IMAGE_NAME}:${VERSION} .`
-    - [ ] Use `--platform linux/amd64`
-  - [ ] Tag with version and latest
-  - [ ] Push to Artifact Registry or GCR
-- [ ] Add orchestrator build to CI/CD pipeline — *See [09-deployment-spec.md#github-actions-workflow](../spec/09-deployment-spec.md)*
+- [x] Create build script `scripts/build-orchestrator.sh` — *See [09-deployment-spec.md#container-build](../spec/09-deployment-spec.md)*:
+  - [x] Build Docker image:
+    - [x] `docker build -f orchestrator/Dockerfile.orchestrator -t ${IMAGE_NAME}:${VERSION} .`
+    - [x] Use `--platform linux/amd64`
+  - [x] Tag with version and latest
+  - [x] Push to Artifact Registry or GCR
+- [x] Add orchestrator build to CI/CD pipeline — *See [09-deployment-spec.md#github-actions-workflow](../spec/09-deployment-spec.md)*
 
 ### Orchestrator Integration Tests
 
-- [ ] Create local orchestrator test:
-  - [ ] Mock PostgreSQL connection
-  - [ ] Test entrypoint with sample config
-  - [ ] Verify update_status.py works
-  - [ ] Test error handling paths
+- [x] Create local orchestrator test:
+  - [x] Mock PostgreSQL connection
+  - [x] Test entrypoint with sample config
+  - [x] Verify update_status.py works
+  - [x] Test error handling paths
 
 ---
 

@@ -9,6 +9,7 @@ env:
   REGION: us-west1
   AR_REPO: arc-reactor
   IMAGE_NAME: arc-reactor
+  ORCHESTRATOR_IMAGE_NAME: nextflow-orchestrator
 
 jobs:
   deploy:
@@ -52,6 +53,17 @@ jobs:
           tags: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           secrets: |
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push orchestrator image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: orchestrator/Dockerfile.orchestrator
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.ORCHESTRATOR_IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.ORCHESTRATOR_IMAGE_NAME }}:latest
 
       - name: Deploy to Cloud Run
         run: |

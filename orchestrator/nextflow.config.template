@@ -1,0 +1,43 @@
+// Arc Reactor workflow hooks for status updates
+workflow.onStart {
+  "python3 /update_status.py ${params.run_id} running --started_at '${new Date().toInstant().toString()}'".execute()
+}
+
+workflow.onComplete {
+  def status = workflow.success ? "completed" : "failed"
+  def timestamp = status == "completed" ? "--completed_at" : "--failed_at"
+  def cmd = "python3 /update_status.py ${params.run_id} ${status} ${timestamp} '${new Date().toInstant().toString()}'"
+  if (!workflow.success) {
+    cmd += " --exit_code ${workflow.exitStatus}"
+    if (workflow.errorMessage) {
+      def cleaned = workflow.errorMessage.replaceAll("'", "")
+      cmd += " --error_message '${cleaned}'"
+    }
+  }
+  cmd.execute()
+}
+
+workflow.onError {
+  def message = workflow.errorMessage?.replaceAll("'", "") ?: "Unknown error"
+  "python3 /update_status.py ${params.run_id} failed --failed_at '${new Date().toInstant().toString()}' --error_message '${message}'".execute()
+}
+
+// GCP Batch executor configuration (documented reference)
+// process {
+//   executor = 'google-batch'
+//   errorStrategy = 'retry'
+//   maxRetries = 3
+//   scratch = true
+//   resourceLimits = [cpus: 36, memory: 500.GB, time: 48.h]
+// }
+//
+// google {
+//   project = '<PROJECT_ID>'
+//   location = 'us-west1'
+//   batch {
+//     serviceAccountEmail = 'nextflow-tasks@project.iam.gserviceaccount.com'
+//     spot = true
+//     maxSpotAttempts = 3
+//     bootDiskSize = 100.GB
+//   }
+// }
