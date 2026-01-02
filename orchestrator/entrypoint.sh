@@ -74,17 +74,36 @@ bucket="${bucket%%/*}"
 log_root="gs://${bucket}/runs/${RUN_ID}/logs"
 
 log "Uploading logs to ${log_root}"
+upload_with_retry() {
+  local src="$1"
+  local dest="$2"
+  local attempts=3
+  local delay=2
+
+  for attempt in $(seq 1 "${attempts}"); do
+    if gsutil -m cp "${src}" "${dest}"; then
+      return 0
+    fi
+    log "Warning: failed to upload ${src} (attempt ${attempt}/${attempts})"
+    sleep "${delay}"
+    delay=$((delay * 2))
+  done
+
+  log "Warning: giving up on uploading ${src} after ${attempts} attempts"
+  return 1
+}
+
 if [ -f ".nextflow.log" ]; then
-  gsutil -m cp ".nextflow.log" "${log_root}/nextflow.log"
+  upload_with_retry ".nextflow.log" "${log_root}/nextflow.log" || true
 fi
 if [ -f "trace.txt" ]; then
-  gsutil -m cp "trace.txt" "${log_root}/trace.txt"
+  upload_with_retry "trace.txt" "${log_root}/trace.txt" || true
 fi
 if [ -f "timeline.html" ]; then
-  gsutil -m cp "timeline.html" "${log_root}/timeline.html"
+  upload_with_retry "timeline.html" "${log_root}/timeline.html" || true
 fi
 if [ -f "report.html" ]; then
-  gsutil -m cp "report.html" "${log_root}/report.html"
+  upload_with_retry "report.html" "${log_root}/report.html" || true
 fi
 
 log "Nextflow finished with exit code ${exit_code}"

@@ -22,6 +22,7 @@ from backend.models.schemas.runs import (
     RunStatus,
 )
 from backend.services.pipelines import PipelineRegistry
+from backend.services.batch import BatchService
 from backend.services.runs import RunStoreService
 from backend.services.storage import StorageService
 from backend.utils.auth import UserContext
@@ -48,6 +49,33 @@ def _count_samples(samplesheet_csv: str) -> int:
 
 def _sse_event(event: str, data: dict[str, Any]) -> bytes:
     return f"event: {event}\ndata: {json.dumps(data)}\n\n".encode("utf-8")
+
+
+def _status_timestamp(run: RunResponse) -> datetime:
+    if run.status == RunStatus.SUBMITTED and run.submitted_at:
+        return run.submitted_at
+    if run.status == RunStatus.RUNNING and run.started_at:
+        return run.started_at
+    if run.status == RunStatus.COMPLETED and run.completed_at:
+        return run.completed_at
+    if run.status == RunStatus.FAILED and run.failed_at:
+        return run.failed_at
+    if run.status == RunStatus.CANCELLED and run.cancelled_at:
+        return run.cancelled_at
+    return run.updated_at
+
+
+def _progress_from_metrics(metrics: dict[str, Any] | None) -> float | None:
+    if not metrics:
+        return None
+    raw = metrics.get("progress")
+    if isinstance(raw, (int, float)):
+        return float(raw)
+    completed = metrics.get("tasks_completed")
+    total = metrics.get("tasks_total")
+    if isinstance(completed, (int, float)) and isinstance(total, (int, float)) and total:
+        return float(completed) / float(total)
+    return None
 
 
 def _cancel_batch_job(batch_job_name: str | None) -> None:
@@ -104,6 +132,7 @@ async def create_run(
     payload: RunCreateRequest,
     user: UserContext = Depends(get_current_user_context),
     session: AsyncSession = Depends(get_db_session),
+    storage: StorageService = Depends(get_storage_service),
 ) -> RunResponse:
     registry = PipelineRegistry.create()
     pipeline = registry.get_pipeline(payload.pipeline)
@@ -121,13 +150,14 @@ async def create_run(
         raise ValidationError("samplesheet_csv must include at least one sample")
 
     service = RunStoreService.create(session, settings)
-    run_id = await service.create_run(
-        pipeline=payload.pipeline,
-        pipeline_version=payload.pipeline_version,
+    batch = BatchService.create(settings)
+    run_id = await service.submit_run(
+        payload=payload,
         user_email=user.email,
         user_name=user.name,
-        params=payload.params,
         sample_count=sample_count,
+        storage=storage,
+        batch=batch,
     )
 
     run = await service.get_run(run_id)
@@ -173,23 +203,18 @@ async def recover_run(
         raise NotFoundError("Run not found", detail=f"No run exists with ID {run_id}")
     _ensure_owner_or_admin(run, user)
 
-    if run.status not in {RunStatus.FAILED, RunStatus.CANCELLED}:
-        raise ValidationError("Run is not eligible for recovery", detail=run.status.value)
-
-    if payload.reuse_work_dir:
-        if not storage.check_work_dir_exists(run_id):
-            raise ValidationError("Recovery unavailable: work directory not found")
-
-    recovery_id = await service.create_recovery_run(
+    batch = BatchService.create(settings)
+    recovery_id = await service.submit_recovery_run(
         parent_run_id=run_id,
         user_email=user.email,
         user_name=user.name,
+        storage=storage,
+        batch=batch,
         notes=payload.notes,
         override_params=payload.override_params,
-        reused_work_dir=f"gs://{storage.bucket_name}/runs/{run_id}/work/" if payload.reuse_work_dir else None,
+        override_config=payload.override_config,
+        reuse_work_dir=payload.reuse_work_dir,
     )
-    if not recovery_id:
-        raise NotFoundError("Run not found", detail=f"No run exists with ID {run_id}")
 
     recovery = await service.get_run(recovery_id)
     if not recovery:
@@ -239,7 +264,14 @@ async def stream_run_events(
     async def event_generator():
         last_status = run.status
         start = datetime.now(timezone.utc)
-        yield _sse_event("status", {"status": last_status.value})
+        yield _sse_event(
+            "status",
+            {
+                "status": last_status.value,
+                "timestamp": _status_timestamp(run).isoformat(),
+                "progress": _progress_from_metrics(run.metrics),
+            },
+        )
         while True:
             if await request.is_disconnected():
                 break
@@ -249,9 +281,22 @@ async def stream_run_events(
                 break
             if current.status != last_status:
                 last_status = current.status
-                yield _sse_event("status", {"status": last_status.value})
+                yield _sse_event(
+                    "status",
+                    {
+                        "status": last_status.value,
+                        "timestamp": _status_timestamp(current).isoformat(),
+                        "progress": _progress_from_metrics(current.metrics),
+                    },
+                )
                 if last_status in _TERMINAL_STATUSES:
-                    yield _sse_event("done", {"status": last_status.value})
+                    yield _sse_event(
+                        "done",
+                        {
+                            "status": last_status.value,
+                            "timestamp": _status_timestamp(current).isoformat(),
+                        },
+                    )
                     break
             elapsed = (datetime.now(timezone.utc) - start).total_seconds()
             if elapsed > 600:
