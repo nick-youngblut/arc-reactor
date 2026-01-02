@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
-const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
+const MonacoEditor = dynamic(() => import('@monaco-editor/react').then(mod => mod.Editor), { ssr: false });
 
 interface ParamOverride {
   key: string;

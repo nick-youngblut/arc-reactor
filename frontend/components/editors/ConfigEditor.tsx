@@ -7,7 +7,7 @@ import { registerNextflowLanguage } from '@/lib/monaco/nextflowLanguage';
 import { useUiStore } from '@/stores/uiStore';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 
-const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
+const MonacoEditor = dynamic(() => import('@monaco-editor/react').then(mod => mod.Editor), { ssr: false });
 
 interface ConfigEditorProps {
   readOnly?: boolean;
