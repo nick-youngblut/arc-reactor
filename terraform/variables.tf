@@ -91,9 +91,51 @@ variable "db_password" {
   sensitive   = true
 }
 
-variable "benchling_warehouse_password" {
+variable "benchling_prod_api_key" {
   type        = string
-  description = "Benchling warehouse password"
+  description = "Benchling prod API key"
+  sensitive   = true
+}
+
+variable "benchling_prod_database_uri" {
+  type        = string
+  description = "Benchling prod database URI"
+  sensitive   = true
+}
+
+variable "benchling_prod_app_client_id" {
+  type        = string
+  description = "Benchling prod app client ID"
+  sensitive   = true
+}
+
+variable "benchling_prod_app_client_secret" {
+  type        = string
+  description = "Benchling prod app client secret"
+  sensitive   = true
+}
+
+variable "benchling_test_api_key" {
+  type        = string
+  description = "Benchling test API key"
+  sensitive   = true
+}
+
+variable "benchling_test_database_uri" {
+  type        = string
+  description = "Benchling test database URI"
+  sensitive   = true
+}
+
+variable "benchling_test_app_client_id" {
+  type        = string
+  description = "Benchling test app client ID"
+  sensitive   = true
+}
+
+variable "benchling_test_app_client_secret" {
+  type        = string
+  description = "Benchling test app client secret"
   sensitive   = true
 }
 

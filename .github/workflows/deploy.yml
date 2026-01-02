@@ -24,10 +24,10 @@ jobs:
         id: vars
         run: |
           if [ "${GITHUB_REF_NAME}" = "main" ]; then
-            echo "env_name=production" >> "$GITHUB_OUTPUT"
+            echo "env_name=prod" >> "$GITHUB_OUTPUT"
             echo "service_name=arc-reactor" >> "$GITHUB_OUTPUT"
           else
-            echo "env_name=dev" >> "$GITHUB_OUTPUT"
+            echo "env_name=test" >> "$GITHUB_OUTPUT"
             echo "service_name=arc-reactor-dev" >> "$GITHUB_OUTPUT"
           fi
 
@@ -73,5 +73,5 @@ jobs:
             --platform managed \
             --service-account "arc-reactor@${{ env.PROJECT_ID }}.iam.gserviceaccount.com" \
             --set-env-vars "DYNACONF=${{ steps.vars.outputs.env_name }},FRONTEND_OUT_DIR=/app/frontend/out" \
-            --set-secrets "BENCHLING_WAREHOUSE_PASSWORD=benchling-warehouse-password:latest,GOOGLE_API_KEY=google-api-key:latest" \
+            --set-secrets "BENCHLING_PROD_API_KEY=benchling-prod-api-key:latest,BENCHLING_PROD_DATABASE_URI=benchling-prod-database-uri:latest,BENCHLING_PROD_APP_CLIENT_ID=benchling-prod-app-client-id:latest,BENCHLING_PROD_APP_CLIENT_SECRET=benchling-prod-app-client-secret:latest,BENCHLING_TEST_API_KEY=benchling-test-api-key:latest,BENCHLING_TEST_DATABASE_URI=benchling-test-database-uri:latest,BENCHLING_TEST_APP_CLIENT_ID=benchling-test-app-client-id:latest,BENCHLING_TEST_APP_CLIENT_SECRET=benchling-test-app-client-secret:latest,GOOGLE_API_KEY=google-api-key:latest" \
             --no-allow-unauthenticated

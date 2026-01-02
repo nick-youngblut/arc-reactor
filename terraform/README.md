@@ -19,12 +19,18 @@ terraform init
 ```bash
 terraform plan -var-file=environments/dev.tfvars \
   -var "db_password=..." \
-  -var "benchling_warehouse_password=..." \
+  -var "benchling_test_api_key=..." \
+  -var "benchling_test_database_uri=..." \
+  -var "benchling_test_app_client_id=..." \
+  -var "benchling_test_app_client_secret=..." \
   -var "google_api_key=..."
 
 terraform apply -var-file=environments/dev.tfvars \
   -var "db_password=..." \
-  -var "benchling_warehouse_password=..." \
+  -var "benchling_test_api_key=..." \
+  -var "benchling_test_database_uri=..." \
+  -var "benchling_test_app_client_id=..." \
+  -var "benchling_test_app_client_secret=..." \
   -var "google_api_key=..."
 ```
 

@@ -179,17 +179,108 @@ resource "google_project_iam_member" "task_roles" {
   member   = "serviceAccount:${google_service_account.tasks.email}"
 }
 
-resource "google_secret_manager_secret" "benchling_password" {
-  secret_id = "benchling-warehouse-password"
+resource "google_secret_manager_secret" "benchling_prod_api_key" {
+  secret_id = "benchling-prod-api-key"
 
   replication {
     automatic = true
   }
 }
 
-resource "google_secret_manager_secret_version" "benchling_password" {
-  secret      = google_secret_manager_secret.benchling_password.id
-  secret_data = var.benchling_warehouse_password
+resource "google_secret_manager_secret_version" "benchling_prod_api_key" {
+  secret      = google_secret_manager_secret.benchling_prod_api_key.id
+  secret_data = var.benchling_prod_api_key
+}
+
+resource "google_secret_manager_secret" "benchling_prod_database_uri" {
+  secret_id = "benchling-prod-database-uri"
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "benchling_prod_database_uri" {
+  secret      = google_secret_manager_secret.benchling_prod_database_uri.id
+  secret_data = var.benchling_prod_database_uri
+}
+
+resource "google_secret_manager_secret" "benchling_prod_app_client_id" {
+  secret_id = "benchling-prod-app-client-id"
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "benchling_prod_app_client_id" {
+  secret      = google_secret_manager_secret.benchling_prod_app_client_id.id
+  secret_data = var.benchling_prod_app_client_id
+}
+
+resource "google_secret_manager_secret" "benchling_prod_app_client_secret" {
+  secret_id = "benchling-prod-app-client-secret"
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "benchling_prod_app_client_secret" {
+  secret      = google_secret_manager_secret.benchling_prod_app_client_secret.id
+  secret_data = var.benchling_prod_app_client_secret
+}
+
+resource "google_secret_manager_secret" "benchling_test_api_key" {
+  secret_id = "benchling-test-api-key"
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "benchling_test_api_key" {
+  secret      = google_secret_manager_secret.benchling_test_api_key.id
+  secret_data = var.benchling_test_api_key
+}
+
+resource "google_secret_manager_secret" "benchling_test_database_uri" {
+  secret_id = "benchling-test-database-uri"
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "benchling_test_database_uri" {
+  secret      = google_secret_manager_secret.benchling_test_database_uri.id
+  secret_data = var.benchling_test_database_uri
+}
+
+resource "google_secret_manager_secret" "benchling_test_app_client_id" {
+  secret_id = "benchling-test-app-client-id"
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "benchling_test_app_client_id" {
+  secret      = google_secret_manager_secret.benchling_test_app_client_id.id
+  secret_data = var.benchling_test_app_client_id
+}
+
+resource "google_secret_manager_secret" "benchling_test_app_client_secret" {
+  secret_id = "benchling-test-app-client-secret"
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "benchling_test_app_client_secret" {
+  secret      = google_secret_manager_secret.benchling_test_app_client_secret.id
+  secret_data = var.benchling_test_app_client_secret
 }
 
 resource "google_secret_manager_secret" "google_api_key" {
@@ -305,10 +396,80 @@ resource "google_cloud_run_v2_service" "app" {
       }
 
       env {
-        name = "BENCHLING_WAREHOUSE_PASSWORD"
+        name = "BENCHLING_PROD_API_KEY"
         value_source {
           secret_key_ref {
-            secret  = google_secret_manager_secret.benchling_password.id
+            secret  = google_secret_manager_secret.benchling_prod_api_key.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_PROD_DATABASE_URI"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_prod_database_uri.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_PROD_APP_CLIENT_ID"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_prod_app_client_id.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_PROD_APP_CLIENT_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_prod_app_client_secret.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_TEST_API_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_test_api_key.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_TEST_DATABASE_URI"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_test_database_uri.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_TEST_APP_CLIENT_ID"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_test_app_client_id.id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "BENCHLING_TEST_APP_CLIENT_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.benchling_test_app_client_secret.id
             version = "latest"
           }
         }

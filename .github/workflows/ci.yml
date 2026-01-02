@@ -7,6 +7,12 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    env:
+      DYNACONF: test
+      BENCHLING_TEST_API_KEY: ${{ secrets.BENCHLING_TEST_API_KEY }}
+      BENCHLING_TEST_DATABASE_URI: ${{ secrets.BENCHLING_TEST_DATABASE_URI }}
+      BENCHLING_TEST_APP_CLIENT_ID: ${{ secrets.BENCHLING_TEST_APP_CLIENT_ID }}
+      BENCHLING_TEST_APP_CLIENT_SECRET: ${{ secrets.BENCHLING_TEST_APP_CLIENT_SECRET }}
     steps:
       - uses: actions/checkout@v4
 
