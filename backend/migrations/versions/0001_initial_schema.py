@@ -125,26 +125,8 @@ def upgrade() -> None:
     )
     op.create_index("idx_users_last_login_at", "users", [sa.text("last_login_at DESC")])
 
-    # Checkpoints table (LangGraph)
-    op.create_table(
-        "checkpoints",
-        sa.Column("thread_id", sa.String(length=100), nullable=False),
-        sa.Column("checkpoint_id", sa.String(length=100), nullable=False),
-        sa.Column("parent_checkpoint_id", sa.String(length=100), nullable=True),
-        sa.Column(
-            "checkpoint", postgresql.JSONB(astext_type=sa.Text()), nullable=False
-        ),
-        sa.Column(
-            "checkpoint_metadata", postgresql.JSONB(astext_type=sa.Text()), nullable=True
-        ),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.text("now()"),
-            nullable=False,
-        ),
-        sa.PrimaryKeyConstraint("thread_id", "checkpoint_id"),
-    )
+    # Note: Checkpoints table is created by LangGraph's AsyncPostgresSaver.setup()
+    # when the checkpointer is first used. This allows LangGraph to manage its own schema.
 
     # Tasks table (NEW - for weblog integration)
     op.create_table(
@@ -230,6 +212,6 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_table("weblog_event_log")
     op.drop_table("tasks")
-    op.drop_table("checkpoints")
+    # Note: checkpoints table is not dropped here since it's managed by LangGraph
     op.drop_table("users")
     op.drop_table("runs")

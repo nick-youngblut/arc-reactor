@@ -49,6 +49,7 @@ async def checkpointer_session(settings: object) -> AsyncIterator["AsyncPostgres
     _ensure_available()
     database_url = _build_postgres_connection_string(settings)
     async with AsyncPostgresSaver.from_conn_string(database_url) as saver:
+        await saver.setup()  # Ensure LangGraph tables exist
         yield saver
 
 
