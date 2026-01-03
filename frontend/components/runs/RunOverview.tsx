@@ -1,6 +1,7 @@
 'use client';
 
 import type { RunSummary } from '@/lib/api';
+import { formatDuration } from '@/lib/utils';
 
 const formatDate = (value?: string) => {
   if (!value) return '—';
@@ -8,16 +9,11 @@ const formatDate = (value?: string) => {
   return date.toLocaleString();
 };
 
-const formatDuration = (run: RunSummary) => {
-  if (!run.startedAt) return '—';
+const getDurationMs = (run: RunSummary) => {
+  if (!run.startedAt) return 0;
   const start = new Date(run.startedAt).getTime();
   const end = run.completedAt ? new Date(run.completedAt).getTime() : Date.now();
-  const durationMs = Math.max(0, end - start);
-  const minutes = Math.floor(durationMs / 60000);
-  const hours = Math.floor(minutes / 60);
-  if (!minutes) return `${Math.floor(durationMs / 1000)}s`;
-  if (hours) return `${hours}h ${minutes % 60}m`;
-  return `${minutes}m`;
+  return Math.max(0, end - start);
 };
 
 interface RunOverviewProps {
@@ -76,7 +72,7 @@ export function RunOverview({ run }: RunOverviewProps) {
             <div>
               <p className="text-xs text-arc-gray-400">Duration</p>
               <p className="font-semibold text-arc-gray-700 dark:text-arc-gray-100">
-                {formatDuration(run)}
+                {formatDuration(getDurationMs(run))}
               </p>
             </div>
           </div>
@@ -112,7 +108,7 @@ export function RunOverview({ run }: RunOverviewProps) {
             Metrics
           </p>
           <div className="mt-3 space-y-2 text-xs text-arc-gray-500 dark:text-arc-gray-300">
-            <p>Total runtime: {formatDuration(run)}</p>
+            <p>Total runtime: {formatDuration(getDurationMs(run))}</p>
             <p>Tasks completed: —</p>
             <p>CPU / memory usage: —</p>
           </div>

@@ -9,9 +9,12 @@ import { RunFiles } from '@/components/runs/RunFiles';
 import { RunParameters } from '@/components/runs/RunParameters';
 import { RunLogs } from '@/components/runs/RunLogs';
 import { RecoveryModal } from '@/components/runs/RecoveryModal';
+import { TaskProgress } from '@/components/runs/TaskProgress';
+import { TaskTable } from '@/components/runs/TaskTable';
 
 const tabs = [
   { id: 'overview', label: 'Overview' },
+  { id: 'tasks', label: 'Tasks' },
   { id: 'logs', label: 'Logs' },
   { id: 'files', label: 'Files' },
   { id: 'parameters', label: 'Parameters' }
@@ -29,6 +32,7 @@ export function RunDetail({ run, statusOverride }: RunDetailProps) {
   const [copied, setCopied] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
   const status = statusOverride ?? run.status;
+  const isActive = status === 'pending' || status === 'submitted' || status === 'running';
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(run.id);
@@ -101,6 +105,12 @@ export function RunDetail({ run, statusOverride }: RunDetailProps) {
 
       <div className="min-h-[360px]">
         {activeTab === 'overview' ? <RunOverview run={run} /> : null}
+        {activeTab === 'tasks' ? (
+          <div className="space-y-4">
+            <TaskProgress runId={run.id} isActive={isActive} />
+            <TaskTable runId={run.id} isActive={isActive} />
+          </div>
+        ) : null}
         {activeTab === 'files' ? <RunFiles run={run} /> : null}
         {activeTab === 'parameters' ? <RunParameters run={run} /> : null}
         {activeTab === 'logs' ? <RunLogs runId={run.id} /> : null}

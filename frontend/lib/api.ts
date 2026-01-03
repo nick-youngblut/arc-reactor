@@ -31,6 +31,38 @@ export interface RecoverRunOptions {
   overrideConfig?: string;
 }
 
+export interface TaskSummary {
+  total: number;
+  completed: number;
+  running: number;
+  submitted: number;
+  failed: number;
+  cached: number;
+}
+
+export interface TaskItem {
+  id: string;
+  run_id: string;
+  task_id: number;
+  hash: string;
+  name: string;
+  process: string;
+  status: string;
+  exit_code: number | null;
+  submit_time: number | null;
+  start_time: number | null;
+  complete_time: number | null;
+  duration_ms: number | null;
+  realtime_ms: number | null;
+  cpu_percent: number | null;
+  peak_rss: number | null;
+  peak_vmem: number | null;
+  workdir: string | null;
+  container: string | null;
+  attempt: number;
+  error_message: string | null;
+}
+
 const apiClient = axios.create({
   baseURL: '/api',
   headers: {
@@ -90,6 +122,16 @@ export const fetchPipelines = async () => {
 
 export const fetchPipeline = async (name: string) => {
   const { data } = await apiClient.get<PipelineSummary>(`/pipelines/${name}`);
+  return data;
+};
+
+export const fetchTasks = async (runId: string) => {
+  const { data } = await apiClient.get<TaskItem[]>(`/runs/${runId}/tasks`);
+  return data;
+};
+
+export const fetchTaskSummary = async (runId: string) => {
+  const { data } = await apiClient.get<TaskSummary>(`/runs/${runId}/tasks/summary`);
   return data;
 };
 
