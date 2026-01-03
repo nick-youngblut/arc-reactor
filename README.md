@@ -119,13 +119,28 @@ arc-reactor/
 2. **Start all services**:
    ```bash
    export BENCHLING_TEST_DATABASE_URI='postgresql://...'   # provide full URL; need to deal with $
-   docker compose up --build
+   docker compose up --build --detach
    ```
+
+> The docker container will be running in the background.
+> - Stop and remove containers (keeps volumes/data):
+> `docker compose down`
+> - Stop and remove containers AND volumes (loses database data):
+> `docker compose down -v`
+> - Just stop containers (can restart with `docker compose start`):
+> `docker compose stop`
 
 3. **Run database migrations** (first time only):
    ```bash
-   docker compose exec backend alembic upgrade head
+   cd backend
+   docker compose exec backend sh -c "cd backend && PYTHONPATH=/app alembic upgrade head"
    ```
+
+4. **List Arc Reactor database tables** (optional):
+    ```bash
+    docker compose exec postgres psql -U arc_reactor -d arc_reactor -c "\dt"
+    ```
+
 
 **Services:**
 | Service | URL |
