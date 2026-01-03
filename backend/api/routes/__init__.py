@@ -8,6 +8,7 @@ from .chat_rest import router as chat_rest_router
 from .logs import router as logs_router
 from .pipelines import router as pipelines_router
 from .runs import router as runs_router
+from .tasks import router as tasks_router
 
 api_router = APIRouter(dependencies=[Depends(get_current_user_context)])
 
@@ -16,3 +17,4 @@ api_router.include_router(pipelines_router)
 api_router.include_router(benchling_router)
 api_router.include_router(logs_router)
 api_router.include_router(chat_rest_router)
+api_router.include_router(tasks_router)
