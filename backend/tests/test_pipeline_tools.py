@@ -58,13 +58,13 @@ class _Runtime:
 
 @pytest.mark.asyncio
 async def test_list_pipelines_includes_scrnaseq():
-    output = await list_pipelines.arun()
+    output = await list_pipelines.ainvoke({})
     assert "nf-core/scrnaseq" in output
 
 
 @pytest.mark.asyncio
 async def test_get_pipeline_schema_formats_params():
-    output = await get_pipeline_schema.arun("nf-core/scrnaseq")
+    output = await get_pipeline_schema.ainvoke({"pipeline": "nf-core/scrnaseq"})
     assert "Required Parameters" in output
     assert "genome" in output
 
@@ -72,11 +72,11 @@ async def test_get_pipeline_schema_formats_params():
 @pytest.mark.asyncio
 async def test_generate_samplesheet_stores_file():
     runtime = _Runtime(_BenchlingStub(), _StorageStub())
-    output = await generate_samplesheet.arun(
-        ngs_run="NR-2024-0156",
-        pipeline="nf-core/scrnaseq",
-        runtime=runtime,
-    )
+    output = await generate_samplesheet.ainvoke({
+        "ngs_run": "NR-2024-0156",
+        "pipeline": "nf-core/scrnaseq",
+        "runtime": runtime,
+    })
     assert "samplesheet" in output
     generated = runtime.config["configurable"].get("generated_files", {})
     assert "samplesheet.csv" in generated
@@ -85,10 +85,10 @@ async def test_generate_samplesheet_stores_file():
 
 @pytest.mark.asyncio
 async def test_generate_config_renders_profile():
-    output = await generate_config.arun(
-        pipeline="nf-core/scrnaseq",
-        params={"genome": "GRCh38", "protocol": "10XV3"},
-    )
+    output = await generate_config.ainvoke({
+        "pipeline": "nf-core/scrnaseq",
+        "params": {"genome": "GRCh38", "protocol": "10XV3"},
+    })
     assert "google-batch" in output
     assert "params {" in output
 
@@ -101,7 +101,12 @@ async def test_validate_inputs_reports_missing_files():
     )
     config = 'params {\n  genome = "GRCh38"\n  protocol = "10XV3"\n}\n'
     runtime = _Runtime(_BenchlingStub(), _StorageStub(missing={"gs://bucket/file2.fastq.gz"}))
-    output = await validate_inputs.arun(samplesheet, config, "nf-core/scrnaseq", runtime=runtime)
+    output = await validate_inputs.ainvoke({
+        "samplesheet_csv": samplesheet,
+        "config_content": config,
+        "pipeline": "nf-core/scrnaseq",
+        "runtime": runtime,
+    })
     payload = json.loads(output)
     assert payload["valid"] is False
     assert any(error["type"] == "MISSING_FILE" for error in payload["errors"])

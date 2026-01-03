@@ -4,6 +4,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
+from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +18,9 @@ router = APIRouter(tags=["tasks"])
 
 
 class TaskResponse(BaseModel):
-    id: str
+    model_config = {"from_attributes": True}
+
+    id: UUID
     run_id: str
     task_id: int
     hash: str
@@ -37,9 +40,6 @@ class TaskResponse(BaseModel):
     container: str | None = None
     attempt: int
     error_message: str | None = None
-
-    class Config:
-        from_attributes = True
 
 
 class TaskSummaryResponse(BaseModel):

@@ -5,7 +5,7 @@ import tempfile
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from backend.models import Base
@@ -13,14 +13,22 @@ from backend.models.runs import Run
 from backend.models.tasks import Task
 
 
-@pytest.fixture
+import pytest_asyncio
+
+
+@pytest_asyncio.fixture
 async def session() -> AsyncSession:
     """Create an in-memory SQLite database session for testing."""
+    from datetime import datetime, timezone
+    import uuid
+
     handle, path = tempfile.mkstemp(suffix=".db")
     os.close(handle)
     engine = create_async_engine(f"sqlite+aiosqlite:///{path}")
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
     session_factory = async_sessionmaker(engine, expire_on_commit=False)
     async with session_factory() as session:
         yield session

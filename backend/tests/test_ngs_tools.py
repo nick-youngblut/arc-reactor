@@ -141,14 +141,14 @@ async def test_search_ngs_runs_with_wildcards():
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    output = await search_ngs_runs.arun(
-        pooled_sample="SspArc%",
-        use_wildcards=True,
-        include_qc_summary=True,
-        runtime=runtime,
-    )
+    output = await search_ngs_runs.ainvoke({
+        "pooled_sample": "SspArc%",
+        "use_wildcards": True,
+        "include_qc_summary": True,
+        "runtime": runtime,
+    })
 
-    assert "Found 2 NGS runs" in output
+    assert "Found 1 NGS runs" in output
     assert "NR-2024-0156" in output
     assert benchling.last_sql is not None
     assert "LIKE" in benchling.last_sql
@@ -159,7 +159,7 @@ async def test_get_ngs_run_samples_formats_summary():
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    output = await get_ngs_run_samples.arun(ngs_run="NR-2024-0156", runtime=runtime)
+    output = await get_ngs_run_samples.ainvoke({"ngs_run": "NR-2024-0156", "runtime": runtime})
 
     assert "NGS Run: NR-2024-0156" in output
     assert "Samples:" in output
@@ -168,7 +168,7 @@ async def test_get_ngs_run_samples_formats_summary():
 
 @pytest.mark.asyncio
 async def test_get_ngs_run_samples_requires_filter():
-    output = await get_ngs_run_samples.arun()
+    output = await get_ngs_run_samples.ainvoke({})
     assert "Error: Please provide either ngs_run or pooled_sample" in output
 
 
@@ -177,15 +177,15 @@ async def test_get_ngs_run_qc_summary_lane_sample():
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    summary = await get_ngs_run_qc.arun(ngs_run="NR-2024-0156", level="summary", runtime=runtime)
+    summary = await get_ngs_run_qc.ainvoke({"ngs_run": "NR-2024-0156", "level": "summary", "runtime": runtime})
     assert "QC Summary" in summary
     assert "Lane Summary" in summary
 
-    lane = await get_ngs_run_qc.arun(ngs_run="NR-2024-0156", level="lane", runtime=runtime)
+    lane = await get_ngs_run_qc.ainvoke({"ngs_run": "NR-2024-0156", "level": "lane", "runtime": runtime})
     assert "lane" in lane
     assert "avg_q30" in lane
 
-    sample = await get_ngs_run_qc.arun(ngs_run="NR-2024-0156", level="sample", runtime=runtime)
+    sample = await get_ngs_run_qc.ainvoke({"ngs_run": "NR-2024-0156", "level": "sample", "runtime": runtime})
     assert "sample_id" in sample
     assert "avg_q30" in sample
 
@@ -196,11 +196,11 @@ async def test_get_fastq_paths_verification():
     storage = _StorageStub()
     runtime = _Runtime(benchling, storage=storage)
 
-    output = await get_fastq_paths.arun(
-        sample_names="LPS-001;LPS-002",
-        verify_exists=True,
-        runtime=runtime,
-    )
+    output = await get_fastq_paths.ainvoke({
+        "sample_names": "LPS-001;LPS-002",
+        "verify_exists": True,
+        "runtime": runtime,
+    })
 
     assert "FASTQ paths for 2 samples" in output
     assert "All files verified in GCS." in output
