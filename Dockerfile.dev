@@ -1,8 +1,15 @@
 FROM python:3.11-slim
 
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=$GITHUB_TOKEN
+
 RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
+
+# Configure Git to use the GitHub token for authentication
+RUN git config --global credential.helper store && \
+    echo "https://x-access-token:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
 
 WORKDIR /app
 

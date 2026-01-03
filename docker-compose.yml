@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      args:
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
     ports:
       - "8000:8000"
     environment:
@@ -20,7 +22,7 @@ services:
       IAP_PROJECT_NUMBER: ${IAP_PROJECT_NUMBER}
       IAP_PROJECT_ID: ${IAP_PROJECT_ID}
       IAP_ALLOWED_DOMAIN: ${IAP_ALLOWED_DOMAIN}
-      ARC_REACTOR_NEXTFLOW_BUCKET: ${ARC_REACTOR_NEXTFLOW_BUCKET}
+      ARC_REACTOR_NEXTFLOW_BUCKET: ${ARC_REACTOR_NEXTFLOW_BUCKET:-arc-reactor-runs-dev}
     volumes:
       - ./backend:/app/backend
     depends_on:
