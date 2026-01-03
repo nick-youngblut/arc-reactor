@@ -72,6 +72,12 @@ interface Run {
     tasks_completed: number;
     tasks_failed: number;
   };
+
+  // Weblog integration
+  weblog_secret_hash?: string;      // SHA-256 of per-run secret token
+  weblog_run_id?: string;           // Nextflow internal run UUID
+  weblog_run_name?: string;         // Nextflow run name (e.g., "friendly_turing")
+  last_weblog_event_at?: string;    // Timestamp of last weblog event
 }
 
 type RunStatus = 
@@ -112,12 +118,18 @@ CREATE TABLE runs (
     exit_code INTEGER,
     error_message TEXT,
     error_task TEXT,
-    metrics JSONB
+    metrics JSONB,
+    weblog_secret_hash VARCHAR(64),
+    weblog_run_id VARCHAR(36),
+    weblog_run_name VARCHAR(255),
+    last_weblog_event_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_runs_user_email_created_at ON runs(user_email, created_at DESC);
 CREATE INDEX idx_runs_status_created_at ON runs(status, created_at DESC);
 CREATE INDEX idx_runs_created_at ON runs(created_at DESC);
+CREATE INDEX idx_runs_stale_detection ON runs(status, updated_at)
+    WHERE status IN ('submitted', 'running');
 ```
 
 **Example Document:**
@@ -152,6 +164,66 @@ CREATE INDEX idx_runs_created_at ON runs(created_at DESC);
 
 Recovery behavior and `-resume` semantics are defined in
 `SPEC/12-recovery-spec.md`.
+
+### Table: `tasks` (Nextflow Task Tracking)
+
+Stores individual task status and metrics streamed from Nextflow weblog events.
+
+```sql
+CREATE TABLE tasks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    run_id VARCHAR(50) NOT NULL REFERENCES runs(run_id) ON DELETE CASCADE,
+    task_id INTEGER NOT NULL,
+    hash VARCHAR(32) NOT NULL,
+    name VARCHAR(500) NOT NULL,
+    process VARCHAR(255) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    exit_code INTEGER,
+    submit_time BIGINT,
+    start_time BIGINT,
+    complete_time BIGINT,
+    duration_ms BIGINT,
+    realtime_ms BIGINT,
+    cpu_percent FLOAT,
+    peak_rss BIGINT,
+    peak_vmem BIGINT,
+    read_bytes BIGINT,
+    write_bytes BIGINT,
+    workdir TEXT,
+    container VARCHAR(500),
+    attempt INTEGER DEFAULT 1,
+    native_id VARCHAR(255),
+    error_message TEXT,
+    trace_data JSONB,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(run_id, task_id, attempt)
+);
+
+CREATE INDEX idx_tasks_run_id ON tasks(run_id);
+CREATE INDEX idx_tasks_run_status ON tasks(run_id, status);
+CREATE INDEX idx_tasks_process ON tasks(process);
+CREATE INDEX idx_tasks_created_at ON tasks(created_at DESC);
+```
+
+### Table: `weblog_event_log` (Deduplication)
+
+Deduplicates Pub/Sub weblog events to ensure idempotent processing.
+
+```sql
+CREATE TABLE weblog_event_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    run_id VARCHAR(50) NOT NULL,
+    event_type VARCHAR(32) NOT NULL,
+    task_id INTEGER,
+    attempt INTEGER,
+    event_timestamp TIMESTAMPTZ NOT NULL,
+    processed_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(run_id, event_type, task_id, attempt)
+);
+
+CREATE INDEX idx_weblog_event_log_cleanup ON weblog_event_log(processed_at);
+```
 
 ### Table: `checkpoints`
 
@@ -402,7 +474,8 @@ WHERE nr."name$" = 'NR-2024-0156'
    └── Batch: Create orchestrator job
 
 3. Orchestrator starts
-   └── PostgreSQL: Update status to "running"
+   └── Weblog: Nextflow emits `started` event
+   └── PostgreSQL: Backend sets status to "running"
 
 4. Nextflow executes
    └── GCS: Write to work/ directory
@@ -410,71 +483,43 @@ WHERE nr."name$" = 'NR-2024-0156'
 
 5. Nextflow completes
    └── GCS: Write logs
-   └── PostgreSQL: Update status to "completed" or "failed"
+   └── Weblog: Nextflow emits `completed` or `error`
+   └── PostgreSQL: Backend updates status and metrics
 ```
 
-### Status Update Flow
+### Status Update Flow (Weblog + Pub/Sub)
 
 ```
-┌─────────────────┐         ┌─────────────────┐
-│  Batch Job      │         │  PostgreSQL     │
-│  (Orchestrator) │ ──────▶ │  runs           │
-└─────────────────┘         └────────┬────────┘
-                                     │
-                                     │ SSE or polling
-                                     ▼
-                            ┌─────────────────┐
-                            │  Frontend       │
-                            │  (UI update)    │
-                            └─────────────────┘
+┌───────────────────────────────┐   HTTP POST   ┌───────────────────────┐
+│ GCP Batch Orchestrator (NF)   │ ────────────▶ │ Weblog Receiver       │
+│ -with-weblog enabled          │               │ (Cloud Run)           │
+└───────────────────────────────┘               └───────────┬───────────┘
+                                                            │ Publish
+                                                            ▼
+                                                   ┌────────────────────┐
+                                                   │ Pub/Sub Topic       │
+                                                   └───────────┬────────┘
+                                                               │ Push (OIDC)
+                                                               ▼
+                                                   ┌────────────────────┐
+                                                   │ Backend /api/internal│
+                                                   │ Weblog Processor    │
+                                                   └───────────┬────────┘
+                                                               ▼
+                                                      ┌─────────────────┐
+                                                      │ PostgreSQL       │
+                                                      │ runs + tasks     │
+                                                      └────────┬────────┘
+                                                               │
+                                                               ▼
+                                                      Frontend (SSE/poll)
 ```
 
 ### Status Update Mechanism
 
-The orchestrator container must update the `runs` table directly in PostgreSQL
-using a lightweight status update script. The script is invoked by Nextflow
-workflow hooks and only touches allowed fields.
+Nextflow emits weblog events to the **weblog receiver** using `-with-weblog`. The weblog receiver validates the per-run secret token and publishes events to Pub/Sub. The backend consumes those events via an OIDC-protected internal endpoint, updates the `runs` table, and records task-level details in the `tasks` table. Deduplication is enforced via the `weblog_event_log` table.
 
-**Script location:** `orchestrator/update_status.py` (packaged into the orchestrator image)
-
-**Required environment:**
-- `DATABASE_URL` (Cloud SQL connection string; Batch service account has `roles/cloudsql.client`).
-  For GCP Batch, this must use the Cloud SQL **Private IP**, not the Cloud Run Unix socket.
-
-**CLI usage (examples):**
-```
-python3 /update_status.py run-abc123 running --started_at 2025-12-30T18:22:11Z
-python3 /update_status.py run-abc123 completed \
-  --completed_at 2025-12-30T20:01:00Z \
-  --metrics '{"duration_seconds": 5929, "tasks_completed": 423}'
-python3 /update_status.py run-abc123 failed \
-  --failed_at 2025-12-30T20:01:00Z \
-  --exit_code 1 \
-  --error_message "Process failed: fastq_qc"
-```
-
-**Allowed fields:**
-- `status`, `submitted_at`, `started_at`, `completed_at`, `failed_at`, `cancelled_at`
-- `exit_code`, `error_message`, `error_task`
-- `metrics` (JSON)
-- `batch_job_name`
-
-**Nextflow hooks:**
-```groovy
-workflow.onStart {
-  "python3 /update_status.py ${params.run_id} running --started_at '${new Date().toInstant().toString()}'".execute()
-}
-
-workflow.onComplete {
-  if (workflow.success) {
-    "python3 /update_status.py ${params.run_id} completed --completed_at '${new Date().toInstant().toString()}'".execute()
-  }
-}
-
-workflow.onError {
-  "python3 /update_status.py ${params.run_id} failed --failed_at '${new Date().toInstant().toString()}' --error_message '${workflow.errorMessage}' --exit_code ${workflow.exitStatus}".execute()
-}
-```
+To address missing events, a Cloud Scheduler job calls `/api/internal/reconcile-runs` every 5 minutes to reconcile stale runs against the GCP Batch API.
 
 ## Data Integrity
 

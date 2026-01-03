@@ -49,10 +49,11 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
       - [x] `PIPELINE`
       - [x] `PIPELINE_VERSION`
       - [x] `CONFIG_GCS_PATH`
-      - [x] `PARAMS_GCS_PATH`
-      - [x] `WORK_DIR`
-      - [x] `DATABASE_URL` (Cloud SQL private IP) — *See [07-integration-spec.md#batch-to-cloud-sql](../spec/07-integration-spec.md)*
-      - [x] `IS_RECOVERY` (for -resume flag)
+    - [x] `PARAMS_GCS_PATH`
+    - [x] `WORK_DIR`
+    - [x] `WEBLOG_URL` — *See [07-integration-spec.md#run-status-updates-weblog](../spec/07-integration-spec.md)*
+    - [x] `WEBLOG_SECRET` — per-run secret token
+    - [x] `IS_RECOVERY` (for -resume flag)
     - [x] Compute resources:
       - [x] CPU: 2000 milli (2 vCPU)
       - [x] Memory: 4096 MiB (4 GB)
@@ -161,8 +162,6 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 - [x] Create `orchestrator/` directory:
   - [x] `Dockerfile.orchestrator`
   - [x] `entrypoint.sh`
-  - [x] `update_status.py`
-  - [x] `nextflow.config.template`
 
 ### Orchestrator Dockerfile
 
@@ -170,19 +169,13 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 > - [09-deployment-spec.md#nextflow-orchestrator-dockerfile](../spec/09-deployment-spec.md) - Complete Dockerfile
 
 - [x] Create `orchestrator/Dockerfile.orchestrator` — *See [09-deployment-spec.md#nextflow-orchestrator-dockerfile](../spec/09-deployment-spec.md)*:
-  - [x] Base image: `nextflow/nextflow:24.04.4`
+  - [x] Base image: `nextflow/nextflow:25.10.2`
   - [x] Install system dependencies:
     - [x] curl
-    - [x] python3
-    - [x] python3-pip
   - [x] Install Google Cloud SDK:
     - [x] Add to PATH
-  - [x] Install Python dependencies:
-    - [x] asyncpg (for PostgreSQL)
-    - [x] psycopg2-binary (sync fallback)
   - [x] Copy scripts:
     - [x] `entrypoint.sh` to `/entrypoint.sh`
-    - [x] `update_status.py` to `/update_status.py`
   - [x] Make scripts executable
   - [x] Set entrypoint to `/entrypoint.sh`
 
@@ -201,6 +194,8 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
     - [x] `PARAMS_GCS_PATH`
     - [x] `WORK_DIR`
     - [x] `IS_RECOVERY` — *See [12-recovery-spec.md#orchestrator-behavior](../spec/12-recovery-spec.md)*
+    - [x] `WEBLOG_URL`
+    - [x] `WEBLOG_SECRET`
   - [x] Log startup information
   - [x] Create local work directory
   - [x] Download config and params from GCS:
@@ -215,6 +210,7 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
     - [x] `-with-trace`
     - [x] `-with-timeline`
     - [x] `-with-report`
+    - [x] `-with-weblog ${WEBLOG_URL}/${RUN_ID}/${WEBLOG_SECRET}`
     - [x] Add `-resume` if `IS_RECOVERY=true` — *See [12-recovery-spec.md#nextflow-resume](../spec/12-recovery-spec.md)*
   - [x] Execute Nextflow
   - [x] Capture exit code
@@ -225,64 +221,17 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
     - [x] `report.html` → `logs/report.html`
   - [x] Exit with Nextflow exit code
 
-### Status Update Script
+### Weblog Integration
 
 > **Spec References:**
-> - [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md) - Update process
-> - [07-integration-spec.md#orchestrator-status-updates](../spec/07-integration-spec.md) - Implementation details
+> - [06-data-model-spec.md#status-update-flow-weblog--pubsub](../spec/06-data-model-spec.md) - Update process
+> - [07-integration-spec.md#run-status-updates-weblog](../spec/07-integration-spec.md) - Implementation details
 
-- [x] Create `orchestrator/update_status.py` — *See [06-data-model-spec.md#status-update-mechanism](../spec/06-data-model-spec.md)*:
-  - [x] Parse command line arguments:
-    - [x] `run_id` (positional)
-    - [x] `status` (positional)
-    - [x] `--started_at` (optional)
-    - [x] `--completed_at` (optional)
-    - [x] `--failed_at` (optional)
-    - [x] `--error_message` (optional)
-    - [x] `--error_task` (optional)
-    - [x] `--exit_code` (optional)
-    - [x] `--metrics` (optional, JSON string)
-  - [x] Read DATABASE_URL from environment — *See [07-integration-spec.md#batch-to-cloud-sql](../spec/07-integration-spec.md)*
-  - [x] Connect to PostgreSQL (sync connection)
-  - [x] Build UPDATE query:
-    - [x] Update `status` column
-    - [x] Update `updated_at` to NOW()
-    - [x] Update timestamp columns based on status
-    - [x] Update error fields if provided — *See [06-data-model-spec.md#error-fields](../spec/06-data-model-spec.md)*
-    - [x] Update metrics if provided — *See [06-data-model-spec.md#metrics-jsonb](../spec/06-data-model-spec.md)*
-  - [x] Execute query with parameterized values — *See [08-security-spec.md#sql-injection-prevention](../spec/08-security-spec.md)*
-  - [x] Log success/failure
-  - [x] Exit with appropriate code
+- [x] Ensure orchestrator uses `-with-weblog ${WEBLOG_URL}/${RUN_ID}/${WEBLOG_SECRET}`
+- [x] Publish weblog events to Pub/Sub via the weblog receiver
+- [x] Process events on backend `/api/internal/weblog` (OIDC)
+- [x] Persist run status updates and task records in `runs` and `tasks`
 
-### Nextflow Hooks Configuration
-
-> **Spec References:**
-> - [07-integration-spec.md#orchestrator-status-updates](../spec/07-integration-spec.md) - Hook implementation
-
-- [x] Create `orchestrator/nextflow.config.template` — *See [07-integration-spec.md#orchestrator-status-updates](../spec/07-integration-spec.md)*:
-  - [x] Include workflow hooks:
-    ```groovy
-    workflow.onStart {
-      "python3 /update_status.py ${params.run_id} running --started_at '${new Date().toInstant().toString()}'".execute()
-    }
-    
-    workflow.onComplete {
-      def status = workflow.success ? "completed" : "failed"
-      def timestamp = status == "completed" ? "--completed_at" : "--failed_at"
-      def cmd = "python3 /update_status.py ${params.run_id} ${status} ${timestamp} '${new Date().toInstant().toString()}'"
-      if (!workflow.success) {
-        cmd += " --exit_code ${workflow.exitStatus}"
-        if (workflow.errorMessage) {
-          cmd += " --error_message '${workflow.errorMessage.replaceAll("'", "")}'"
-        }
-      }
-      cmd.execute()
-    }
-    
-    workflow.onError {
-      "python3 /update_status.py ${params.run_id} failed --failed_at '${new Date().toInstant().toString()}' --error_message '${workflow.errorMessage?.replaceAll("'", "") ?: 'Unknown error'}'".execute()
-    }
-    ```
 
 ### Nextflow GCP Batch Executor Configuration
 
@@ -332,7 +281,7 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 - [x] Create local orchestrator test:
   - [x] Mock PostgreSQL connection
   - [x] Test entrypoint with sample config
-  - [x] Verify update_status.py works
+  - [x] Verify weblog endpoint configuration works
   - [x] Test error handling paths
 
 ---
@@ -502,22 +451,16 @@ This sprint implements the complete pipeline execution workflow including GCP Ba
 - [ ] Orchestrator Docker image:
   - [ ] Nextflow base image
   - [ ] Google Cloud SDK
-  - [ ] Python with asyncpg
-  - [ ] Custom scripts
+  - [ ] Weblog-ready entrypoint
 - [ ] Entrypoint script:
   - [ ] Config download from GCS
   - [ ] Nextflow execution
   - [ ] -resume support
   - [ ] Log upload
-- [ ] update_status.py script:
-  - [ ] PostgreSQL connection
-  - [ ] Status updates
-  - [ ] Error recording
-  - [ ] Metrics recording
-- [ ] Nextflow hooks:
-  - [ ] onStart → running
-  - [ ] onComplete → completed/failed
-  - [ ] onError → failed
+- [ ] Weblog integration:
+  - [ ] `-with-weblog` configured
+  - [ ] Weblog receiver reachable
+  - [ ] Pub/Sub delivery to backend
 - [ ] Nextflow GCP Batch executor config
 - [x] Run submission integration:
   - [x] File upload to GCS

@@ -28,11 +28,11 @@ Security is implemented at multiple layers: network, authentication, authorizati
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           CLOUD RUN SERVICE                                 │
+│                         CLOUD RUN SERVICES                                  │
 │                                                                             │
-│  • Ingress: internal-and-cloud-load-balancing                               │
-│  • No direct internet access                                                │
-│  • Service account with minimal permissions                                 │
+│  • Frontend + Backend behind IAP                                            │
+│  • Weblog Receiver (unauthenticated, secret token protected)                │
+│  • Service accounts with minimal permissions                                │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                     ┌───────────────┼───────────────┐
@@ -86,13 +86,30 @@ IAP provides a signed JWT in the `X-Goog-IAP-JWT-Assertion` header.
 
 ### Service-to-Service Authentication
 
-Internal services authenticate using GCP service accounts.
+Internal services authenticate using GCP service accounts with OIDC Bearer tokens.
+These are used for Pub/Sub push subscriptions and Cloud Scheduler calls to
+`/api/internal/*`.
+
+### Weblog Authentication (Per-Run Secret)
+
+Nextflow cannot perform OIDC authentication, so weblog ingestion uses a per-run
+secret token embedded in the webhook URL:
+
+```
+/weblog/{run_id}/{secret}
+```
+
+The secret is stored hashed in the database and is only valid for the specific
+run. Terminal runs reject further events.
 
 | Service | Service Account |
 |---------|-----------------|
-| Cloud Run | `arc-reactor@project.iam.gserviceaccount.com` |
+| Backend Cloud Run | `arc-reactor@project.iam.gserviceaccount.com` |
+| Weblog Receiver Cloud Run | `arc-reactor-weblog@project.iam.gserviceaccount.com` |
 | Batch Orchestrator | `nextflow-orchestrator@project.iam.gserviceaccount.com` |
 | Nextflow Tasks | `nextflow-tasks@project.iam.gserviceaccount.com` |
+| Pub/Sub Push | `arc-reactor-pubsub@project.iam.gserviceaccount.com` |
+| Cloud Scheduler | `arc-reactor-scheduler@project.iam.gserviceaccount.com` |
 
 ## Authorization
 
@@ -156,12 +173,21 @@ roles:
   - roles/secretmanager.secretAccessor  # Access secrets
 ```
 
+### Weblog Receiver Service Account
+
+```yaml
+# arc-reactor-weblog@project.iam.gserviceaccount.com
+roles:
+  - roles/cloudsql.client          # Read runs for secret validation
+  - roles/pubsub.publisher         # Publish weblog events
+  - roles/logging.logWriter        # Write logs
+```
+
 ### Batch Orchestrator Service Account
 
 ```yaml
 # nextflow-orchestrator@project.iam.gserviceaccount.com
 roles:
-  - roles/cloudsql.client          # Update run status
   - roles/storage.objectAdmin      # GCS read/write (pipeline bucket)
   - roles/storage.objectViewer     # GCS read (NGS data bucket)
   - roles/batch.jobsEditor         # Submit task jobs

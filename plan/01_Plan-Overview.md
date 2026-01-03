@@ -268,7 +268,7 @@ The implementation is organized into **6 major sprints**, each containing **2-5 
   - Configuration download from GCS
   - Nextflow execution
   - `-resume` support for recovery runs
-- Implement `update_status.py` script for PostgreSQL status updates
+- Implement weblog-based status updates (Nextflow `-with-weblog` + Pub/Sub + backend processor)
 - Configure Nextflow hooks (onStart, onComplete, onError)
 - Implement work directory configuration per run
 

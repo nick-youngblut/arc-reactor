@@ -6,9 +6,9 @@ The backend is a FastAPI application that serves three primary functions:
 
 1. **API Server**: REST endpoints for run management, pipeline configuration, and data queries
 2. **WebSocket Server**: Real-time chat interface for the AI agent
-3. **Static File Server**: Serves the compiled Next.js frontend
+3. **Internal Event Processor**: OIDC-protected endpoints for Pub/Sub weblog events and scheduler reconciliation
 
-The backend follows Arc Institute's established patterns for internal applications, using Dynaconf for configuration, Pydantic for validation, and async throughout.
+The backend follows Arc Institute's established patterns for internal applications, using Dynaconf for configuration, Pydantic for validation, and async throughout. The frontend is deployed as a separate Cloud Run service behind the same load balancer.
 
 ## Project Structure
 
@@ -27,13 +27,20 @@ backend/
 │       ├── __init__.py
 │       ├── chat.py         # WebSocket chat endpoint
 │       ├── runs.py         # Run CRUD operations
+│       ├── tasks.py        # Task-level queries
 │       ├── logs.py         # Log streaming and task log endpoints
 │       ├── pipelines.py    # Pipeline registry endpoints
-│       └── health.py       # Health check endpoints
+│       ├── health.py       # Health check endpoints
+│       └── internal/       # OIDC-protected internal endpoints
+│           ├── __init__.py
+│           ├── weblog.py   # Pub/Sub weblog event processor
+│           └── reconcile.py# Stale run reconciliation
 │
 ├── models/
 │   ├── __init__.py
 │   ├── runs.py             # Run request/response models
+│   ├── tasks.py            # Task models
+│   ├── weblog_event_log.py # Weblog deduplication model
 │   ├── pipelines.py        # Pipeline configuration models
 │   ├── chat.py             # Chat message models
 │   └── benchling.py        # Benchling data models
@@ -636,6 +643,10 @@ async def get_current_user(request: Request) -> User:
         name=claims.get("name", claims["email"]),
     )
 ```
+
+### Service-to-Service (OIDC) Integration
+
+Internal endpoints under `/api/internal/*` accept OIDC Bearer tokens from specific service accounts (Pub/Sub push subscription and Cloud Scheduler). These endpoints are mounted separately from user-facing routes to ensure IAP and OIDC auth can be enforced independently.
 
 ### Authorization Rules
 

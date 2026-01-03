@@ -63,10 +63,15 @@ This sprint implements the data models, persistence layer, and core REST API end
     - [x] `error_message` (TEXT, nullable) — *See [06-data-model-spec.md#error-fields](../spec/06-data-model-spec.md)*
     - [x] `error_task` (TEXT, nullable)
     - [x] `metrics` (JSONB, nullable) — *See [06-data-model-spec.md#metrics-jsonb](../spec/06-data-model-spec.md)*
+    - [x] `weblog_secret_hash` (VARCHAR(64), nullable)
+    - [x] `weblog_run_id` (VARCHAR(36), nullable)
+    - [x] `weblog_run_name` (VARCHAR(255), nullable)
+    - [x] `last_weblog_event_at` (TIMESTAMPTZ, nullable)
   - [x] Define indexes — *See [06-data-model-spec.md#indexes](../spec/06-data-model-spec.md)*:
     - [x] `idx_runs_user_email_created_at` (user_email, created_at DESC)
     - [x] `idx_runs_status_created_at` (status, created_at DESC)
     - [x] `idx_runs_created_at` (created_at DESC)
+    - [x] `idx_runs_stale_detection` (status, updated_at WHERE status in submitted/running)
 
 ### Users Table
 
@@ -98,6 +103,28 @@ This sprint implements the data models, persistence layer, and core REST API end
     - [x] `checkpoint_metadata` (JSONB, nullable) — renamed from `metadata` to avoid SQLAlchemy reserved name conflict
     - [x] `created_at` (TIMESTAMPTZ, DEFAULT NOW())
     - [x] PRIMARY KEY (thread_id, checkpoint_id)
+
+### Tasks Table
+
+> **Spec References:**
+> - [06-data-model-spec.md#tasks-table-nextflow-task-tracking](../spec/06-data-model-spec.md) - Task tracking schema
+
+- [x] Create `backend/models/tasks.py`:
+  - [x] Define `Task` SQLAlchemy model with columns:
+    - [x] `run_id` (FK to runs.run_id)
+    - [x] `task_id`, `name`, `process`, `status`
+    - [x] timestamps and metrics (submit/start/complete, duration, cpu, memory)
+    - [x] `trace_data` (JSONB)
+  - [x] Add indexes: `idx_tasks_run_id`, `idx_tasks_run_status`, `idx_tasks_process`, `idx_tasks_created_at`
+
+### Weblog Event Log Table
+
+> **Spec References:**
+> - [06-data-model-spec.md#weblog_event_log-deduplication](../spec/06-data-model-spec.md) - Deduplication schema
+
+- [x] Create `backend/models/weblog_event_log.py`:
+  - [x] Define `WeblogEventLog` model for deduplication
+  - [x] Add index `idx_weblog_event_log_cleanup` on `processed_at`
 
 ### Pydantic Request/Response Models
 
@@ -139,7 +166,7 @@ This sprint implements the data models, persistence layer, and core REST API end
 - [x] Create initial migration:
   - [x] `alembic revision --autogenerate -m "initial_schema"`
   - [x] Review generated migration file
-  - [x] Include runs, users, and checkpoints tables
+  - [x] Include runs (with weblog columns), users, checkpoints, tasks, and weblog_event_log tables
 - [ ] Test migration:
   - [ ] Apply migration to dev database
   - [ ] Verify table creation

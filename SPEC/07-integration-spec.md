@@ -175,27 +175,14 @@ logs_policy:
 | `CONFIG_GCS_PATH` | GCS path to config file |
 | `PARAMS_GCS_PATH` | GCS path to params file |
 | `WORK_DIR` | GCS work directory (original for recovery) |
-| `DATABASE_URL` | Cloud SQL connection string for run status updates (Batch must use Private IP) |
+| `WEBLOG_URL` | Weblog receiver base URL |
+| `WEBLOG_SECRET` | Per-run secret token for weblog auth |
 
-### Run Status Updates (Orchestrator)
+### Run Status Updates (Weblog)
 
-The orchestrator container is responsible for updating the `runs` table in
-PostgreSQL via a lightweight script invoked by Nextflow hooks.
-
-**Script:** `orchestrator/update_status.py`
-
-**Typical flow:**
-1. Backend creates run with status `pending`
-2. Backend submits Batch job and sets status `submitted`
-3. Orchestrator starts Nextflow and sets status `running`
-4. Nextflow hooks set terminal status (`completed` or `failed`) and write metrics
-
-**Hook usage (example):**
-```groovy
-workflow.onStart {
-  "python3 /update_status.py ${params.run_id} running --started_at '${new Date().toInstant().toString()}'".execute()
-}
-```
+Nextflow emits weblog events using `-with-weblog`. The orchestrator sends events
+to the weblog receiver, which publishes to Pub/Sub. The backend consumes the
+events on `/api/internal/weblog` (OIDC auth) and updates `runs` and `tasks`.
 
 ### Nextflow → Batch Task Submission
 
@@ -350,22 +337,9 @@ engine = create_async_engine(
 )
 ```
 
-**GCP Batch (Private IP):**
-```python
-from sqlalchemy.ext.asyncio import create_async_engine
-
-DATABASE_URL = (
-    "postgresql+asyncpg://{user}:{password}@{private_ip}:5432/{db}"
-)
-
-engine = create_async_engine(
-    DATABASE_URL,
-    pool_size=5,
-    max_overflow=10,
-    pool_timeout=30,
-    pool_recycle=1800,
-)
-```
+**Weblog Receiver (Unix socket):**
+The weblog receiver runs on Cloud Run and connects to Cloud SQL via the same
+Unix socket mechanism as the backend. GCP Batch does **not** connect to Cloud SQL.
 
 ### Run Status Queries
 

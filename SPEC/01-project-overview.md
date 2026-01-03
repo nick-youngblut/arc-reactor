@@ -4,6 +4,10 @@
 
 Arc Reactor is a web application that enables wet lab scientists at Arc Institute to run Nextflow bioinformatics pipelines on Google Cloud Platform without requiring command-line expertise. The platform combines an AI-powered assistant with a user-friendly interface to bridge the gap between sample data in Benchling LIMS and computational analysis pipelines.
 
+## Architecture Update (Refactor v2)
+
+The platform is deployed as **separate Cloud Run services** for frontend, backend, and a dedicated **weblog receiver**. Pipeline monitoring is **pipeline-agnostic** using Nextflow's `-with-weblog` events, buffered through Pub/Sub, and stored in the database with **task-level tracking**. Browser traffic continues to use IAP, while internal service calls use OIDC. This refactor is a **greenfield deployment** (no existing GCP services to migrate).
+
 ## Project Goals
 
 ### Primary Goals

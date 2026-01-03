@@ -7,123 +7,67 @@ The Arc Reactor follows a modern cloud-native architecture with clear separation
 ## Architecture Diagram
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                                   USERS                                         │
-│                        (Authenticated via GCP IAP)                              │
-└─────────────────────────────────────────────────────────────────────────────────┘
-                                      │
-                                      ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              CLOUD RUN SERVICE                                  │
-│                           (Single Container Deployment)                         │
-│                                                                                 │
-│  ┌───────────────────────────────────────────────────────────────────────────┐  │
-│  │                         FASTAPI BACKEND                                   │  │
-│  │                                                                           │  │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │  │
-│  │  │  REST API   │  │  WebSocket  │  │  Static     │  │  Health     │       │  │
-│  │  │  Routes     │  │  Handler    │  │  File       │  │  Checks     │       │  │
-│  │  │             │  │             │  │  Server     │  │             │       │  │
-│  │  │ /api/runs   │  │ /ws/chat    │  │ /*          │  │ /health     │       │  │
-│  │  │ /api/pipes  │  │             │  │             │  │ /ready      │       │  │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘       │  │
-│  │         │                │                                                │  │
-│  │         ▼                ▼                                                │  │
-│  │  ┌─────────────────────────────────────────────────────────────────┐      │  │
-│  │  │                     SERVICE LAYER                               │      │  │
-│  │  │                                                                 │      │  │
-│  │  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           │      │  │
-│  │  │  │  Benchling   │  │  Batch       │  │  Pipeline    │           │      │  │
-│  │  │  │  Service     │  │  Service     │  │  Registry    │           │      │  │
-│  │  │  └──────────────┘  └──────────────┘  └──────────────┘           │      │  │
-│  │  └─────────────────────────────────────────────────────────────────┘      │  │
-│  │         │                │                                                │  │
-│  │         ▼                ▼                                                │  │
-│  │  ┌─────────────────────────────────────────────────────────────────┐      │  │
-│  │  │                     AGENT LAYER                                 │      │  │
-│  │  │                                                                 │      │  │
-│  │  │  ┌──────────────────────────────────────────────────────────┐   │      │  │
-│  │  │  │              DEEPAGENT ORCHESTRATOR                      │   │      │  │
-│  │  │  │                                                          │   │      │  │
-│  │  │  │   Tools:                    Subagents:                   │   │      │  │
-│  │  │  │   • get_entities            • benchling_expert           │   │      │  │
-│  │  │  │   • get_relationships       • config_expert              │   │      │  │
-│  │  │  │   • generate_samplesheet                                 │   │      │  │
-│  │  │  │   • generate_config                                      │   │      │  │
-│  │  │  │   • validate_inputs                                      │   │      │  │
-│  │  │  │   • submit_run                                           │   │      │  │
-│  │  │  └──────────────────────────────────────────────────────────┘   │      │  │
-│  │  └─────────────────────────────────────────────────────────────────┘      │  │
-│  └───────────────────────────────────────────────────────────────────────────┘  │
-│                                                                                 │
-│  ┌───────────────────────────────────────────────────────────────────────────┐  │
-│  │                      NEXT.JS FRONTEND (Static)                            │  │
-│  │                                                                           │  │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │  │
-│  │  │  Pipeline   │  │  Chat       │  │  File       │  │  Run        │       │  │
-│  │  │  Workspace  │  │  Panel      │  │  Editors    │  │  History    │       │  │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘       │  │
-│  └───────────────────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────────┘
-          │              │                    │                    │
-          │              │                    │                    │
-          ▼              ▼                    ▼                    ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│  Benchling   │  │  Cloud SQL   │  │     GCS      │  │  GCP Batch   │
-│  Warehouse   │  │ (PostgreSQL) │  │              │  │              │
-│              │  │  • runs      │  │  • inputs    │  │  • orchestr. │
-│  • samples   │  │  • users     │  │  • work      │  │  • tasks     │
-│  • runs      │  │  • checkpoints│ │  • results   │  │              │
-│  • metadata  │  │              │  │  • logs      │  │              │
-└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
-                                                │                    │
-                                                │                    │
-                                                ▼                    ▼
-                                         ┌──────────────────────────────┐
-                                    │     NEXTFLOW EXECUTION       │
-                                    │                              │
-                                    │  Orchestrator Job            │
-                                    │  (runs `nextflow run`)       │
-                                    │         │                    │
-                                    │         ▼                    │
-                                    │  ┌────┐ ┌────┐ ┌────┐        │
-                                    │  │Task│ │Task│ │Task│ ...    │
-                                    │  └────┘ └────┘ └────┘        │
-                                    │  (pipeline process jobs)     │
-                                    └──────────────────────────────┘
+                                    ┌─────────────────────────────────┐
+                                    │      Global Load Balancer       │
+                                    │         (IAP Enabled)           │
+                                    └─────────────────┬───────────────┘
+                                                      │
+                                    ┌─────────────────┴───────────────┐
+                                    │           URL Map               │
+                                    │  /api/*  → Backend Service      │
+                                    │  /*      → Frontend Service     │
+                                    └─────────────────┬───────────────┘
+                                                      │
+                         ┌────────────────────────────┼────────────────────────────┐
+                         │                            │                            │
+                         ▼                            ▼                            ▼
+              ┌─────────────────────┐    ┌─────────────────────┐    ┌─────────────────────┐
+              │  Frontend Service   │    │  Backend Service    │    │  Weblog Receiver    │
+              │    (Cloud Run)      │    │    (Cloud Run)      │    │    (Cloud Run)      │
+              │  • Static Next.js   │    │  • FastAPI app      │    │  • Weblog ingest    │
+              │  • No SSR           │    │  • REST + WS + SSE  │    │  • Pub/Sub publish  │
+              │  • No DB access     │    │  • IAP auth         │    │  • Secret auth      │
+              └─────────────────────┘    └──────────┬──────────┘    └─────────────────────┘
+                                                    │
+                                                    ▼
+                                         ┌─────────────────────┐
+                                         │     Cloud SQL       │
+                                         │    (PostgreSQL)     │
+                                         └─────────────────────┘
 ```
 
 ## Component Overview
 
 ### Web Application Layer
 
-#### Cloud Run Service
+#### Cloud Run Services
 
-The entire application is deployed as a single Cloud Run service, following Arc's established patterns for internal applications.
+The application is deployed as three Cloud Run services behind a single load balancer: a static Next.js frontend, the FastAPI backend, and a dedicated weblog receiver for Nextflow event ingestion. Browser traffic uses IAP; internal service calls use OIDC; weblog ingestion uses per-run secret tokens.
 
 | Aspect | Details |
 |--------|---------|
-| **Container** | Single Docker image containing FastAPI + static Next.js |
-| **Scaling** | Auto-scales 0-10 instances based on traffic |
-| **Timeout** | 60 minutes (for long-polling/WebSocket connections) |
-| **Memory** | 2GB per instance |
-| **CPU** | 2 vCPUs per instance |
+| **Container** | Separate images for frontend, backend, and weblog receiver |
+| **Scaling** | Frontend: 0-5, Backend: 0-10, Weblog: 1-10 |
+| **Timeout** | Backend: 60 minutes for WebSocket/SSE |
+| **Memory** | Backend: 2Gi, Frontend: 512Mi (defaults) |
+| **CPU** | Backend: 2 vCPU, Frontend: 1 vCPU (defaults) |
 
 #### FastAPI Backend
 
-Handles all API requests, WebSocket connections, and serves the static frontend.
+Handles REST APIs, WebSocket chat, SSE run updates, and internal event processing (Pub/Sub + scheduler).
 
 | Responsibility | Implementation |
 |----------------|----------------|
 | **REST API** | Pydantic models, automatic OpenAPI docs |
 | **WebSocket** | Chat streaming via AI SDK-compatible format |
-| **Static files** | Serves Next.js build output |
+| **Internal endpoints** | `/api/internal/*` for Pub/Sub and scheduler (OIDC) |
+| **Static files** | Served by the frontend service (not the backend) |
 | **Resilience** | Circuit breakers for external services, readiness supports degraded mode |
 | **Auth context** | Extracts user identity from IAP headers |
 
 #### Next.js Frontend
 
-Static export served by FastAPI, providing the user interface.
+Static export served by the frontend Cloud Run service, providing the user interface.
 
 | Aspect | Details |
 |--------|---------|
