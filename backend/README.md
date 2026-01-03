@@ -18,6 +18,16 @@ uv pip install -e 'backend/.[dev]'
 uvicorn backend.main:app --reload --port 8000
 ```
 
+## Check server health & readiness
+
+```bash
+curl http://localhost:8000/health
+```
+
+```bash
+curl http://localhost:8000/ready
+```
+
 ## Tests
 ```bash
 # activate venv if needed
