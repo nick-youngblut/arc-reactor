@@ -156,7 +156,7 @@ CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8080"]
 
 ```dockerfile
 # Dockerfile.orchestrator
-FROM nextflow/nextflow:24.04.4
+FROM nextflow/nextflow:25.10.2
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \

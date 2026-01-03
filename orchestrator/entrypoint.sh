@@ -20,15 +20,14 @@ require_env CONFIG_GCS_PATH
 require_env PARAMS_GCS_PATH
 require_env WORK_DIR
 require_env IS_RECOVERY
-require_env DATABASE_URL
+require_env WEBLOG_URL
+require_env WEBLOG_SECRET
 
 CONFIG_DIR="${CONFIG_DIR:-/config}"
 LOCAL_WORK_DIR="${LOCAL_WORK_DIR:-/work}"
 
 log "Starting Nextflow orchestrator for run ${RUN_ID}"
 log "Pipeline: ${PIPELINE} (${PIPELINE_VERSION})"
-log "Config: ${CONFIG_GCS_PATH}"
-log "Params: ${PARAMS_GCS_PATH}"
 log "Work dir: ${WORK_DIR}"
 log "Recovery: ${IS_RECOVERY}"
 
@@ -38,14 +37,11 @@ log "Downloading config and params from GCS"
 gsutil cp "${CONFIG_GCS_PATH}" "${CONFIG_DIR}/nextflow.config"
 gsutil cp "${PARAMS_GCS_PATH}" "${CONFIG_DIR}/params.yaml"
 
-if [ -f "/nextflow.config.template" ]; then
-  log "Appending Arc Reactor hooks to config"
-  cat "/nextflow.config.template" >> "${CONFIG_DIR}/nextflow.config"
-fi
-
 if ! grep -q '^run_id:' "${CONFIG_DIR}/params.yaml"; then
   printf '\nrun_id: "%s"\n' "${RUN_ID}" >> "${CONFIG_DIR}/params.yaml"
 fi
+
+WEBLOG_ENDPOINT="${WEBLOG_URL}/${RUN_ID}/${WEBLOG_SECRET}"
 
 cmd=(
   nextflow run "${PIPELINE}"
@@ -56,13 +52,14 @@ cmd=(
   -with-trace
   -with-timeline
   -with-report
+  -with-weblog "${WEBLOG_ENDPOINT}"
 )
 
 if [ "${IS_RECOVERY}" = "true" ]; then
   cmd+=( -resume )
 fi
 
-log "Launching Nextflow"
+log "Launching Nextflow with weblog endpoint"
 cd "${LOCAL_WORK_DIR}"
 set +e
 "${cmd[@]}"
@@ -74,11 +71,16 @@ bucket="${bucket%%/*}"
 log_root="gs://${bucket}/runs/${RUN_ID}/logs"
 
 log "Uploading logs to ${log_root}"
+
 upload_with_retry() {
   local src="$1"
   local dest="$2"
   local attempts=3
   local delay=2
+
+  if [ ! -f "${src}" ]; then
+    return 0
+  fi
 
   for attempt in $(seq 1 "${attempts}"); do
     if gsutil -m cp "${src}" "${dest}"; then
@@ -93,18 +95,10 @@ upload_with_retry() {
   return 1
 }
 
-if [ -f ".nextflow.log" ]; then
-  upload_with_retry ".nextflow.log" "${log_root}/nextflow.log" || true
-fi
-if [ -f "trace.txt" ]; then
-  upload_with_retry "trace.txt" "${log_root}/trace.txt" || true
-fi
-if [ -f "timeline.html" ]; then
-  upload_with_retry "timeline.html" "${log_root}/timeline.html" || true
-fi
-if [ -f "report.html" ]; then
-  upload_with_retry "report.html" "${log_root}/report.html" || true
-fi
+upload_with_retry ".nextflow.log" "${log_root}/nextflow.log" || true
+upload_with_retry "trace.txt" "${log_root}/trace.txt" || true
+upload_with_retry "timeline.html" "${log_root}/timeline.html" || true
+upload_with_retry "report.html" "${log_root}/report.html" || true
 
 log "Nextflow finished with exit code ${exit_code}"
 exit "${exit_code}"
