@@ -71,13 +71,13 @@ async def test_submit_run_creates_run():
     samplesheet = "sample,fastq_1,fastq_2\nA,gs://a,gs://b"
     config = "params {\n  genome = \"GRCh38\"\n  protocol = \"10XV3\"\n}\n"
 
-    output = await submit_run(
-        samplesheet_csv=samplesheet,
-        config_content=config,
-        pipeline="nf-core/scrnaseq",
-        pipeline_version="2.7.1",
-        runtime=runtime,
-    )
+    output = await submit_run.ainvoke({
+        "samplesheet_csv": samplesheet,
+        "config_content": config,
+        "pipeline": "nf-core/scrnaseq",
+        "pipeline_version": "2.7.1",
+        "runtime": runtime,
+    })
 
     payload = json.loads(output)
     assert payload["run_id"] == "run-abc123"
@@ -90,7 +90,7 @@ async def test_cancel_run_updates_status():
     storage = _StorageStub()
     runtime = _Runtime(run_store, storage)
 
-    output = await cancel_run(run_id="run-abc123", runtime=runtime)
+    output = await cancel_run.ainvoke({"run_id": "run-abc123", "runtime": runtime})
     payload = json.loads(output)
     assert payload["status"] == RunStatus.CANCELLED.value
 
@@ -101,7 +101,7 @@ async def test_delete_file_missing():
     storage = _StorageStub(exists=False)
     runtime = _Runtime(run_store, storage)
 
-    output = await delete_file(run_id="run-abc123", file_path="inputs/missing.txt", runtime=runtime)
+    output = await delete_file.ainvoke({"run_id": "run-abc123", "file_path": "inputs/missing.txt", "runtime": runtime})
     assert "Error: File not found" in output
 
 
@@ -112,6 +112,6 @@ async def test_clear_samplesheet():
     runtime = _Runtime(run_store, storage)
     runtime.config["configurable"]["generated_files"] = {"samplesheet.csv": {"content": "x"}}
 
-    output = await clear_samplesheet(confirm=True, runtime=runtime)
+    output = await clear_samplesheet.ainvoke({"confirm": True, "runtime": runtime})
     assert "Samplesheet cleared" in output
     assert "samplesheet.csv" not in runtime.config["configurable"]["generated_files"]

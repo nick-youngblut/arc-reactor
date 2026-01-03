@@ -6,7 +6,9 @@ from pathlib import Path
 
 
 def test_entrypoint_uploads_logs(tmp_path: Path) -> None:
-    entrypoint = Path("orchestrator/entrypoint.sh")
+    # Get the project root (parent of backend directory)
+    project_root = Path(__file__).parent.parent.parent
+    entrypoint = project_root / "orchestrator" / "entrypoint.sh"
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
 

@@ -173,7 +173,7 @@ async def test_get_entities_with_fields():
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    output = await get_entities(
+    output = await get_entities.arun(
         entity_names="LPS-001",
         fields="entity_id;entity_name;schema_name",
         allow_wildcards=True,
@@ -190,7 +190,7 @@ async def test_get_entity_relationships_tree():
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    output = await get_entity_relationships(
+    output = await get_entity_relationships.arun(
         entity_name="LPS-001",
         relationship_depth=2,
         output_format="tree",
@@ -206,14 +206,14 @@ async def test_list_entries_and_entry_content():
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    entries = await list_entries(
+    entries = await list_entries.arun(
         entry_names="NGS_Run_Notes",
         allow_wildcards=False,
         runtime=runtime,
     )
     assert "NGS_Run_Notes" in entries
 
-    content = await get_entry_content(
+    content = await get_entry_content.arun(
         entry_names="NGS_Run_Notes",
         head=2,
         runtime=runtime,
@@ -227,7 +227,7 @@ async def test_get_entry_entities():
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    output = await get_entry_entities(entry_name="NGS_Run_Notes", runtime=runtime)
+    output = await get_entry_entities.arun(entry_name="NGS_Run_Notes", runtime=runtime)
     assert "No entities" in output or "entity_id" in output
 
 
@@ -236,17 +236,17 @@ async def test_schema_and_dropdown_tools():
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    schemas = await get_schemas(get_all_schemas=True, runtime=runtime)
+    schemas = await get_schemas.arun(get_all_schemas=True, runtime=runtime)
     assert "All schemas" in schemas
 
-    fields = await get_schema_field_info(schema_name="NGS Run", runtime=runtime)
+    fields = await get_schema_field_info.arun(schema_name="NGS Run", runtime=runtime)
     assert "NGS Run" in fields
 
-    dropdowns = await get_dropdown_values(dropdown_name="Organism", runtime=runtime)
+    dropdowns = await get_dropdown_values.arun(dropdown_name="Organism", runtime=runtime)
     assert "Human" in dropdowns
 
-    projects = await list_projects(runtime=runtime)
+    projects = await list_projects.arun(runtime=runtime)
     assert "CellAtlas" in projects
 
-    query = await execute_warehouse_query(sql="SELECT 1 AS example", runtime=runtime)
+    query = await execute_warehouse_query.arun(sql="SELECT 1 AS example", runtime=runtime)
     assert "Query results" in query

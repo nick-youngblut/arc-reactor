@@ -1,34 +1,18 @@
 from __future__ import annotations
 
-import os
-import tempfile
 from datetime import datetime, timezone
 from uuid import uuid4
 
 import pytest
 from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from backend.api.routes.tasks import get_task_summary, list_tasks
-from backend.models import Base
 from backend.models.runs import Run
 from backend.models.tasks import Task
 from backend.utils.auth import UserContext
 from backend.utils.errors import NotFoundError
 
 
-@pytest.fixture
-async def session() -> AsyncSession:
-    handle, path = tempfile.mkstemp(suffix=".db")
-    os.close(handle)
-    engine = create_async_engine(f"sqlite+aiosqlite:///{path}")
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    session_factory = async_sessionmaker(engine, expire_on_commit=False)
-    async with session_factory() as session:
-        yield session
-    await engine.dispose()
-    os.unlink(path)
 
 
 async def _create_run(session: AsyncSession, run_id: str, user_email: str) -> None:

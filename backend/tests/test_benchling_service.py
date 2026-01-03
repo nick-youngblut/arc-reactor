@@ -24,7 +24,6 @@ def mock_session():
     session = MagicMock()
     session.warehouse = MagicMock()
     session.entities = MagicMock()
-    session.upsert = MagicMock()
     session.navigator = MagicMock()
     session.api_client = MagicMock()
     return session
@@ -51,7 +50,6 @@ def test_properties_expose_session_clients(service, mock_session) -> None:
     assert service.session is mock_session
     assert service.warehouse is mock_session.warehouse
     assert service.entities is mock_session.entities
-    assert service.upsert is mock_session.upsert
     assert service.navigator is mock_session.navigator
     assert service.api_client is mock_session.api_client
 

@@ -81,11 +81,11 @@ async def test_trace_sample_lineage() -> None:
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    output = await trace_sample_lineage(
-        entity_id="ent_child",
-        relationship_field="parent_sample",
-        runtime=runtime,
-    )
+    output = await trace_sample_lineage.ainvoke({
+        "entity_id": "ent_child",
+        "relationship_field": "parent_sample",
+        "runtime": runtime,
+    })
 
     assert "Lineage for ent_child" in output
     assert benchling.last_call is not None
@@ -98,11 +98,11 @@ async def test_find_sample_descendants() -> None:
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    output = await find_sample_descendants(
-        entity_id="ent_parent",
-        relationship_field=None,
-        runtime=runtime,
-    )
+    output = await find_sample_descendants.ainvoke({
+        "entity_id": "ent_parent",
+        "relationship_field": None,
+        "runtime": runtime,
+    })
 
     assert "Descendants for ent_parent" in output
     assert benchling.last_call is not None
@@ -115,7 +115,7 @@ async def test_get_entity_relationships() -> None:
     benchling = _BenchlingStub()
     runtime = _Runtime(benchling)
 
-    output = await get_entity_relationships(entity_id="ent_123", runtime=runtime)
+    output = await get_entity_relationships.ainvoke({"entity_id": "ent_123", "runtime": runtime})
 
     assert "Relationships for Sample 1" in output
     assert "parent_sample" in output
