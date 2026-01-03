@@ -2,6 +2,37 @@
 
 ## Local Development
 
+### Quick Start (Separate Dev Servers)
+
+For rapid development with hot-reloading:
+
+1. **Setup Frontend Environment**
+   ```bash
+   # Copy the example env file
+   cp frontend/.env.example frontend/.env.local
+   # Edit frontend/.env.local if needed (default points to localhost:8000)
+   ```
+
+2. **Start Backend**
+   ```bash
+   # From project root, with .venv activated
+   uvicorn backend.main:app --reload --port 8000
+   ```
+
+3. **Start Frontend** (in a separate terminal)
+   ```bash
+   cd frontend
+   npm install  # first time only
+   npm run dev
+   ```
+
+4. **Access the App**
+   - Frontend: `http://localhost:3000`
+   - Backend API: `http://localhost:8000/api`
+   - Backend Docs: `http://localhost:8000/docs`
+
+**Important:** The frontend `.env.local` file is required for the AI Agent Chat WebSocket to connect properly in local dev mode.
+
 ### Environment Variables
 Set the following variables in your local shell or `.env` files:
 - `DYNACONF=test` (or `dev`; `prod` is reserved for production)

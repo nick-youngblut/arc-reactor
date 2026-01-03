@@ -163,7 +163,15 @@ export function useAgentChat() {
 
     socket.onmessage = (event) => {
       const payload = typeof event.data === 'string' ? event.data : '';
-      if (payload) handleStreamChunk(payload);
+      if (!payload) return;
+      const json = safeJsonParse<{ type?: string; message?: string }>(payload);
+      if (json?.type === 'error') {
+        setError(json.message || 'Unknown error');
+        setLoading(false);
+        return;
+      }
+      if (json?.type === 'connected') return;
+      handleStreamChunk(payload);
     };
 
     socket.onerror = () => {
@@ -179,7 +187,7 @@ export function useAgentChat() {
       reconnectAttempts.current += 1;
       setTimeout(() => connect(), RECONNECT_DELAY_MS);
     };
-  }, [handleStreamChunk, setError]);
+  }, [handleStreamChunk, setError, setLoading]);
 
   useEffect(() => {
     connect();
@@ -217,8 +225,9 @@ export function useAgentChat() {
 
       wsRef.current.send(
         JSON.stringify({
-          message,
-          threadId
+          type: 'message',
+          content: message,
+          thread_id: threadId
         })
       );
     },

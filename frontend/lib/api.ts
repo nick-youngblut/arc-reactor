@@ -64,7 +64,9 @@ export interface TaskItem {
 }
 
 const apiClient = axios.create({
-  baseURL: '/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL
+    ? `${process.env.NEXT_PUBLIC_API_URL}/api`
+    : '/api',
   headers: {
     'Content-Type': 'application/json'
   }
