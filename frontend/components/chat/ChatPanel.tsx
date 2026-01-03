@@ -15,7 +15,7 @@ export function ChatPanel() {
   };
 
   return (
-    <section className="flex h-full flex-col gap-5 p-6">
+    <section className="flex h-full min-h-0 flex-col gap-5 p-6">
       <header className="flex items-center justify-between border-b border-arc-gray-100 pb-4 dark:border-arc-gray-800">
         <div>
           <div className="flex items-center gap-2 mb-0.5">
@@ -38,7 +38,7 @@ export function ChatPanel() {
         </button>
       </header>
 
-      <div className={`flex-1 ${messages.length === 0 ? 'hidden' : ''}`}>
+      <div className={`flex-1 min-h-0 overflow-y-auto ${messages.length === 0 ? 'hidden' : ''}`}>
         <MessageList messages={messages} onSelectPrompt={setInput} />
       </div>
 

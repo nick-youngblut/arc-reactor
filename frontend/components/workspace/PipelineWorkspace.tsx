@@ -58,10 +58,10 @@ export function PipelineWorkspace() {
       </header>
 
       <div className="grid flex-1 gap-8 lg:grid-cols-[2fr_3fr]">
-        <div className="arc-surface flex min-h-[580px] flex-col overflow-hidden border-arc-blue/10 bg-panel/40 ring-1 ring-arc-night/5 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
+        <div className="arc-surface flex h-[780px] flex-col overflow-hidden border-arc-blue/10 bg-panel/40 ring-1 ring-arc-night/5 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
           <ChatPanel />
         </div>
-        <div className="arc-surface flex min-h-[580px] flex-col overflow-hidden border-arc-blue/10 bg-panel/40 ring-1 ring-arc-night/5 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
+        <div className="arc-surface flex h-[780px] flex-col overflow-hidden border-arc-blue/10 bg-panel/40 ring-1 ring-arc-night/5 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
           <FileEditorPanel />
         </div>
       </div>
