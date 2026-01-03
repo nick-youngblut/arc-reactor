@@ -32,7 +32,7 @@ async def session() -> AsyncSession:
 @pytest.mark.asyncio
 async def test_create_and_get_run(session: AsyncSession) -> None:
     service = RunStoreService.create(session, _Settings())
-    run_id = await service.create_run(
+    run_id, _weblog_secret = await service.create_run(
         pipeline="nf-core/scrnaseq",
         pipeline_version="2.7.1",
         user_email="user@arc.org",
@@ -51,7 +51,7 @@ async def test_create_and_get_run(session: AsyncSession) -> None:
 @pytest.mark.asyncio
 async def test_list_runs_filters(session: AsyncSession) -> None:
     service = RunStoreService.create(session, _Settings())
-    first_run = await service.create_run(
+    first_run, _weblog_secret = await service.create_run(
         pipeline="nf-core/scrnaseq",
         pipeline_version="2.7.1",
         user_email="user@arc.org",
@@ -76,7 +76,7 @@ async def test_list_runs_filters(session: AsyncSession) -> None:
 @pytest.mark.asyncio
 async def test_update_run_status_transitions(session: AsyncSession) -> None:
     service = RunStoreService.create(session, _Settings())
-    run_id = await service.create_run(
+    run_id, _weblog_secret = await service.create_run(
         pipeline="nf-core/scrnaseq",
         pipeline_version="2.7.1",
         user_email="user@arc.org",
@@ -97,7 +97,7 @@ async def test_update_run_status_transitions(session: AsyncSession) -> None:
 @pytest.mark.asyncio
 async def test_invalid_status_transition(session: AsyncSession) -> None:
     service = RunStoreService.create(session, _Settings())
-    run_id = await service.create_run(
+    run_id, _weblog_secret = await service.create_run(
         pipeline="nf-core/scrnaseq",
         pipeline_version="2.7.1",
         user_email="user@arc.org",
@@ -113,7 +113,7 @@ async def test_invalid_status_transition(session: AsyncSession) -> None:
 @pytest.mark.asyncio
 async def test_create_recovery_run(session: AsyncSession) -> None:
     service = RunStoreService.create(session, _Settings())
-    parent_id = await service.create_run(
+    parent_id, _weblog_secret = await service.create_run(
         pipeline="nf-core/scrnaseq",
         pipeline_version="2.7.1",
         user_email="user@arc.org",

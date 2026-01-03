@@ -107,6 +107,7 @@ def _submit_orchestrator_job(
     config_uri: str,
     params_uri: str,
     work_dir: str,
+    weblog_secret: str,
 ) -> str | None:
     if batch_v1 is None:
         return None
@@ -115,6 +116,10 @@ def _submit_orchestrator_job(
         region = settings.get("gcp_region")
         service_account = settings.get("nextflow_service_account")
         orchestrator_image = settings.get("orchestrator_image")
+        weblog_url = settings.get("weblog_receiver_url")
+        if not weblog_url:
+            logger.error("Missing weblog_receiver_url setting for run %s", run_id)
+            return None
 
         env = {
             "RUN_ID": run_id,
@@ -123,6 +128,8 @@ def _submit_orchestrator_job(
             "CONFIG_GCS_PATH": config_uri,
             "PARAMS_GCS_PATH": params_uri,
             "WORK_DIR": work_dir,
+            "WEBLOG_URL": weblog_url,
+            "WEBLOG_SECRET": weblog_secret,
         }
 
         runnable = batch_v1.Runnable(
@@ -233,7 +240,7 @@ async def submit_run(
 
     run_store, session = await _get_run_store(runtime)
     try:
-        run_id = await run_store.create_run(
+        run_id, weblog_secret = await run_store.create_run(
             pipeline=pipeline,
             pipeline_version=pipeline_version,
             user_email=context.user_email or "unknown",
@@ -264,6 +271,7 @@ async def submit_run(
             config_uri=config_uri,
             params_uri=params_uri,
             work_dir=work_dir,
+            weblog_secret=weblog_secret,
         )
 
         await run_store.update_run_status(

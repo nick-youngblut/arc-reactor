@@ -24,7 +24,7 @@ class _RunStoreStub:
 
     async def create_run(self, **kwargs):
         self.created = True
-        return self.run.run_id
+        return self.run.run_id, "secret"
 
     async def get_run(self, run_id: str):
         if run_id != self.run.run_id:

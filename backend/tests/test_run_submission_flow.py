@@ -85,6 +85,7 @@ async def test_submit_run_flow(session: AsyncSession) -> None:
     assert run.status == RunStatus.SUBMITTED
     assert run.batch_job_name == f"batch/{run_id}"
     assert f"{run_id}/inputs/samplesheet.csv" in storage.files
+    assert batch.submissions[0]["weblog_secret"]
 
 
 @pytest.mark.asyncio
@@ -93,7 +94,7 @@ async def test_submit_recovery_run_flow(session: AsyncSession) -> None:
     storage = _StorageStub()
     batch = _BatchStub()
 
-    parent_id = await service.create_run(
+    parent_id, _weblog_secret = await service.create_run(
         pipeline="nf-core/scrnaseq",
         pipeline_version="2.7.1",
         user_email="user@arc.org",
@@ -128,3 +129,4 @@ async def test_submit_recovery_run_flow(session: AsyncSession) -> None:
     assert recovery.status == RunStatus.SUBMITTED
     assert recovery.parent_run_id == parent_id
     assert recovery.batch_job_name == f"batch/{recovery_id}"
+    assert batch.submissions[0]["weblog_secret"]

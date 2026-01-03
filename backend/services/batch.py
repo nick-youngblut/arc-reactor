@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import os
 import re
 import time
 from dataclasses import dataclass
@@ -49,23 +48,6 @@ _STATE_TO_RUN_STATUS: dict[str, RunStatus] = {
 }
 
 
-def _build_batch_database_url(settings: object) -> str:
-    env_url = os.getenv("DATABASE_URL")
-    if env_url:
-        return env_url
-
-    user = os.getenv("DB_USER") or getattr(settings, "db_user", None)
-    password = os.getenv("DB_PASSWORD") or getattr(settings, "db_password", "")
-    database = os.getenv("DB_NAME") or getattr(settings, "db_name", None)
-    host = os.getenv("DB_HOST") or getattr(settings, "db_host", None)
-    port = os.getenv("DB_PORT") or getattr(settings, "db_port", 5432)
-
-    if user and database and host:
-        return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}"
-
-    raise ValueError("DB_HOST must be set for Batch jobs to reach Cloud SQL via private IP")
-
-
 def _sanitize_label_value(value: str, *, max_length: int = 63) -> str:
     normalized = value.lower()
     normalized = _LABEL_ALLOWED_RE.sub("-", normalized)
@@ -93,7 +75,7 @@ class BatchService:
     region: str
     orchestrator_image: str
     service_account: str | None
-    database_url: str
+    weblog_receiver_url: str
 
     @classmethod
     def create(cls, settings: object) -> "BatchService":
@@ -104,7 +86,7 @@ class BatchService:
         region = getattr(settings, "gcp_region", None)
         orchestrator_image = getattr(settings, "orchestrator_image", None)
         service_account = getattr(settings, "nextflow_service_account", None)
-        database_url = _build_batch_database_url(settings)
+        weblog_receiver_url = getattr(settings, "weblog_receiver_url", None)
 
         missing = [
             name
@@ -112,6 +94,7 @@ class BatchService:
                 ("gcp_project", project),
                 ("gcp_region", region),
                 ("orchestrator_image", orchestrator_image),
+                ("weblog_receiver_url", weblog_receiver_url),
             )
             if not value
         ]
@@ -125,7 +108,7 @@ class BatchService:
             region=region,
             orchestrator_image=orchestrator_image,
             service_account=service_account,
-            database_url=database_url,
+            weblog_receiver_url=weblog_receiver_url,
         )
 
     def _parent(self) -> str:
@@ -193,6 +176,7 @@ class BatchService:
         params_gcs_path: str,
         work_dir: str,
         is_recovery: bool,
+        weblog_secret: str,
         user_email: str | None = None,
     ) -> str:
         if batch_v1 is None:
@@ -205,8 +189,9 @@ class BatchService:
             "CONFIG_GCS_PATH": config_gcs_path,
             "PARAMS_GCS_PATH": params_gcs_path,
             "WORK_DIR": work_dir,
-            "DATABASE_URL": self.database_url,
             "IS_RECOVERY": "true" if is_recovery else "false",
+            "WEBLOG_URL": self.weblog_receiver_url,
+            "WEBLOG_SECRET": weblog_secret,
         }
 
         runnable = batch_v1.Runnable(

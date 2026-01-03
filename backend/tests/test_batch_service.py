@@ -192,7 +192,7 @@ def _service(client: _Client) -> BatchService:
         region="us-west1",
         orchestrator_image="us-docker.pkg.dev/proj/arc-reactor/orchestrator:latest",
         service_account="svc@proj.iam.gserviceaccount.com",
-        database_url="postgresql+asyncpg://user:pass@10.0.0.1:5432/db",
+        weblog_receiver_url="https://arc-reactor-weblog.example.com/weblog",
     )
 
 
@@ -211,6 +211,7 @@ def test_submit_orchestrator_job_builds_job(monkeypatch) -> None:
         params_gcs_path="gs://bucket/runs/run-123/inputs/params.yaml",
         work_dir="gs://bucket/runs/run-123/work/",
         is_recovery=False,
+        weblog_secret="secret",
         user_email="dev@arc.org",
     )
 
@@ -228,7 +229,8 @@ def test_submit_orchestrator_job_builds_job(monkeypatch) -> None:
     assert env["PIPELINE"] == "nf-core/scrnaseq"
     assert env["PIPELINE_VERSION"] == "2.7.1"
     assert env["IS_RECOVERY"] == "false"
-    assert env["DATABASE_URL"].startswith("postgresql+asyncpg://")
+    assert env["WEBLOG_URL"].endswith("/weblog")
+    assert env["WEBLOG_SECRET"] == "secret"
 
 
 def test_get_job_status_maps_state(monkeypatch) -> None:
@@ -281,6 +283,7 @@ def test_submit_orchestrator_job_error_handling(monkeypatch) -> None:
         params_gcs_path="gs://bucket/runs/run-456/inputs/params.yaml",
         work_dir="gs://bucket/runs/run-456/work/",
         is_recovery=True,
+        weblog_secret="secret",
     )
     assert job_name.endswith("/jobs/nf-run-456")
 
@@ -294,6 +297,7 @@ def test_submit_orchestrator_job_error_handling(monkeypatch) -> None:
             params_gcs_path="gs://bucket/runs/run-789/inputs/params.yaml",
             work_dir="gs://bucket/runs/run-789/work/",
             is_recovery=False,
+            weblog_secret="secret",
         )
 
     client.create_side_effects = [_Exceptions.PermissionDenied("denied")]
@@ -306,6 +310,7 @@ def test_submit_orchestrator_job_error_handling(monkeypatch) -> None:
             params_gcs_path="gs://bucket/runs/run-790/inputs/params.yaml",
             work_dir="gs://bucket/runs/run-790/work/",
             is_recovery=False,
+            weblog_secret="secret",
         )
 
 

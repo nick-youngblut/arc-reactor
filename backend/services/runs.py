@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import logging
+import secrets
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
@@ -89,6 +91,12 @@ class RunStoreService:
         logger.info("metric %s=%s %s", name, value, tags)
 
     @staticmethod
+    def _generate_weblog_secret() -> tuple[str, str]:
+        weblog_secret = secrets.token_urlsafe(24)
+        weblog_secret_hash = hashlib.sha256(weblog_secret.encode()).hexdigest()
+        return weblog_secret, weblog_secret_hash
+
+    @staticmethod
     def _to_response(run: Run) -> RunResponse:
         return RunResponse(
             run_id=run.run_id,
@@ -131,9 +139,10 @@ class RunStoreService:
         sample_count: int,
         source_ngs_runs: list[str] | None = None,
         source_project: str | None = None,
-    ) -> str:
-        run_id = f"run-{uuid4().hex[:8]}"
+    ) -> tuple[str, str]:
+        run_id = f"run-{uuid4().hex[:12]}"
         now = self._now()
+        weblog_secret, weblog_secret_hash = self._generate_weblog_secret()
         run = Run(
             run_id=run_id,
             pipeline=pipeline,
@@ -149,10 +158,11 @@ class RunStoreService:
             source_ngs_runs=source_ngs_runs,
             source_project=source_project,
             is_recovery=False,
+            weblog_secret_hash=weblog_secret_hash,
         )
         self.session.add(run)
         await self.session.commit()
-        return run_id
+        return run_id, weblog_secret
 
     async def get_run(self, run_id: str) -> RunResponse | None:
         run = await self.session.get(Run, run_id)
@@ -280,13 +290,14 @@ class RunStoreService:
         notes: str | None = None,
         override_params: dict[str, Any] | None = None,
         reused_work_dir: str | None = None,
-    ) -> str | None:
+    ) -> tuple[str, str] | None:
         parent = await self.session.get(Run, parent_run_id)
         if not parent:
             return None
 
-        run_id = f"run-{uuid4().hex[:8]}"
+        run_id = f"run-{uuid4().hex[:12]}"
         now = self._now()
+        weblog_secret, weblog_secret_hash = self._generate_weblog_secret()
         run = Run(
             run_id=run_id,
             pipeline=parent.pipeline,
@@ -305,10 +316,11 @@ class RunStoreService:
             is_recovery=True,
             recovery_notes=notes,
             reused_work_dir=reused_work_dir or self._work_dir(parent.run_id),
+            weblog_secret_hash=weblog_secret_hash,
         )
         self.session.add(run)
         await self.session.commit()
-        return run_id
+        return run_id, weblog_secret
 
     async def submit_run(
         self,
@@ -329,7 +341,7 @@ class RunStoreService:
         if not all([samplesheet_csv, config_content, params is not None, pipeline, pipeline_version]):
             raise ValidationError("Missing required submission inputs")
 
-        run_id = await self.create_run(
+        run_id, weblog_secret = await self.create_run(
             pipeline=pipeline,
             pipeline_version=pipeline_version,
             user_email=user_email,
@@ -369,6 +381,7 @@ class RunStoreService:
                 params_gcs_path=params_gcs_path,
                 work_dir=work_dir,
                 is_recovery=False,
+                weblog_secret=weblog_secret,
                 user_email=user_email,
             )
 
@@ -421,7 +434,7 @@ class RunStoreService:
             raise ValidationError("Recovery unavailable: work directory not found")
 
         reused_work_dir = f"gs://{storage.bucket_name}/runs/{parent_run_id}/work/"
-        run_id = await self.create_recovery_run(
+        recovery = await self.create_recovery_run(
             parent_run_id=parent_run_id,
             user_email=user_email,
             user_name=user_name,
@@ -429,8 +442,9 @@ class RunStoreService:
             override_params=override_params,
             reused_work_dir=reused_work_dir if reuse_work_dir else None,
         )
-        if not run_id:
+        if not recovery:
             raise NotFoundError("Run not found", detail=f"No run exists with ID {parent_run_id}")
+        run_id, weblog_secret = recovery
 
         logger.info(
             "Submitting recovery run",
@@ -486,6 +500,7 @@ class RunStoreService:
                 params_gcs_path=params_gcs_path,
                 work_dir=work_dir,
                 is_recovery=True,
+                weblog_secret=weblog_secret,
                 user_email=user_email,
             )
 
