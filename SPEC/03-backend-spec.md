@@ -94,7 +94,7 @@ default:
   # Service Configuration
   nextflow_bucket: "arc-reactor-runs"
   nextflow_service_account: "nextflow-orchestrator@arc-ctc-project.iam.gserviceaccount.com"
-  orchestrator_image: "gcr.io/arc-ctc-project/nextflow-orchestrator:latest"
+  orchestrator_image: "us-docker.pkg.dev/arc-ctc-project/arc-reactor/nextflow-orchestrator:latest"
   
   # Benchling Configuration
   # Benchling settings are sourced via benchling-py Dynaconf (DYNACONF env var)

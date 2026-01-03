@@ -265,7 +265,7 @@ Outbound traffic allowed to:
 - `generativelanguage.googleapis.com` (Gemini Developer API)
 - `benchling-warehouse.arcinstitute.org` (Benchling)
 - `github.com` (Nextflow pipelines)
-- `docker.io`, `gcr.io`, `quay.io` (Container images)
+- `docker.io`, `us-docker.pkg.dev`, `quay.io` (Container images)
 
 ## Application Security
 

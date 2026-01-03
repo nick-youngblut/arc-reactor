@@ -25,7 +25,7 @@ test:
   gcp_project: "multi-omics-dev"
   nextflow_bucket: "arc-reactor-runs-dev"
   nextflow_service_account: "nextflow-orchestrator@multi-omics-dev.iam.gserviceaccount.com"
-  orchestrator_image: "gcr.io/multi-omics-dev/nextflow-orchestrator:latest"
+  orchestrator_image: "us-docker.pkg.dev/multi-omics-dev/arc-reactor/nextflow-orchestrator:latest"
   cors_allowed_origins:
   - "https://arc-reactor-dev.multi-omics-dev.arcinstitute.org"
   - "http://localhost:3000"
@@ -35,7 +35,7 @@ prod:
   gcp_project: "arc-genomics02"
   nextflow_bucket: "arc-reactor-runs"
   nextflow_service_account: "nextflow-orchestrator@arc-genomics02.iam.gserviceaccount.com"
-  orchestrator_image: "gcr.io/arc-genomics02/nextflow-orchestrator:latest"
+  orchestrator_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/nextflow-orchestrator:latest"
   cors_allowed_origins:
   - "https://arc-reactor.genomics.arcinstitute.org"
   - "http://localhost:3000"

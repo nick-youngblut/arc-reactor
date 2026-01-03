@@ -190,7 +190,7 @@ def _service(client: _Client) -> BatchService:
         client=client,
         project="proj",
         region="us-west1",
-        orchestrator_image="gcr.io/proj/orchestrator:latest",
+        orchestrator_image="us-docker.pkg.dev/proj/arc-reactor/orchestrator:latest",
         service_account="svc@proj.iam.gserviceaccount.com",
         database_url="postgresql+asyncpg://user:pass@10.0.0.1:5432/db",
     )

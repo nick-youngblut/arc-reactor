@@ -281,11 +281,11 @@ jobs:
         run: |
           DOCKER_BUILDKIT=1 docker build \
             --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
-            -t gcr.io/$PROJECT_ID/${{ steps.env.outputs.service }}:${{ github.sha }} \
-            -t gcr.io/$PROJECT_ID/${{ steps.env.outputs.service }}:latest \
+            -t us-docker.pkg.dev/$PROJECT_ID/arc-reactor/${{ steps.env.outputs.service }}:${{ github.sha }} \
+            -t us-docker.pkg.dev/$PROJECT_ID/arc-reactor/${{ steps.env.outputs.service }}:latest \
             .
-          docker push gcr.io/$PROJECT_ID/${{ steps.env.outputs.service }}:${{ github.sha }}
-          docker push gcr.io/$PROJECT_ID/${{ steps.env.outputs.service }}:latest
+          docker push us-docker.pkg.dev/$PROJECT_ID/arc-reactor/${{ steps.env.outputs.service }}:${{ github.sha }}
+          docker push us-docker.pkg.dev/$PROJECT_ID/arc-reactor/${{ steps.env.outputs.service }}:latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
@@ -318,7 +318,7 @@ jobs:
         with:
           service: ${{ steps.env.outputs.service }}
           region: ${{ env.REGION }}
-          image: gcr.io/${{ env.PROJECT_ID }}/${{ steps.env.outputs.service }}:${{ github.sha }}
+          image: us-docker.pkg.dev/${{ env.PROJECT_ID }}/arc-reactor/${{ steps.env.outputs.service }}:${{ github.sha }}
           flags: |
             --min-instances=1
             --max-instances=10
