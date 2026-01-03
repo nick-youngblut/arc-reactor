@@ -48,9 +48,6 @@ class PipelineAgent:
             create_config_expert(model),
         ]
         middleware = [
-            TodoListMiddleware(),
-            LargeOutputMiddleware(),
-            SummarizationMiddleware(),
             build_hitl_middleware(),
         ]
         agent = create_deep_agent(

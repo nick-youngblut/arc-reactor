@@ -40,7 +40,7 @@ def create_benchling_expert(model):
             "Expert at complex Benchling queries involving multiple data sources, "
             "relationship traversal, and data reconciliation"
         ),
-        "prompt": BENCHLING_EXPERT_PROMPT,
+        "system_prompt": BENCHLING_EXPERT_PROMPT,
         "tools": [
             search_ngs_runs,
             get_ngs_run_samples,

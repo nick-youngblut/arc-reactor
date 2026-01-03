@@ -22,7 +22,7 @@ def create_config_expert(model):
     return {
         "name": "config_expert",
         "description": "Expert at Nextflow pipeline configuration, parameter selection, and resource optimization",
-        "prompt": CONFIG_EXPERT_PROMPT,
+        "system_prompt": CONFIG_EXPERT_PROMPT,
         "tools": [list_pipelines, get_pipeline_schema, get_dropdown_values],
         "model": model,
     }
