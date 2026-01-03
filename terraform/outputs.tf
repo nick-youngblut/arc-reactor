@@ -1,9 +1,9 @@
 output "cloud_run_service" {
-  value = google_cloud_run_v2_service.app.name
+  value = google_cloud_run_v2_service.backend.name
 }
 
 output "cloud_run_uri" {
-  value = google_cloud_run_v2_service.app.uri
+  value = google_cloud_run_v2_service.backend.uri
 }
 
 output "runs_bucket" {

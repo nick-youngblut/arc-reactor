@@ -35,7 +35,9 @@ locals {
     "artifactregistry.googleapis.com",
     "vpcaccess.googleapis.com",
     "compute.googleapis.com",
-    "servicenetworking.googleapis.com"
+    "servicenetworking.googleapis.com",
+    "pubsub.googleapis.com",
+    "cloudscheduler.googleapis.com"
   ]
 
   app_roles = [
@@ -374,7 +376,7 @@ resource "google_sql_user" "app" {
   password = var.db_password
 }
 
-resource "google_cloud_run_v2_service" "app" {
+resource "google_cloud_run_v2_service" "backend" {
   name     = var.service_name
   location = var.region
   ingress  = var.cloud_run_ingress
@@ -383,7 +385,7 @@ resource "google_cloud_run_v2_service" "app" {
     service_account = google_service_account.app.email
 
     containers {
-      image = var.image
+      image = var.backend_image
 
       env {
         name  = "DYNACONF"
@@ -503,13 +505,50 @@ resource "google_cloud_run_v2_service" "app" {
   }
 }
 
-resource "google_compute_region_network_endpoint_group" "app" {
-  name                  = "arc-reactor-neg"
+resource "google_cloud_run_v2_service" "frontend" {
+  name     = "arc-reactor-frontend"
+  location = var.region
+
+  template {
+    service_account = google_service_account.app.email
+
+    containers {
+      image = var.frontend_image
+
+      resources {
+        limits = {
+          cpu    = "1"
+          memory = "512Mi"
+        }
+      }
+    }
+
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 5
+    }
+  }
+
+  ingress = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+}
+
+resource "google_compute_region_network_endpoint_group" "backend" {
+  name                  = "arc-reactor-backend-neg"
   region                = var.region
   network_endpoint_type = "SERVERLESS"
 
   cloud_run {
-    service = google_cloud_run_v2_service.app.name
+    service = google_cloud_run_v2_service.backend.name
+  }
+}
+
+resource "google_compute_region_network_endpoint_group" "frontend" {
+  name                  = "arc-reactor-frontend-neg"
+  region                = var.region
+  network_endpoint_type = "SERVERLESS"
+
+  cloud_run {
+    service = google_cloud_run_v2_service.frontend.name
   }
 }
 
@@ -525,13 +564,13 @@ resource "google_iap_client" "iap_client" {
   brand        = google_iap_brand.iap_brand.name
 }
 
-resource "google_compute_backend_service" "app" {
+resource "google_compute_backend_service" "backend" {
   name                  = "arc-reactor-backend"
   protocol              = "HTTP"
   load_balancing_scheme = "EXTERNAL_MANAGED"
 
   backend {
-    group = google_compute_region_network_endpoint_group.app.id
+    group = google_compute_region_network_endpoint_group.backend.id
   }
 
   iap {
@@ -541,7 +580,7 @@ resource "google_compute_backend_service" "app" {
 }
 
 resource "google_iap_web_backend_service_iam_binding" "iap_access" {
-  web_backend_service = google_compute_backend_service.app.name
+  web_backend_service = google_compute_backend_service.backend.name
   role                = "roles/iap.httpsResourceAccessor"
   members             = ["group:${var.iap_access_group}"]
 }

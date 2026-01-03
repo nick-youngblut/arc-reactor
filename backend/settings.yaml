@@ -14,6 +14,9 @@ default:
   gemini_thinking_level: "medium"
 
   frontend_out_dir: "/app/frontend/out"
+  frontend_image: ""
+  backend_image: ""
+  weblog_receiver_url: ""
 
   benchling_cb_failure_threshold: 5
   benchling_cb_recovery_timeout: 30
@@ -26,6 +29,9 @@ test:
   nextflow_bucket: "arc-reactor-runs-dev"
   nextflow_service_account: "nextflow-orchestrator@multi-omics-dev.iam.gserviceaccount.com"
   orchestrator_image: "us-docker.pkg.dev/multi-omics-dev/arc-reactor/nextflow-orchestrator:latest"
+  frontend_image: "us-docker.pkg.dev/multi-omics-dev/arc-reactor/arc-reactor-frontend:latest"
+  backend_image: "us-docker.pkg.dev/multi-omics-dev/arc-reactor/arc-reactor-backend:latest"
+  weblog_receiver_url: "https://arc-reactor-weblog-xxx.run.app/weblog"
   cors_allowed_origins:
   - "https://arc-reactor-dev.multi-omics-dev.arcinstitute.org"
   - "http://localhost:3000"
@@ -36,6 +42,9 @@ prod:
   nextflow_bucket: "arc-reactor-runs"
   nextflow_service_account: "nextflow-orchestrator@arc-genomics02.iam.gserviceaccount.com"
   orchestrator_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/nextflow-orchestrator:latest"
+  frontend_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/arc-reactor-frontend:latest"
+  backend_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/arc-reactor-backend:latest"
+  weblog_receiver_url: "https://arc-reactor-weblog-xxx.run.app/weblog"
   cors_allowed_origins:
   - "https://arc-reactor.genomics.arcinstitute.org"
   - "http://localhost:3000"

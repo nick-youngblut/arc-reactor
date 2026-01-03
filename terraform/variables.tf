@@ -19,9 +19,25 @@ variable "service_name" {
   description = "Cloud Run service name"
 }
 
-variable "image" {
+variable "frontend_image" {
+  description = "Container image for frontend service"
   type        = string
-  description = "Container image URI"
+}
+
+variable "backend_image" {
+  description = "Container image for backend service"
+  type        = string
+}
+
+variable "weblog_receiver_image" {
+  description = "Container image for weblog receiver service"
+  type        = string
+}
+
+variable "database_url" {
+  description = "PostgreSQL database connection URL"
+  type        = string
+  sensitive   = true
 }
 
 variable "runs_bucket" {

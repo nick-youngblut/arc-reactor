@@ -2,7 +2,9 @@ project_id   = "multi-omics-dev"
 region       = "us-west1"
 environment  = "test"
 service_name = "arc-reactor-dev"
-image        = "us-west1-docker.pkg.dev/multi-omics-dev/arc-reactor/arc-reactor:dev"
+frontend_image = "us-docker.pkg.dev/multi-omics-dev/arc-reactor/arc-reactor-frontend:latest"
+backend_image = "us-docker.pkg.dev/multi-omics-dev/arc-reactor/arc-reactor-backend:latest"
+weblog_receiver_image = "us-docker.pkg.dev/multi-omics-dev/arc-reactor/arc-reactor-weblog:latest"
 runs_bucket  = "arc-reactor-runs-dev"
 
 db_instance_name = "arc-reactor-db-dev"
@@ -10,6 +12,7 @@ db_name          = "arc_reactor_dev"
 
 # Set via -var or TF_VAR_* env vars for local runs
 # db_password = ""
+# database_url = ""
 # benchling_test_api_key = ""
 # benchling_test_database_uri = ""
 # benchling_test_app_client_id = ""
