@@ -5,11 +5,12 @@ on:
     branches: [main, dev]
 
 env:
-  PROJECT_ID: arc-ctc-project
+  PROJECT_ID: arc-genomics02
   REGION: us-west1
   AR_REPO: arc-reactor
   IMAGE_NAME: arc-reactor
   ORCHESTRATOR_IMAGE_NAME: nextflow-orchestrator
+  WEBLOG_RECEIVER_IMAGE_NAME: arc-reactor-weblog
 
 jobs:
   deploy:
@@ -64,6 +65,17 @@ jobs:
           tags: |
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.ORCHESTRATOR_IMAGE_NAME }}:${{ github.sha }}
             ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.ORCHESTRATOR_IMAGE_NAME }}:latest
+
+      - name: Build and push weblog receiver image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: weblog_receiver/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.WEBLOG_RECEIVER_IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.WEBLOG_RECEIVER_IMAGE_NAME }}:latest
 
       - name: Deploy to Cloud Run
         run: |

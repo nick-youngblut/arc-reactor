@@ -208,7 +208,7 @@ on:
     branches: [main, develop]
 
 env:
-  PROJECT_ID: arc-ctc-project
+  PROJECT_ID: arc-genomics02
   REGION: us-west1
   
 jobs:
@@ -349,7 +349,7 @@ jobs:
 # settings.yaml - prod section
 prod:
   debug: false
-  gcp_project: "arc-ctc-project"
+  gcp_project: "arc-genomics02"
   gcp_region: "us-west1"
   nextflow_bucket: "arc-reactor-runs"
   log_level: "INFO"
@@ -361,7 +361,7 @@ prod:
 # settings.yaml - test section
 test:
   debug: true
-  gcp_project: "arc-ctc-project"
+  gcp_project: "multi-omics-dev"
   gcp_region: "us-west1"
   nextflow_bucket: "arc-reactor-runs-dev"
   log_level: "DEBUG"

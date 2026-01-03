@@ -88,13 +88,13 @@ default:
   debug: false
   
   # GCP Configuration
-  gcp_project: "arc-ctc-project"
+  gcp_project: "arc-genomics02"
   gcp_region: "us-west1"
   
   # Service Configuration
   nextflow_bucket: "arc-reactor-runs"
-  nextflow_service_account: "nextflow-orchestrator@arc-ctc-project.iam.gserviceaccount.com"
-  orchestrator_image: "us-docker.pkg.dev/arc-ctc-project/arc-reactor/nextflow-orchestrator:latest"
+  nextflow_service_account: "nextflow-orchestrator@arc-genomics02.iam.gserviceaccount.com"
+  orchestrator_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/nextflow-orchestrator:latest"
   
   # Benchling Configuration
   # Benchling settings are sourced via benchling-py Dynaconf (DYNACONF env var)

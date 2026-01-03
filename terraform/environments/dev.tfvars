@@ -1,8 +1,8 @@
-project_id   = "arc-ctc-project"
+project_id   = "multi-omics-dev"
 region       = "us-west1"
 environment  = "test"
 service_name = "arc-reactor-dev"
-image        = "us-west1-docker.pkg.dev/arc-ctc-project/arc-reactor/arc-reactor:dev"
+image        = "us-west1-docker.pkg.dev/multi-omics-dev/arc-reactor/arc-reactor:dev"
 runs_bucket  = "arc-reactor-runs-dev"
 
 db_instance_name = "arc-reactor-db-dev"

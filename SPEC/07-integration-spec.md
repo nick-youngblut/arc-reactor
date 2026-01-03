@@ -212,7 +212,7 @@ process {
 }
 
 google {
-    project = "arc-ctc-project"
+    project = "arc-genomics02"
     location = "us-west1"
     batch {
         serviceAccountEmail = "nextflow-tasks@project.iam.gserviceaccount.com"
