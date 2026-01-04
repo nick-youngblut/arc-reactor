@@ -79,7 +79,7 @@ def _extract_params(config_content: str) -> dict[str, Any]:
         value = value.strip().rstrip(",")
         if value.lower() in {"true", "false"}:
             params[key] = value.lower() == "true"
-        elif value.startswith(("\"", "'")) and value.endswith(("\"", "'")):
+        elif value.startswith(('"', "'")) and value.endswith(('"', "'")):
             params[key] = value[1:-1]
         else:
             try:
@@ -109,7 +109,20 @@ async def generate_samplesheet(
     expected_cells: int | None = None,
     runtime: Any | None = None,
 ) -> str:
-    """Generate a samplesheet CSV for a pipeline."""
+    """
+    Generate a samplesheet CSV for a pipeline.
+
+    Args:
+        ngs_run: NGS Run name (e.g., "NR-2024-0156")
+        pooled_sample: Pooled sample / SspArc name (e.g., "SspArc0050")
+        sample_ids: Sample IDs, semicolon-delimited (e.g., "LPS-001;LPS-002")
+        pipeline: Pipeline name (e.g., "nf-core/scrnaseq")
+        expected_cells: Expected cells per sample (default: 10000)
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        String message containing the samplesheet CSV
+    """
     if not pipeline:
         return "Error: pipeline is required."
     if not ngs_run and not pooled_sample:
@@ -137,7 +150,7 @@ async def generate_samplesheet(
         placeholders = ", ".join(f":sample_{i}" for i in range(len(sample_list)))
         params.update({f"sample_{i}": sample for i, sample in enumerate(sample_list)})
         sample_filter = (
-            f"AND (lps.sample_id IN ({placeholders}) OR lps.\"name$\" IN ({placeholders}))"
+            f'AND (lps.sample_id IN ({placeholders}) OR lps."name$" IN ({placeholders}))'
         )
 
     sql = f"""
@@ -178,9 +191,7 @@ async def generate_samplesheet(
         return "No samples found for the requested run."
 
     missing_fastq = [
-        row.get("sample_id")
-        for row in rows
-        if not row.get("fastq_1") or not row.get("fastq_2")
+        row.get("sample_id") for row in rows if not row.get("fastq_1") or not row.get("fastq_2")
     ]
     if missing_fastq:
         preview = ", ".join(str(sample) for sample in missing_fastq[:5])
@@ -249,7 +260,18 @@ async def generate_config(
     profile: str | None = None,
     runtime: Any | None = None,
 ) -> str:
-    """Generate a Nextflow config for a pipeline."""
+    """
+    Generate a Nextflow config for a pipeline.
+
+    Args:
+        pipeline: Pipeline name (e.g., "nf-core/scrnaseq")
+        params: Pipeline parameters to include
+        profile: Execution profile (default: "gcp_batch")
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        String message containing the Nextflow config
+    """
     if not pipeline:
         return "Error: pipeline is required."
 
@@ -284,16 +306,16 @@ async def generate_config(
             f"profiles {{",
             f"  {profile_name} {{",
             "    process {",
-            "      executor = \"google-batch\"",
-            "      errorStrategy = \"retry\"",
+            '      executor = "google-batch"',
+            '      errorStrategy = "retry"',
             "      maxRetries = 3",
             "      scratch = true",
             "    }",
             "    google {",
-            f"      project = \"{gcp_project}\"",
-            f"      location = \"{gcp_region}\"",
+            f'      project = "{gcp_project}"',
+            f'      location = "{gcp_region}"',
             "      batch {",
-            f"        serviceAccountEmail = \"{service_account}\"",
+            f'        serviceAccountEmail = "{service_account}"',
             "        spot = true",
             "        maxSpotAttempts = 3",
             "      }",
@@ -324,7 +346,18 @@ async def validate_inputs(
     pipeline: str,
     runtime: Any | None = None,
 ) -> str:
-    """Validate samplesheet and config contents."""
+    """
+    Validate samplesheet and config contents.
+
+    Args:
+        samplesheet_csv: CSV content
+        config_content: Config content
+        pipeline: Pipeline name (e.g., "nf-core/scrnaseq")
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        JSON string containing the validation results
+    """
     registry = PipelineRegistry.create()
     pipeline_schema = registry.get_pipeline(pipeline)
     if not pipeline_schema:

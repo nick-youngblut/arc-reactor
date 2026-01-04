@@ -503,9 +503,7 @@ async def _traverse_relationships(
         return results, True
 
     next_entity_ids = {
-        link["linked_entity_id"]
-        for link in all_links
-        if link.get("linked_entity_id")
+        link["linked_entity_id"] for link in all_links if link.get("linked_entity_id")
     }
     next_entity_ids -= visited_entities
 
@@ -580,6 +578,9 @@ async def get_entities(
         allow_wildcards: Enable SQL-style wildcards for name filters (% and _; * and ? supported).
         limit: Max results to return (default 40, max 500).
         runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        Toon formatted table of entities
     """
     context = get_tool_context(runtime)
     benchling = context.benchling
@@ -589,7 +590,9 @@ async def get_entities(
         unknown_fields = [field for field in selected_fields if field not in _ALLOWED_ENTITY_FIELDS]
         if unknown_fields:
             return f"Error: Unsupported fields requested: {', '.join(unknown_fields)}"
-        select_columns = [f"{_ALLOWED_ENTITY_FIELDS[field]} AS {field}" for field in selected_fields]
+        select_columns = [
+            f"{_ALLOWED_ENTITY_FIELDS[field]} AS {field}" for field in selected_fields
+        ]
     else:
         select_columns = [
             "entity.id AS entity_id",
@@ -646,7 +649,9 @@ async def get_entities(
 
     if schema_name:
         if allow_wildcards:
-            clause, clause_params = _build_like_clause("schema.name", [schema_name], "schema_name_like")
+            clause, clause_params = _build_like_clause(
+                "schema.name", [schema_name], "schema_name_like"
+            )
             conditions.append(clause)
             params.update(clause_params)
         else:
@@ -655,7 +660,9 @@ async def get_entities(
 
     if project_name:
         if allow_wildcards:
-            clause, clause_params = _build_like_clause("project.name", [project_name], "project_name_like")
+            clause, clause_params = _build_like_clause(
+                "project.name", [project_name], "project_name_like"
+            )
             conditions.append(clause)
             params.update(clause_params)
         else:
@@ -664,7 +671,9 @@ async def get_entities(
 
     if folder_name:
         if allow_wildcards:
-            clause, clause_params = _build_like_clause("folder.name", [folder_name], "folder_name_like")
+            clause, clause_params = _build_like_clause(
+                "folder.name", [folder_name], "folder_name_like"
+            )
             conditions.append(clause)
             params.update(clause_params)
         else:
@@ -690,7 +699,7 @@ async def get_entities(
         params["created_before"] = created_before
 
     if archived is not None:
-        conditions.append("entity.\"archived$\" = :archived")
+        conditions.append('entity."archived$" = :archived')
         params["archived"] = bool(archived)
 
     if conditions:
@@ -728,6 +737,9 @@ async def get_entity_relationships(
         include_reverse_links: Include back-references when True.
         output_format: Output format ("tree", "yaml", or "json").
         runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        A string containing the relationships
     """
     if not entity_name:
         return "Error: entity_name is required."
@@ -839,6 +851,9 @@ async def list_entries(
         archived: Include archived entries when True.
         limit: Max results to return (default 50, max 500).
         runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        Toon formatted table of Benchling notebook entries
     """
     context = get_tool_context(runtime)
     benchling = context.benchling
@@ -890,7 +905,7 @@ async def list_entries(
         params["max_date"] = max_date
 
     if archived is not None:
-        conditions.append("entry.\"archived$\" = :archived")
+        conditions.append('entry."archived$" = :archived')
         params["archived"] = bool(archived)
 
     if conditions:
@@ -932,8 +947,10 @@ async def get_entry_content(
     columns = await _get_table_columns(benchling, "entry$raw")
     content_column = next((col for col in _CONTENT_COLUMNS if col in columns), None)
     if not content_column:
-        return "Error: Entry content column not found in entry$raw." \
+        return (
+            "Error: Entry content column not found in entry$raw."
             f" Available columns: {', '.join(sorted(columns))}"
+        )
 
     clause, params = _build_in_clause("entry_name", entries)
     sql = f"""
@@ -984,6 +1001,9 @@ async def get_entry_entities(
         entry_name: Entry name to resolve.
         limit: Max entities to return (default 40, max 500).
         runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        Toon formatted table of entities linked to the entry
     """
     if not entry_name:
         return "Error: entry_name is required."

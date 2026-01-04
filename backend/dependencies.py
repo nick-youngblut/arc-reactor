@@ -5,6 +5,7 @@ from fastapi import Depends, Request
 from .config import settings
 from .context import AppContext
 from .services.benchling import BenchlingService
+from .services.checkpointer import CheckpointerService
 from .services.database import DatabaseService
 from .services.gemini import DisabledGeminiService, GeminiService
 from .services.storage import StorageService
@@ -34,6 +35,10 @@ def get_database_service(request: Request) -> DatabaseService:
 
 def get_storage_service(request: Request) -> StorageService:
     return request.app.state.storage_service
+
+
+def get_checkpointer_service(request: Request) -> CheckpointerService:
+    return request.app.state.checkpointer_service
 
 
 def get_gemini_service(request: Request) -> GeminiService | DisabledGeminiService:

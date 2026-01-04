@@ -67,6 +67,15 @@ def q30_status(q30_value: float | None) -> str:
 
 
 def format_table(rows: Sequence[Mapping[str, Any]] | str) -> str:
+    """
+    Format table using TOON encoding.
+
+    Args:
+        rows: Sequence of rows to format
+
+    Returns:
+        String message containing the formatted table
+    """
     if not rows:
         return "No results found."
     if isinstance(rows, str):
@@ -104,12 +113,32 @@ def format_run_samples_result(
     summary: Mapping[str, Any],
     samples: Sequence[Mapping[str, Any]],
 ) -> str:
+    """
+    Format run samples result.
+
+    Args:
+        summary: Summary of the NGS run
+        samples: Sequence of sample information
+
+    Returns:
+        String message containing the run samples result
+    """
     table = format_table(samples)
     summary_text = format_run_summary(summary)
     return f"{summary_text}\n\nSamples:\n{table}"
 
 
 def format_fastq_paths(rows: Sequence[Mapping[str, Any]], validated: bool) -> str:
+    """
+    Format FASTQ paths.
+
+    Args:
+        rows: Sequence of rows to format
+        validated: Whether the FASTQ paths have been verified
+
+    Returns:
+        Toon formatted table of FASTQ file paths
+    """
     if not rows:
         return "No FASTQ paths found for the requested samples."
     table = format_table(rows)

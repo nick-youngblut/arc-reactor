@@ -7,6 +7,7 @@ import { useWorkspaceStore } from '@/stores/workspaceStore';
 
 const MAX_RECONNECTS = 5;
 const RECONNECT_DELAY_MS = 2000;
+const CONNECT_DELAY_MS = 100; // Delay to handle React Strict Mode double-mount
 
 function buildWebSocketUrl() {
   if (typeof window === 'undefined') return null;
@@ -52,24 +53,24 @@ export function useAgentChat() {
         const existing = prev.toolInvocations ?? [];
         const next = existing.some((item) => item.toolCallId === toolCallId)
           ? existing.map((item) =>
-              item.toolCallId === toolCallId
-                ? {
-                    ...item,
-                    ...updates,
-                    state: (updates.state ?? item.state) as 'pending' | 'running' | 'completed' | 'error'
-                  }
-                : item
-            )
-          : [
-              ...existing,
-              {
-                toolCallId,
-                toolName: updates.toolName ?? 'tool',
-                args: updates.args ?? {},
-                state: (updates.state ?? 'running') as 'pending' | 'running' | 'completed' | 'error',
-                result: updates.result
+            item.toolCallId === toolCallId
+              ? {
+                ...item,
+                ...updates,
+                state: (updates.state ?? item.state) as 'pending' | 'running' | 'completed' | 'error'
               }
-            ];
+              : item
+          )
+          : [
+            ...existing,
+            {
+              toolCallId,
+              toolName: updates.toolName ?? 'tool',
+              args: updates.args ?? {},
+              state: (updates.state ?? 'running') as 'pending' | 'running' | 'completed' | 'error',
+              result: updates.result
+            }
+          ];
 
         return { toolInvocations: next };
       });
@@ -79,14 +80,20 @@ export function useAgentChat() {
 
   const handleStreamLine = useCallback(
     (line: string) => {
+      console.log('[useAgentChat] handleStreamLine:', line.slice(0, 80));
       if (!line) return;
       const trimmed = line.startsWith('data:') ? line.replace(/^data:\s*/, '') : line;
       const code = trimmed[0];
-      if (!code || trimmed[1] !== ':') return;
+      if (!code || trimmed[1] !== ':') {
+        console.log('[useAgentChat] Invalid format, code:', code, 'char1:', trimmed[1]);
+        return;
+      }
       const payload = trimmed.slice(2);
+      console.log('[useAgentChat] Code:', code, 'Payload:', payload.slice(0, 50));
 
       if (code === '0') {
         const text = safeJsonParse<string>(payload) ?? payload.replace(/^"|"$/g, '');
+        console.log('[useAgentChat] Appending text:', text.slice(0, 50));
         updateLastMessage((prev) => ({
           content: `${prev.content ?? ''}${text}`,
           isStreaming: true
@@ -149,58 +156,88 @@ export function useAgentChat() {
     [handleStreamLine]
   );
 
+  // Store handlers in refs to avoid re-creating the connect function
+  const handleStreamChunkRef = useRef(handleStreamChunk);
+  handleStreamChunkRef.current = handleStreamChunk;
+  const setErrorRef = useRef(setError);
+  setErrorRef.current = setError;
+  const setLoadingRef = useRef(setLoading);
+  setLoadingRef.current = setLoading;
+
   const connect = useCallback(() => {
     const url = buildWebSocketUrl();
+    console.log('[useAgentChat] Connecting to WebSocket:', url);
     if (!url) return;
 
     const socket = new WebSocket(url);
     wsRef.current = socket;
 
     socket.onopen = () => {
+      console.log('[useAgentChat] WebSocket connected');
       reconnectAttempts.current = 0;
-      setError(null);
+      setErrorRef.current(null);
     };
 
     socket.onmessage = (event) => {
       const payload = typeof event.data === 'string' ? event.data : '';
+      console.log('[useAgentChat] Received:', payload.slice(0, 100));
       if (!payload) return;
       const json = safeJsonParse<{ type?: string; message?: string }>(payload);
       if (json?.type === 'error') {
-        setError(json.message || 'Unknown error');
-        setLoading(false);
+        console.error('[useAgentChat] Server error:', json.message);
+        setErrorRef.current(json.message || 'Unknown error');
+        setLoadingRef.current(false);
         return;
       }
-      if (json?.type === 'connected') return;
-      handleStreamChunk(payload);
+      if (json?.type === 'connected') {
+        console.log('[useAgentChat] Received connected confirmation');
+        return;
+      }
+      console.log('[useAgentChat] Processing stream chunk');
+      handleStreamChunkRef.current(payload);
     };
 
-    socket.onerror = () => {
-      setError('Chat connection error');
+    socket.onerror = (err) => {
+      console.error('[useAgentChat] WebSocket error:', err);
+      setErrorRef.current('Chat connection error');
     };
 
-    socket.onclose = () => {
+    socket.onclose = (event) => {
+      console.log('[useAgentChat] WebSocket closed:', event.code, event.reason, 'manual:', manualClose.current);
       if (manualClose.current) return;
       if (reconnectAttempts.current >= MAX_RECONNECTS) {
-        setError('Unable to reconnect to chat stream');
+        setErrorRef.current('Unable to reconnect to chat stream');
         return;
       }
       reconnectAttempts.current += 1;
+      console.log('[useAgentChat] Reconnecting in', RECONNECT_DELAY_MS, 'ms, attempt', reconnectAttempts.current);
       setTimeout(() => connect(), RECONNECT_DELAY_MS);
     };
-  }, [handleStreamChunk, setError, setLoading]);
+  }, []); // No dependencies - uses refs for stable access
 
   useEffect(() => {
-    connect();
+    // Reset manualClose for this mount cycle
+    manualClose.current = false;
+
+    // Delay connection to handle React Strict Mode double-mount
+    // If cleanup runs before timeout, connection is cancelled
+    const timeoutId = setTimeout(() => {
+      connect();
+    }, CONNECT_DELAY_MS);
+
     return () => {
+      clearTimeout(timeoutId);
       manualClose.current = true;
       wsRef.current?.close();
     };
-  }, [connect]);
+  }, []); // Only run once on mount
 
   const sendMessage = useCallback(
     (message: string) => {
       if (!message.trim()) return;
+      console.log('[useAgentChat] sendMessage called, readyState:', wsRef.current?.readyState);
       if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+        console.error('[useAgentChat] Cannot send - WebSocket not open');
         setError('Chat connection is not available.');
         return;
       }
@@ -223,6 +260,7 @@ export function useAgentChat() {
       addMessage(assistantMessage);
       setLoading(true);
 
+      console.log('[useAgentChat] Sending message:', message.slice(0, 50));
       wsRef.current.send(
         JSON.stringify({
           type: 'message',

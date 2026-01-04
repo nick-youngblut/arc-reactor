@@ -15,7 +15,16 @@ _PIPELINE_CATEGORIES = {
 @tool
 @tool_error_handler
 async def list_pipelines(category: str | None = None, runtime: Any | None = None) -> str:
-    """List available pipelines in the registry."""
+    """
+    List available pipelines in the registry.
+
+    Args:
+        category: Filter by category (e.g., "scRNA-seq", "bulk-RNA-seq")
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        String message containing the available pipelines
+    """
     registry = PipelineRegistry.create()
     rows = []
     category_filter = (category or "").strip().lower()

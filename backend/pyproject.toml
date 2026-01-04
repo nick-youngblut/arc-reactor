@@ -24,6 +24,7 @@ dependencies = [
     "langchain-google-genai>=1.0.0",
     "langgraph>=0.2.0",
     "langgraph-checkpoint-postgres>=3.0.2",
+    "psycopg[pool]>=3.2.0",
     "deepagents>=0.2.0",
     "benchling-py @ git+https://github.com/arcinstitute/benchling-py.git@main",
     "circuitbreaker>=2.0.0",

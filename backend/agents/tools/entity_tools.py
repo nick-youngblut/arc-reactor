@@ -8,15 +8,12 @@ from langchain_core.tools import tool
 from backend.agents.tools.base import format_table, get_tool_context, tool_error_handler
 
 
-
-
 def _rows_from_frame(frame: pd.DataFrame | dict[str, Any]) -> list[dict[str, Any]]:
     if isinstance(frame, pd.DataFrame):
         return frame.to_dict(orient="records")
     if isinstance(frame, dict):
         return [frame]
     return []
-
 
 
 @tool
@@ -28,7 +25,19 @@ async def trace_sample_lineage(
     include_path: bool = True,
     runtime: Any | None = None,
 ) -> str:
-    """Trace parent lineage for an entity through a relationship field."""
+    """
+    Trace parent lineage for an entity through a relationship field.
+
+    Args:
+        entity_id: Entity ID
+        relationship_field: Relationship field
+        max_depth: Maximum depth to trace (default: 10)
+        include_path: Whether to include the path
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        A TOON formatted table of the lineage
+    """
     if not entity_id:
         return "Error: entity_id is required."
     if not relationship_field:
@@ -59,7 +68,19 @@ async def find_sample_descendants(
     include_path: bool = True,
     runtime: Any | None = None,
 ) -> str:
-    """Find descendant entities from a starting entity."""
+    """
+    Find descendant entities from a starting entity.
+
+    Args:
+        entity_id: Entity ID
+        relationship_field: Relationship field
+        max_depth: Maximum depth to trace (default: 10)
+        include_path: Whether to include the path
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        A TOON formatted table of the descendants
+    """
     if not entity_id:
         return "Error: entity_id is required."
 
@@ -86,7 +107,17 @@ async def get_entity_relationships(
     relationship_field: str | None = None,
     runtime: Any | None = None,
 ) -> str:
-    """Get entity_link relationships for a specific entity."""
+    """
+    Get entity_link relationships for a specific entity.
+
+    Args:
+        entity_id: Entity ID
+        relationship_field: Relationship field
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        A string containing the relationships
+    """
     if not entity_id:
         return "Error: entity_id is required."
 

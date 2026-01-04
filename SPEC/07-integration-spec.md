@@ -11,6 +11,24 @@ The platform integrates with several external systems:
 5. **Google Gemini API**: AI model (Gemini 3 Flash)
 6. **GCP IAP**: Authentication
 
+## Chat State Persistence
+
+LangGraph checkpoints are stored in PostgreSQL via a dedicated psycopg3 connection pool
+(`CheckpointerService`). This pool is separate from the SQLAlchemy pool used for application
+data (runs, users, tasks) to accommodate `AsyncPostgresSaver` requirements.
+
+**Connection Pools:**
+
+- SQLAlchemy pool (asyncpg): application data
+- psycopg3 pool (AsyncPostgresSaver): chat checkpoints
+
+**Capacity Note:**
+
+Default PostgreSQL `max_connections` is 100. With the default pool sizes
+(SQLAlchemy ~15, checkpointer up to 50), the combined upper bound is ~70,
+which fits within the default limit. Increase `max_connections` in production
+if pool sizes are raised.
+
 ## Benchling Integration
 
 ### Connection Method

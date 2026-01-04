@@ -66,7 +66,7 @@ def _extract_params_from_config(config_content: str) -> dict[str, Any]:
         value = value.strip().rstrip(",")
         if value.lower() in {"true", "false"}:
             params[key] = value.lower() == "true"
-        elif value.startswith(("\"", "'")) and value.endswith(("\"", "'")):
+        elif value.startswith(('"', "'")) and value.endswith(('"', "'")):
             params[key] = value[1:-1]
         else:
             try:
@@ -84,7 +84,7 @@ def _render_params_yaml(params: dict[str, Any]) -> str:
         elif isinstance(value, (int, float)):
             rendered = str(value)
         else:
-            rendered = f"\"{value}\""
+            rendered = f'"{value}"'
         lines.append(f"{key}: {rendered}")
     return "\n".join(lines)
 
@@ -216,7 +216,19 @@ async def submit_run(
     pipeline_version: str,
     runtime: Any | None = None,
 ) -> str:
-    """Submit a validated pipeline run to GCP Batch."""
+    """
+    Submit a validated pipeline run to GCP Batch.
+
+    Args:
+        samplesheet_csv: CSV string containing samplesheet data
+        config_content: Nextflow config content
+        pipeline: Pipeline name
+        pipeline_version: Pipeline version
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        JSON string containing run details
+    """
     if not samplesheet_csv or not config_content:
         return "Error: samplesheet_csv and config_content are required."
 
@@ -297,7 +309,16 @@ async def submit_run(
 @tool
 @tool_error_handler
 async def cancel_run(run_id: str, runtime: Any | None = None) -> str:
-    """Cancel a running pipeline job."""
+    """
+    Cancel a running pipeline job.
+
+    Args:
+        run_id: ID of the run to cancel
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        JSON string containing run details
+    """
     if not run_id:
         return "Error: run_id is required."
 
@@ -334,7 +355,17 @@ async def cancel_run(run_id: str, runtime: Any | None = None) -> str:
 @tool
 @tool_error_handler
 async def delete_file(run_id: str, file_path: str, runtime: Any | None = None) -> str:
-    """Delete a run file from GCS."""
+    """
+    Delete a run file from GCS.
+
+    Args:
+        run_id: ID of the run
+        file_path: Path of the file to delete
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        JSON string containing run details
+    """
     if not run_id or not file_path:
         return "Error: run_id and file_path are required."
 
@@ -367,7 +398,16 @@ async def delete_file(run_id: str, file_path: str, runtime: Any | None = None) -
 @tool
 @tool_error_handler
 async def clear_samplesheet(confirm: bool, runtime: Any | None = None) -> str:
-    """Clear samplesheet from agent state."""
+    """
+    Clear samplesheet from agent state.
+
+    Args:
+        confirm: Whether to confirm the action
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        String message indicating the action was performed
+    """
     if not confirm:
         return "Error: confirm must be true to clear samplesheet."
 

@@ -6,6 +6,12 @@ import os
 from pathlib import Path
 from typing import AsyncIterator
 
+# Configure logging before any other imports
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s:%(name)s:%(message)s",
+)
+
 # Load .env file before any other imports to ensure environment variables
 # are available to all modules, especially benchling-py which needs them
 from dotenv import load_dotenv
@@ -24,6 +30,7 @@ from .api.routes.health import router as health_router
 from .config import settings
 from .services.benchling import BenchlingService
 from .services.database import DatabaseService
+from .services.checkpointer import CheckpointerService
 from .services.gemini import DisabledGeminiService, GeminiService
 from .services.storage import StorageService
 from .utils.circuit_breaker import create_breakers
@@ -60,6 +67,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.database_service = DatabaseService.create(settings)
     app.state.storage_service = StorageService.create(settings)
     try:
+        app.state.checkpointer_service = await CheckpointerService.create(settings)
+    except Exception as exc:
+        logger.error("Failed to initialize checkpointer service: %s", exc)
+        raise
+    try:
         app.state.gemini_service = GeminiService.create(settings, breakers)
     except Exception as exc:
         logger.warning("Gemini service failed to initialize: %s", exc)
@@ -68,6 +80,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
 
     logger.info("Shutting down Arc Reactor services")
+    await app.state.checkpointer_service.close()
     app.state.benchling_service.close()
     # BenchlingService.close_all_engines()
     await app.state.database_service.close()

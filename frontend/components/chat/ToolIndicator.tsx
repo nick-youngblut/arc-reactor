@@ -17,7 +17,8 @@ const toolCategoryStyles: Record<string, string> = {
   runs: 'border-arc-marigold/20 text-arc-marigold bg-arc-marigold/5'
 };
 
-function getCategory(toolName: string) {
+function getCategory(toolName: string | null | undefined) {
+  if (!toolName) return 'default';
   if (toolName.includes('benchling')) return 'benchling';
   if (toolName.includes('pipeline')) return 'pipelines';
   if (toolName.includes('run')) return 'runs';
@@ -53,7 +54,7 @@ export function ToolIndicator({ invocation }: { invocation: ToolInvocation }) {
             className={`inline-flex items-center rounded-lg border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${toolCategoryStyles[category] ?? 'border-arc-gray-200 text-arc-gray-500 bg-arc-gray-50'
               }`}
           >
-            {invocation.toolName}
+            {invocation.toolName ?? 'tool'}
           </span>
           <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 border ${status.bg} ${status.border}`}>
             <span className={`h-1.5 w-1.5 rounded-full ${status.color} bg-current animate-pulse`} />
@@ -66,19 +67,19 @@ export function ToolIndicator({ invocation }: { invocation: ToolInvocation }) {
       </button>
 
       {isExpanded && invocation.state !== 'pending' && invocation.state !== 'running' ? (
-        <div className="mt-3 space-y-3 rounded-xl border border-arc-gray-200/70 bg-white/90 p-3 text-xs text-arc-gray-600 dark:border-arc-gray-800/70 dark:bg-slate-950 dark:text-arc-gray-200">
+        <div className="mx-3 mb-3 space-y-3 rounded-xl border border-arc-gray-200/70 bg-white/90 p-3 text-xs dark:border-arc-gray-700 dark:bg-arc-night/80">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-arc-gray-400">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-arc-gray-400 dark:text-arc-gray-400">
               Args
             </p>
-            <pre className="mt-2 whitespace-pre-wrap text-[11px] leading-relaxed">{formattedArgs}</pre>
+            <pre className="mt-2 whitespace-pre-wrap text-[11px] leading-relaxed text-arc-gray-700 dark:text-arc-gray-100">{formattedArgs}</pre>
           </div>
           {formattedResult ? (
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-arc-gray-400">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-arc-gray-400 dark:text-arc-gray-400">
                 Result
               </p>
-              <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap text-[11px] leading-relaxed">
+              <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap text-[11px] leading-relaxed text-arc-gray-700 dark:text-arc-gray-100">
                 {formattedResult}
               </pre>
             </div>

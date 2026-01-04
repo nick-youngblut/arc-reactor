@@ -4,7 +4,12 @@ from typing import Any
 
 from langchain_core.tools import tool
 
-from backend.agents.tools.base import ensure_limit, format_table, get_tool_context, tool_error_handler
+from backend.agents.tools.base import (
+    ensure_limit,
+    format_table,
+    get_tool_context,
+    tool_error_handler,
+)
 
 
 _READ_ONLY_KEYWORDS = {
@@ -22,7 +27,8 @@ _READ_ONLY_KEYWORDS = {
 def _contains_disallowed_keywords(sql: str) -> bool:
     normalized = sql.upper()
     return any(
-        f" {keyword}" in normalized or normalized.startswith(keyword) for keyword in _READ_ONLY_KEYWORDS
+        f" {keyword}" in normalized or normalized.startswith(keyword)
+        for keyword in _READ_ONLY_KEYWORDS
     )
 
 
@@ -145,6 +151,9 @@ async def get_dropdown_values(
     Args:
         dropdown_name: Dropdown name to query.
         runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        Comma-separated list of dropdown values
     """
     if not dropdown_name:
         return "Error: dropdown_name is required."
@@ -179,6 +188,9 @@ async def list_projects(
     Args:
         wildcard_pattern: SQL wildcard pattern to filter projects (e.g., \"Cell%\") .
         runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        Projects matching the wildcard pattern formatted as a TOON table
     """
     context = get_tool_context(runtime)
     benchling = context.benchling
@@ -221,6 +233,9 @@ async def execute_warehouse_query(
         params: Named parameters for the query.
         limit: Max rows to return (default 100, max 1000).
         runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        Query results formatted as a TOON table
     """
     if not isinstance(sql, str) or not sql.strip():
         return "Error: SQL query must be a non-empty string."

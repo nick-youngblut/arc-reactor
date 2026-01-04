@@ -6,9 +6,9 @@ from typing import Any, AsyncIterator
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage
+from psycopg_pool import PoolTimeout
 from pydantic import BaseModel, Field
 
-from backend.agents.checkpointer import checkpointer_session
 from backend.agents.pipeline_agent import PipelineAgent
 from backend.agents.streaming import stream_agent_response
 from backend.config import settings
@@ -29,23 +29,30 @@ async def _event_stream(
     *,
     thread_id: str,
     user: UserContext,
-    request: Request,
+    checkpointer: Any,
+    benchling_service: Any,
+    storage_service: Any,
+    database_service: Any,
 ) -> AsyncIterator[bytes]:
     config = {
         "configurable": {
             "thread_id": thread_id,
+            "checkpoint_ns": user.email,
             "user_email": user.email,
             "user_name": user.name,
-            "benchling_service": request.app.state.benchling_service,
-            "storage_service": request.app.state.storage_service,
-            "database_service": request.app.state.database_service,
+            "benchling_service": benchling_service,
+            "storage_service": storage_service,
+            "database_service": database_service,
         }
     }
-    async with checkpointer_session(settings) as checkpointer:
+    try:
         agent = PipelineAgent.create(settings, checkpointer=checkpointer)
         async for chunk in stream_agent_response(agent.agent, messages, config=config):
             line = f"data: {chunk.rstrip()}\n\n"
             yield line.encode("utf-8")
+    except PoolTimeout:
+        yield b'data: 3:"Service temporarily unavailable"\n\n'
+        yield b'd:{"finishReason":"error"}\n\n'
 
 
 @router.post("/chat")
@@ -62,12 +69,16 @@ async def chat_rest(
 
     thread_id = request.thread_id or f"thread-{uuid.uuid4().hex}"
     messages = [HumanMessage(content=request.content)]
+    checkpointer_service = http_request.app.state.checkpointer_service
     return StreamingResponse(
         _event_stream(
             messages,
             thread_id=thread_id,
             user=user,
-            request=http_request,
+            checkpointer=checkpointer_service.checkpointer,
+            benchling_service=http_request.app.state.benchling_service,
+            storage_service=http_request.app.state.storage_service,
+            database_service=http_request.app.state.database_service,
         ),
         media_type="text/event-stream",
     )

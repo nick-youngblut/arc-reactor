@@ -13,6 +13,11 @@ default:
   gemini_model: "gemini-3-flash-preview"
   gemini_thinking_level: "medium"
 
+  checkpointer_pool_min_size: 5
+  checkpointer_pool_max_size: 50
+  checkpointer_pool_timeout: 30.0
+  checkpointer_pool_max_idle: 300.0
+
   frontend_out_dir: "/app/frontend/out"
   frontend_image: ""
   backend_image: ""
@@ -45,6 +50,8 @@ prod:
   frontend_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/arc-reactor-frontend:latest"
   backend_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/arc-reactor-backend:latest"
   weblog_receiver_url: "https://arc-reactor-weblog-xxx.run.app/weblog"
+  checkpointer_pool_min_size: 10
+  checkpointer_pool_max_size: 100
   cors_allowed_origins:
   - "https://arc-reactor.genomics.arcinstitute.org"
   - "http://localhost:3000"

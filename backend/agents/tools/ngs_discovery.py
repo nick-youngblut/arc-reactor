@@ -62,7 +62,7 @@ async def search_ngs_runs(
         include_qc_summary: Include basic QC metrics (slower query)
 
     Returns:
-        Formatted table of matching NGS runs with key metadata
+        Toon formatted table of matching NGS runs with key metadata
     """
     context = get_tool_context(runtime)
     benchling = context.benchling
@@ -190,7 +190,21 @@ async def get_ngs_run_samples(
     limit: int | None = None,
     runtime: Any | None = None,
 ) -> str:
-    """Get detailed sample information for a specific NGS run."""
+    """
+    Get detailed sample information for a specific NGS run.
+
+    Args:
+        ngs_run: NGS Run name (e.g., "NR-2024-0156")
+        pooled_sample: Pooled sample / SspArc name (e.g., "SspArc0050")
+        include_fastq_paths: Include FASTQ file paths
+        include_metadata: Include sample metadata
+        include_qc: Include per-sample QC metrics
+        limit: Maximum results to return (default: 100, max: 1000)
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        Toon formatted table of sample information
+    """
     if not ngs_run and not pooled_sample:
         return "Error: Please provide either ngs_run or pooled_sample parameter."
 
@@ -346,7 +360,18 @@ async def get_ngs_run_qc(
     level: str = "summary",
     runtime: Any | None = None,
 ) -> str:
-    """Get QC metrics for an NGS run."""
+    """
+    Get QC metrics for an NGS run.
+
+    Args:
+        ngs_run: NGS Run name (e.g., "NR-2024-0156")
+        pooled_sample: Pooled sample / SspArc name (e.g., "SspArc0050")
+        level: Detail level - "summary", "lane", or "sample" (default: "summary")
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        String message containing the QC metrics
+    """
     if not ngs_run and not pooled_sample:
         return "Error: Please provide either ngs_run or pooled_sample parameter."
 
@@ -484,7 +509,20 @@ async def get_fastq_paths(
     verify_exists: bool = False,
     runtime: Any | None = None,
 ) -> str:
-    """Get FASTQ file paths for specified samples."""
+    """
+    Get FASTQ file paths for specified samples.
+
+    Args:
+        sample_names: Sample names, semicolon-delimited (e.g., "LPS-001;LPS-002")
+        sample_ids: Sample IDs, semicolon-delimited (e.g., "LPS-001;LPS-002")
+        ngs_run: NGS Run name (e.g., "NR-2024-0156")
+        pooled_sample: Pooled sample / SspArc name (e.g., "SspArc0050")
+        verify_exists: Check if files exist in GCS (default: false)
+        runtime: LangChain tool runtime for injected services/config.
+
+    Returns:
+        Toon formatted table of FASTQ file paths
+    """
     identifiers = sample_names or sample_ids
     samples = parse_semicolon_delimited(identifiers)
     if not samples:

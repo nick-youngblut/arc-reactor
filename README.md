@@ -219,6 +219,14 @@ docker compose down -v
 docker compose up postgres -d
 ```
 
+**Checkpointer pool exhaustion (chat timeouts)**
+
+- Symptoms: chat requests hang or return "Service temporarily unavailable"
+- Mitigations:
+  - Increase `checkpointer_pool_max_size` and/or `checkpointer_pool_timeout` in `backend/settings.yaml`
+  - Ensure PostgreSQL `max_connections` covers combined pools (SQLAlchemy + checkpointer)
+  - Check active sessions with `SELECT count(*) FROM pg_stat_activity`
+
 ## Testing
 
 ```bash

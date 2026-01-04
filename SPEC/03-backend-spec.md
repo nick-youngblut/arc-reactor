@@ -463,6 +463,26 @@ gs://{settings.nextflow_bucket}/
             └── report.html
 ```
 
+### CheckpointerService
+
+Provides LangGraph checkpoint persistence using a shared psycopg3 `AsyncConnectionPool`.
+The pool is created on application startup and reused across WebSocket and REST chat.
+
+**Key Methods:**
+
+| Method | Description | Returns |
+|--------|-------------|---------|
+| `create()` | Initialize pool and `AsyncPostgresSaver` | `CheckpointerService` |
+| `health_check()` | Validate pool connectivity via `SELECT 1` | bool |
+| `close()` | Gracefully close pool | None |
+
+**Pool Settings (Dynaconf):**
+
+- `checkpointer_pool_min_size`
+- `checkpointer_pool_max_size`
+- `checkpointer_pool_timeout`
+- `checkpointer_pool_max_idle`
+
 ### RunStoreService (PostgreSQL)
 
 Manages run persistence in Cloud SQL PostgreSQL.
