@@ -119,12 +119,21 @@ export function useAgentChat() {
             state: 'completed',
             result: data.result
           });
-          const toolName = toolNameMap.current[data.toolCallId] ?? '';
-          if (toolName.includes('samplesheet') && typeof data.result === 'string') {
-            setSamplesheet(data.result);
+        }
+      }
+
+      if (code === 'b') {
+        const data = safeJsonParse<{
+          fileType: 'samplesheet' | 'config';
+          content: string;
+          metadata?: { modifiedBy?: 'agent'; modifiedAt?: string };
+        }>(payload);
+        if (data) {
+          if (data.fileType === 'samplesheet') {
+            setSamplesheet(data.content, 'agent');
           }
-          if (toolName.includes('config') && typeof data.result === 'string') {
-            setConfig(data.result);
+          if (data.fileType === 'config') {
+            setConfig(data.content, 'agent');
           }
         }
       }
