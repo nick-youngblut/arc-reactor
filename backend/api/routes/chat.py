@@ -94,6 +94,7 @@ async def websocket_chat(websocket: WebSocket) -> None:
                     "benchling_service": websocket.app.state.benchling_service,
                     "storage_service": websocket.app.state.storage_service,
                     "database_service": websocket.app.state.database_service,
+                    "workspace_service_factory": websocket.app.state.workspace_service_factory,
                 },
             }
 

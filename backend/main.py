@@ -33,6 +33,7 @@ from .services.database import DatabaseService
 from .services.checkpointer import CheckpointerService
 from .services.gemini import DisabledGeminiService, GeminiService
 from .services.storage import StorageService
+from .services.workspace import WorkspaceService
 from .utils.circuit_breaker import create_breakers
 from .utils.errors import register_exception_handlers
 
@@ -76,6 +77,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     except Exception as exc:
         logger.warning("Gemini service failed to initialize: %s", exc)
         app.state.gemini_service = DisabledGeminiService(error=exc)
+
+    @asynccontextmanager
+    async def workspace_service_factory() -> AsyncIterator[WorkspaceService]:
+        async for session in app.state.database_service.get_session():
+            yield WorkspaceService(session=session)
+
+    app.state.workspace_service_factory = workspace_service_factory
 
     yield
 

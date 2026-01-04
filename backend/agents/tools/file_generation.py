@@ -10,6 +10,7 @@ from langchain_core.tools import tool
 from backend.agents.tools.base import (
     ensure_limit,
     format_table,
+    get_workspace_context,
     get_tool_context,
     parse_semicolon_delimited,
     tool_error_handler,
@@ -54,6 +55,76 @@ def _format_missing_paths(missing: list[str]) -> str:
     preview = ", ".join(missing[:5])
     suffix = "..." if len(missing) > 5 else ""
     return f"Missing FASTQ files: {preview}{suffix}"
+
+
+async def _persist_samplesheet(
+    runtime: Any | None,
+    content: str,
+    pipeline: str | None,
+) -> str | None:
+    context = await get_workspace_context(runtime)
+    try:
+        if not context.service or not context.thread_id or not context.user_email:
+            return None
+
+        workspace = await context.service.get_or_create_for_thread(
+            context.user_email,
+            context.thread_id,
+        )
+        if pipeline:
+            await context.service.update_pipeline(
+                workspace.id,
+                context.user_email,
+                pipeline,
+                workspace.version,
+            )
+        await context.service.update_samplesheet(
+            workspace.id,
+            context.user_email,
+            content,
+            "agent",
+        )
+        return None
+    except ValueError as exc:
+        return f"Error: {exc}"
+    finally:
+        if context.close:
+            await context.close()
+
+
+async def _persist_config(
+    runtime: Any | None,
+    content: str,
+    pipeline: str | None,
+) -> str | None:
+    context = await get_workspace_context(runtime)
+    try:
+        if not context.service or not context.thread_id or not context.user_email:
+            return None
+
+        workspace = await context.service.get_or_create_for_thread(
+            context.user_email,
+            context.thread_id,
+        )
+        if pipeline:
+            await context.service.update_pipeline(
+                workspace.id,
+                context.user_email,
+                pipeline,
+                workspace.version,
+            )
+        await context.service.update_config(
+            workspace.id,
+            context.user_email,
+            content,
+            "agent",
+        )
+        return None
+    except ValueError as exc:
+        return f"Error: {exc}"
+    finally:
+        if context.close:
+            await context.close()
 
 
 def _extract_params(config_content: str) -> dict[str, Any]:
@@ -230,6 +301,9 @@ async def generate_samplesheet(
         writer.writerow(record)
 
     csv_content = buffer.getvalue().strip()
+    persist_error = await _persist_samplesheet(runtime, csv_content, pipeline)
+    if persist_error:
+        return persist_error
     _store_generated_file(
         runtime,
         filename="samplesheet.csv",
@@ -322,6 +396,10 @@ async def generate_config(
             "}",
         ]
     )
+
+    persist_error = await _persist_config(runtime, config_content, pipeline)
+    if persist_error:
+        return persist_error
 
     _store_generated_file(
         runtime,

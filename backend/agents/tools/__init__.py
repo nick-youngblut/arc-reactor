@@ -24,6 +24,7 @@ from .schema_tools import (
 )
 from .submission import cancel_run, clear_samplesheet, delete_file, submit_run
 from .file_generation import generate_config, generate_samplesheet, validate_inputs
+from .workspace_tools import get_current_config, get_current_samplesheet, get_workspace_status
 
 NGS_TOOL_CATEGORY = "ngs"
 BENCHLING_TOOL_CATEGORY = "benchling"
@@ -41,6 +42,9 @@ def get_agent_tools() -> list[BaseTool]:
         generate_samplesheet,
         generate_config,
         validate_inputs,
+        get_current_samplesheet,
+        get_current_config,
+        get_workspace_status,
         submit_run,
         cancel_run,
         delete_file,
