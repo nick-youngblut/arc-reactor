@@ -5,10 +5,12 @@ import { useDebouncedCallback } from 'use-debounce';
 
 import {
   ApiError,
+  associateWorkspaceThread,
   createWorkspace,
   fetchWorkspaceByThread,
   fetchWorkspaceDraft,
   updateWorkspaceConfig,
+  updateWorkspacePipeline,
   updateWorkspaceSamplesheet
 } from '@/lib/api';
 import { useChatStore } from '@/stores/chatStore';
@@ -74,6 +76,7 @@ async function withRetry<T>(
 
 export function useWorkspaceSync() {
   const threadId = useChatStore((state) => state.threadId);
+  const setThreadId = useChatStore((state) => state.setThreadId);
 
   const samplesheet = useWorkspaceStore((state) => state.samplesheet);
   const config = useWorkspaceStore((state) => state.config);
@@ -81,6 +84,8 @@ export function useWorkspaceSync() {
   const configDirty = useWorkspaceStore((state) => state.configDirty);
   const samplesheetModifiedBy = useWorkspaceStore((state) => state.samplesheetModifiedBy);
   const configModifiedBy = useWorkspaceStore((state) => state.configModifiedBy);
+  const selectedPipeline = useWorkspaceStore((state) => state.selectedPipeline);
+  const selectedVersion = useWorkspaceStore((state) => state.selectedVersion);
 
   const setSyncing = useWorkspaceStore((state) => state.setSyncing);
   const setSyncError = useWorkspaceStore((state) => state.setSyncError);
@@ -88,6 +93,7 @@ export function useWorkspaceSync() {
   const markConfigSynced = useWorkspaceStore((state) => state.markConfigSynced);
   const loadFromBackend = useWorkspaceStore((state) => state.loadFromBackend);
   const setWorkspaceId = useWorkspaceStore((state) => state.setWorkspaceId);
+  const loadFromBackend = useWorkspaceStore((state) => state.loadFromBackend);
 
   const setSyncingRef = useRef(setSyncing);
   const setSyncErrorRef = useRef(setSyncError);
@@ -95,6 +101,8 @@ export function useWorkspaceSync() {
   const markConfigSyncedRef = useRef(markConfigSynced);
   const loadFromBackendRef = useRef(loadFromBackend);
   const setWorkspaceIdRef = useRef(setWorkspaceId);
+  const selectedPipelineRef = useRef(selectedPipeline);
+  const selectedVersionRef = useRef(selectedVersion);
 
   useEffect(() => {
     setSyncingRef.current = setSyncing;
@@ -103,19 +111,24 @@ export function useWorkspaceSync() {
     markConfigSyncedRef.current = markConfigSynced;
     loadFromBackendRef.current = loadFromBackend;
     setWorkspaceIdRef.current = setWorkspaceId;
+    selectedPipelineRef.current = selectedPipeline;
+    selectedVersionRef.current = selectedVersion;
   }, [
     setSyncing,
     setSyncError,
     markSamplesheetSynced,
     markConfigSynced,
     loadFromBackend,
-    setWorkspaceId
+    setWorkspaceId,
+    selectedPipeline,
+    selectedVersion
   ]);
 
   const pendingSyncs = useRef<{ samplesheet?: PendingSync; config?: PendingSync }>({});
   const workspaceCreationInFlight = useRef<Promise<string | null> | null>(null);
   const previousThreadId = useRef<string | null>(null);
   const hasLoadedRef = useRef(false);
+  const generatedThreadRef = useRef(false);
 
   const setSyncErrorMessage = useCallback((error: unknown) => {
     const status = getErrorStatus(error);
@@ -150,12 +163,19 @@ export function useWorkspaceSync() {
           if (getErrorStatus(error) !== 404) throw error;
         }
         if (!workspace) {
-          workspace = await createWorkspace({ thread_id: threadId });
+          workspace = await createWorkspace({
+            thread_id: threadId,
+            pipeline: selectedPipelineRef.current ?? null,
+            version: selectedVersionRef.current ?? null
+          });
         }
       } else {
         workspace = await fetchWorkspaceDraft();
         if (!workspace) {
-          workspace = await createWorkspace({});
+          workspace = await createWorkspace({
+            pipeline: selectedPipelineRef.current ?? null,
+            version: selectedVersionRef.current ?? null
+          });
         }
       }
 
@@ -296,12 +316,19 @@ export function useWorkspaceSync() {
           if (getErrorStatus(error) !== 404) throw error;
         }
         if (!workspace) {
-          workspace = await createWorkspace({ thread_id: threadId });
+          workspace = await createWorkspace({
+            thread_id: threadId,
+            pipeline: selectedPipelineRef.current ?? null,
+            version: selectedVersionRef.current ?? null
+          });
         }
       } else {
         workspace = await fetchWorkspaceDraft();
         if (!workspace) {
-          workspace = await createWorkspace({});
+          workspace = await createWorkspace({
+            pipeline: selectedPipelineRef.current ?? null,
+            version: selectedVersionRef.current ?? null
+          });
         }
       }
 
@@ -342,6 +369,15 @@ export function useWorkspaceSync() {
   }, [config, configDirty, configModifiedBy, syncConfig]);
 
   useEffect(() => {
+    const workspaceId = useWorkspaceStore.getState().workspaceId;
+    if (!selectedPipeline || !workspaceId) return;
+
+    void updateWorkspacePipeline(workspaceId, selectedPipeline, selectedVersion)
+      .then((workspace) => loadFromBackendRef.current(workspace))
+      .catch(() => undefined);
+  }, [selectedPipeline, selectedVersion]);
+
+  useEffect(() => {
     const currentThreadId = threadId ?? null;
     if (hasLoadedRef.current && previousThreadId.current === currentThreadId) return;
 
@@ -349,11 +385,30 @@ export function useWorkspaceSync() {
       if (hasLoadedRef.current) {
         await saveUnsavedChangesBeforeSwitch();
       }
+      if (!currentThreadId && !generatedThreadRef.current) {
+        if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+          generatedThreadRef.current = true;
+          const fallbackId = `thread-${crypto.randomUUID()}`;
+          setThreadId(fallbackId);
+          previousThreadId.current = fallbackId;
+          hasLoadedRef.current = true;
+          return;
+        }
+      }
       await loadWorkspaceForThread();
+      const state = useWorkspaceStore.getState();
+      if (state.workspaceId && threadId) {
+        try {
+          const associated = await associateWorkspaceThread(state.workspaceId, threadId);
+          loadFromBackendRef.current(associated);
+        } catch {
+          // Ignore association errors to avoid blocking workspace load.
+        }
+      }
       previousThreadId.current = currentThreadId;
       hasLoadedRef.current = true;
     })();
-  }, [loadWorkspaceForThread, saveUnsavedChangesBeforeSwitch, threadId]);
+  }, [loadWorkspaceForThread, saveUnsavedChangesBeforeSwitch, threadId, setThreadId]);
 
   useEffect(() => {
     const handleOnline = () => retryPendingSyncs();

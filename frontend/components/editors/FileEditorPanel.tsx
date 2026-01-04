@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { SamplesheetEditor } from '@/components/editors/SamplesheetEditor';
 import { ConfigEditor } from '@/components/editors/ConfigEditor';
 import { getSamplesheetColumns } from '@/lib/handsontable/columnConfig';
+import { useWorkspaceSync } from '@/hooks/useWorkspaceSync';
 import { useUiStore } from '@/stores/uiStore';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 
@@ -14,6 +15,7 @@ const tabConfig = [
 ] as const;
 
 export function FileEditorPanel() {
+  const { hasPendingSyncs } = useWorkspaceSync();
   const activeTab = useUiStore((state) => state.activeTab);
   const setActiveTab = useUiStore((state) => state.setActiveTab);
   const samplesheet = useWorkspaceStore((state) => state.samplesheet);
@@ -24,6 +26,11 @@ export function FileEditorPanel() {
   const selectedPipeline = useWorkspaceStore((state) => state.selectedPipeline);
   const setSamplesheet = useWorkspaceStore((state) => state.setSamplesheet);
   const setConfig = useWorkspaceStore((state) => state.setConfig);
+  const samplesheetModifiedBy = useWorkspaceStore((state) => state.samplesheetModifiedBy);
+  const configModifiedBy = useWorkspaceStore((state) => state.configModifiedBy);
+  const isSyncing = useWorkspaceStore((state) => state.isSyncing);
+  const syncError = useWorkspaceStore((state) => state.syncError);
+  const lastSyncedAt = useWorkspaceStore((state) => state.lastSyncedAt);
   const [isMobile, setIsMobile] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -95,6 +102,45 @@ export function FileEditorPanel() {
   };
 
   const isLikelyBinary = (content: string) => content.includes('\u0000');
+
+  const renderSyncStatus = () => {
+    const activeModifiedBy =
+      activeTab === 'samplesheet' ? samplesheetModifiedBy : configModifiedBy;
+    const modifierLabel =
+      activeModifiedBy === 'agent'
+        ? 'Agent'
+        : activeModifiedBy === 'user'
+          ? 'User'
+          : null;
+    if (syncError) {
+      return (
+        <span className="text-xs font-semibold text-arc-error">{syncError}</span>
+      );
+    }
+    if (hasPendingSyncs()) {
+      return (
+        <span className="text-xs font-semibold text-arc-marigold">Pending retry</span>
+      );
+    }
+    if (isSyncing) {
+      return (
+        <span className="text-xs font-semibold text-arc-gray-400">Saving...</span>
+      );
+    }
+    if (lastSyncedAt) {
+      return (
+        <span className="text-xs font-semibold text-arc-gray-400">Saved</span>
+      );
+    }
+    if (modifierLabel) {
+      return (
+        <span className="text-xs font-semibold text-arc-gray-400">
+          Edited by {modifierLabel}
+        </span>
+      );
+    }
+    return null;
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -187,7 +233,8 @@ export function FileEditorPanel() {
         />
       </header>
 
-      <div className="flex flex-wrap gap-1.5 rounded-2xl bg-panel p-1.5 border border-arc-gray-100 dark:border-arc-gray-800">
+      <div className="flex items-center justify-between gap-3 rounded-2xl bg-panel p-1.5 border border-arc-gray-100 dark:border-arc-gray-800">
+        <div className="flex flex-wrap gap-1.5">
         {tabConfig.map((tab) => {
           const meta = tabMeta[tab.id];
           const isActive = activeTab === tab.id;
@@ -220,6 +267,8 @@ export function FileEditorPanel() {
             </button>
           );
         })}
+        </div>
+        <div className="pr-2">{renderSyncStatus()}</div>
       </div>
 
       {uploadError ? (

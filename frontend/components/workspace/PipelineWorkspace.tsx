@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { ChatPanel } from '@/components/chat/ChatPanel';
 import { FileEditorPanel } from '@/components/editors/FileEditorPanel';
 import { SubmitPanel } from '@/components/workspace/SubmitPanel';
+import { updateWorkspacePipeline } from '@/lib/api';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 
 const pipelines = [
@@ -16,10 +17,19 @@ export function PipelineWorkspace() {
   const [pipeline, setPipeline] = useState(pipelines[0]);
   const [version, setVersion] = useState(pipelines[0].versions[0]);
   const setWorkspacePipeline = useWorkspaceStore((state) => state.setPipeline);
+  const workspaceId = useWorkspaceStore((state) => state.workspaceId);
+  const loadFromBackend = useWorkspaceStore((state) => state.loadFromBackend);
 
   useEffect(() => {
     setWorkspacePipeline(pipeline.name, version);
-  }, [pipeline.name, version, setWorkspacePipeline]);
+
+    if (workspaceId) {
+      void updateWorkspacePipeline(workspaceId, pipeline.name, version)
+        .then((workspace) => loadFromBackend(workspace))
+        .catch(() => undefined);
+    }
+  }, [pipeline.name, version, setWorkspacePipeline, workspaceId, loadFromBackend]);
+
 
   return (
     <section className="flex h-full flex-col gap-8 py-2">
