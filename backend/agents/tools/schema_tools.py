@@ -53,7 +53,6 @@ async def get_schemas(
     Args:
         schema_names: Specific schema names (semicolon-delimited).
         get_all_schemas: When True, return all schema names.
-        runtime: LangChain tool runtime for injected services/config.
     """
     context = get_tool_context(runtime)
     benchling = context.benchling
@@ -106,7 +105,6 @@ async def get_schema_field_info(
 
     Args:
         schema_name: Schema display name to inspect.
-        runtime: LangChain tool runtime for injected services/config.
     """
     if not schema_name:
         return "Error: schema_name is required."
@@ -150,7 +148,6 @@ async def get_dropdown_values(
 
     Args:
         dropdown_name: Dropdown name to query.
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         Comma-separated list of dropdown values
@@ -187,7 +184,6 @@ async def list_projects(
 
     Args:
         wildcard_pattern: SQL wildcard pattern to filter projects (e.g., \"Cell%\") .
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         Projects matching the wildcard pattern formatted as a TOON table
@@ -232,7 +228,6 @@ async def execute_warehouse_query(
         sql: SQL query (SELECT/CTE only).
         params: Named parameters for the query.
         limit: Max rows to return (default 100, max 1000).
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         Query results formatted as a TOON table

@@ -118,7 +118,6 @@ async def generate_samplesheet(
         sample_ids: Sample IDs, semicolon-delimited (e.g., "LPS-001;LPS-002")
         pipeline: Pipeline name (e.g., "nf-core/scrnaseq")
         expected_cells: Expected cells per sample (default: 10000)
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         String message containing the samplesheet CSV
@@ -267,7 +266,6 @@ async def generate_config(
         pipeline: Pipeline name (e.g., "nf-core/scrnaseq")
         params: Pipeline parameters to include
         profile: Execution profile (default: "gcp_batch")
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         String message containing the Nextflow config
@@ -353,7 +351,6 @@ async def validate_inputs(
         samplesheet_csv: CSV content
         config_content: Config content
         pipeline: Pipeline name (e.g., "nf-core/scrnaseq")
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         JSON string containing the validation results

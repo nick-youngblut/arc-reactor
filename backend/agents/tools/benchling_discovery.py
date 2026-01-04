@@ -577,7 +577,6 @@ async def get_entities(
             created_at, modified_at, creator_name.
         allow_wildcards: Enable SQL-style wildcards for name filters (% and _; * and ? supported).
         limit: Max results to return (default 40, max 500).
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         Toon formatted table of entities
@@ -736,7 +735,6 @@ async def get_entity_relationships(
         relationship_types: Specific relationship field names to follow (semicolon-delimited).
         include_reverse_links: Include back-references when True.
         output_format: Output format ("tree", "yaml", or "json").
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         A string containing the relationships
@@ -850,7 +848,6 @@ async def list_entries(
         allow_wildcards: Enable SQL-style wildcards for name filters.
         archived: Include archived entries when True.
         limit: Max results to return (default 50, max 500).
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         Toon formatted table of Benchling notebook entries
@@ -935,7 +932,6 @@ async def get_entry_content(
         entry_names: Entry names (semicolon-delimited).
         head: Number of lines from the beginning to include.
         tail: Number of lines from the end to include.
-        runtime: LangChain tool runtime for injected services/config.
     """
     entries = parse_semicolon_delimited(entry_names)
     if not entries:
@@ -1000,7 +996,6 @@ async def get_entry_entities(
     Args:
         entry_name: Entry name to resolve.
         limit: Max entities to return (default 40, max 500).
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         Toon formatted table of entities linked to the entry

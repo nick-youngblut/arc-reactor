@@ -53,7 +53,7 @@ class PipelineAgent:
         agent = create_deep_agent(
             model=model,
             tools=tool_list,
-            system_prompt=PIPELINE_AGENT_SYSTEM_PROMPT,
+            system_prompt=PIPELINE_AGENT_SYSTEM_PROMPT.strip(),
             checkpointer=checkpointer,
             middleware=middleware,
             subagents=subagents,

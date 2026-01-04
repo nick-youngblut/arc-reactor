@@ -33,7 +33,6 @@ async def trace_sample_lineage(
         relationship_field: Relationship field
         max_depth: Maximum depth to trace (default: 10)
         include_path: Whether to include the path
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         A TOON formatted table of the lineage
@@ -76,7 +75,6 @@ async def find_sample_descendants(
         relationship_field: Relationship field
         max_depth: Maximum depth to trace (default: 10)
         include_path: Whether to include the path
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         A TOON formatted table of the descendants
@@ -113,7 +111,6 @@ async def get_entity_relationships(
     Args:
         entity_id: Entity ID
         relationship_field: Relationship field
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         A string containing the relationships

@@ -200,7 +200,6 @@ async def get_ngs_run_samples(
         include_metadata: Include sample metadata
         include_qc: Include per-sample QC metrics
         limit: Maximum results to return (default: 100, max: 1000)
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         Toon formatted table of sample information
@@ -367,7 +366,6 @@ async def get_ngs_run_qc(
         ngs_run: NGS Run name (e.g., "NR-2024-0156")
         pooled_sample: Pooled sample / SspArc name (e.g., "SspArc0050")
         level: Detail level - "summary", "lane", or "sample" (default: "summary")
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         String message containing the QC metrics
@@ -518,7 +516,6 @@ async def get_fastq_paths(
         ngs_run: NGS Run name (e.g., "NR-2024-0156")
         pooled_sample: Pooled sample / SspArc name (e.g., "SspArc0050")
         verify_exists: Check if files exist in GCS (default: false)
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         Toon formatted table of FASTQ file paths

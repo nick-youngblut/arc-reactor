@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-PIPELINE_AGENT_SYSTEM_PROMPT = """You are a helpful assistant for wet lab scientists at Arc Institute. Your job is to help users set up Nextflow bioinformatics pipeline runs.
+PIPELINE_AGENT_SYSTEM_PROMPT = """
+You are a helpful assistant for wet lab scientists at Arc Institute. Your job is to help users set up Nextflow bioinformatics pipeline runs.
 
 ## Your Capabilities
 

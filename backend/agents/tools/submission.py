@@ -224,7 +224,6 @@ async def submit_run(
         config_content: Nextflow config content
         pipeline: Pipeline name
         pipeline_version: Pipeline version
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         JSON string containing run details
@@ -314,7 +313,6 @@ async def cancel_run(run_id: str, runtime: Any | None = None) -> str:
 
     Args:
         run_id: ID of the run to cancel
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         JSON string containing run details
@@ -361,7 +359,6 @@ async def delete_file(run_id: str, file_path: str, runtime: Any | None = None) -
     Args:
         run_id: ID of the run
         file_path: Path of the file to delete
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         JSON string containing run details
@@ -403,7 +400,6 @@ async def clear_samplesheet(confirm: bool, runtime: Any | None = None) -> str:
 
     Args:
         confirm: Whether to confirm the action
-        runtime: LangChain tool runtime for injected services/config.
 
     Returns:
         String message indicating the action was performed
