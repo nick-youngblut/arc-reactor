@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.models.runs import Run
 from backend.models.schemas.runs import RunListResponse, RunResponse, RunStatus
+from backend.models.schemas.tasks import TaskResponse, TaskSummaryResponse
 from backend.services.batch import BatchService
 from backend.services.storage import StorageService
 from backend.utils.errors import BatchError, NotFoundError, ValidationError
@@ -169,6 +170,91 @@ class RunStoreService:
         if not run:
             return None
         return self._to_response(run)
+
+    async def get_task_summary(self, run_id: str) -> TaskSummaryResponse:
+        """Get aggregated task counts by status.
+
+        Args:
+            run_id: The run identifier
+
+        Returns:
+            TaskSummaryResponse with counts per status
+        """
+        from backend.models.tasks import Task
+
+        result = await self.session.execute(
+            select(
+                Task.status,
+                func.count(Task.id).label("count"),
+            )
+            .where(Task.run_id == run_id)
+            .group_by(Task.status)
+        )
+
+        counts = {row.status: row.count for row in result}
+
+        return TaskSummaryResponse(
+            total=sum(counts.values()),
+            completed=counts.get("COMPLETED", 0),
+            running=counts.get("RUNNING", 0),
+            submitted=counts.get("SUBMITTED", 0),
+            failed=counts.get("FAILED", 0),
+            cached=counts.get("CACHED", 0),
+        )
+
+    async def get_run_tasks(
+        self,
+        run_id: str,
+        *,
+        status_filter: str | None = None,
+        limit: int = 50,
+    ) -> list[TaskResponse]:
+        """Get task details for a run.
+
+        Args:
+            run_id: The run identifier
+            status_filter: Optional status filter (COMPLETED, RUNNING, FAILED, etc.)
+            limit: Maximum tasks to return
+
+        Returns:
+            List of TaskResponse objects
+        """
+        from backend.models.tasks import Task
+
+        query = select(Task).where(Task.run_id == run_id)
+
+        if status_filter:
+            query = query.where(Task.status == status_filter.upper())
+
+        query = query.order_by(Task.submit_time.desc()).limit(limit)
+
+        result = await self.session.execute(query)
+        return [TaskResponse.model_validate(t) for t in result.scalars().all()]
+
+    async def get_task_by_name(
+        self,
+        run_id: str,
+        task_name: str,
+    ) -> TaskResponse | None:
+        """Get a specific task by name.
+
+        Args:
+            run_id: The run identifier
+            task_name: Task name (e.g., "STAR_ALIGN (1)")
+
+        Returns:
+            TaskResponse or None if not found
+        """
+        from backend.models.tasks import Task
+
+        result = await self.session.execute(
+            select(Task)
+            .where(Task.run_id == run_id, Task.name == task_name)
+            .order_by(Task.attempt.desc())
+            .limit(1)
+        )
+        task = result.scalar_one_or_none()
+        return TaskResponse.model_validate(task) if task else None
 
     async def list_runs(
         self,
