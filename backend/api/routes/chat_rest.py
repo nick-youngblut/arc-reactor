@@ -56,7 +56,7 @@ async def chat_rest(
 ):
     if request.type != "message":
         return StreamingResponse(
-            iter([b"data: 3:\"Invalid message type\"\n\n"]),
+            iter([b'data: 3:"Invalid message type"\n\n']),
             media_type="text/event-stream",
         )
 
