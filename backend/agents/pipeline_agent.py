@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.agents.model import get_chat_model
-from backend.agents.prompts import PIPELINE_AGENT_SYSTEM_PROMPT
-from backend.agents.subagents import create_benchling_expert, create_config_expert
-from backend.agents.tools import get_agent_tools
-from backend.agents.middleware.hitl import build_hitl_middleware
-from langchain.agents.middleware import TodoListMiddleware
-
-from backend.agents.middleware.large_output import LargeOutputMiddleware
-from backend.agents.middleware.summarization import SummarizationMiddleware
+from backend.agents.middleware.hitl import build_hitl_interrupt_map
+from backend.agents.model import create_agent_model, get_agent_config
+from backend.agents.prompts import ORCHESTRATOR_SYSTEM_PROMPT
+from backend.agents.subagents import (
+    create_benchling_expert,
+    create_config_expert,
+    create_execution_expert,
+)
+from backend.agents.tools.collections.workspace import get_orchestrator_tools
 
 try:
     from deepagents import create_deep_agent
@@ -27,6 +27,8 @@ def _ensure_available() -> None:
 
 
 class PipelineAgent:
+    """Orchestrator agent that delegates to specialized subagents."""
+
     def __init__(self, agent: Any, model: Any, tools: list[Any]) -> None:
         self.agent = agent
         self.model = model
@@ -37,25 +39,33 @@ class PipelineAgent:
         cls,
         settings: object,
         *,
-        tools: list[Any] | None = None,
         checkpointer: Any | None = None,
     ) -> "PipelineAgent":
+        """Create the pipeline orchestrator agent.
+
+        Args:
+            settings: Dynaconf settings object
+            checkpointer: Optional LangGraph checkpointer for state persistence
+
+        Returns:
+            Configured PipelineAgent instance
+        """
         _ensure_available()
-        tool_list = tools if tools is not None else get_agent_tools()
-        model = get_chat_model(settings)
+        config = get_agent_config(settings, "orchestrator")
+        model = create_agent_model(config)
+        orchestrator_tools = get_orchestrator_tools()
         subagents = [
             create_benchling_expert(settings),
             create_config_expert(settings),
+            create_execution_expert(settings),
         ]
-        middleware = [
-            build_hitl_middleware(),
-        ]
+        interrupt_on = build_hitl_interrupt_map()
         agent = create_deep_agent(
             model=model,
-            tools=tool_list,
-            system_prompt=PIPELINE_AGENT_SYSTEM_PROMPT.lstrip(),
+            tools=orchestrator_tools,
+            system_prompt=ORCHESTRATOR_SYSTEM_PROMPT.strip(),
             checkpointer=checkpointer,
-            middleware=middleware,
             subagents=subagents,
+            interrupt_on=interrupt_on,
         )
-        return cls(agent=agent, model=model, tools=tool_list)
+        return cls(agent=agent, model=model, tools=orchestrator_tools)
