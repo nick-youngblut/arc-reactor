@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import Depends, Request
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .config import settings
 from .context import AppContext
@@ -9,6 +10,7 @@ from .services.checkpointer import CheckpointerService
 from .services.database import DatabaseService
 from .services.gemini import DisabledGeminiService, GeminiService
 from .services.storage import StorageService
+from .services.workspace import WorkspaceService
 from .utils.circuit_breaker import Breakers
 from .utils.auth import UserContext, get_current_user
 
@@ -50,6 +52,13 @@ async def get_db_session(
 ):
     async for session in database.get_session():
         yield session
+
+
+async def get_workspace_service(
+    session: AsyncSession = Depends(get_db_session),
+) -> WorkspaceService:
+    """Get workspace service with injected database session."""
+    return WorkspaceService(session=session)
 
 
 async def get_current_user_context(request: Request) -> UserContext:
