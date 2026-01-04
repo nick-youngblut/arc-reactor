@@ -208,8 +208,81 @@ def upgrade() -> None:
     )
     op.create_index("idx_weblog_event_log_cleanup", "weblog_event_log", ["processed_at"])
 
+    # Workspace states table (for frontend state sync)
+    op.create_table(
+        "workspace_states",
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
+        sa.Column("user_email", sa.String(length=255), nullable=False),
+        sa.Column("thread_id", sa.String(length=255), nullable=True),
+        sa.Column("pipeline", sa.String(length=255), nullable=True),
+        sa.Column("version", sa.String(length=50), nullable=True),
+        sa.Column("samplesheet", sa.Text(), nullable=True),
+        sa.Column("samplesheet_modified_by", sa.String(length=10), nullable=True),
+        sa.Column("samplesheet_modified_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("config", sa.Text(), nullable=True),
+        sa.Column("config_modified_by", sa.String(length=10), nullable=True),
+        sa.Column("config_modified_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column(
+            "validation_result",
+            postgresql.JSONB(astext_type=sa.Text()),
+            nullable=True,
+        ),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+
+    # Workspace indexes
+    op.create_index("idx_workspace_user_email", "workspace_states", ["user_email"])
+    op.create_index(
+        "idx_workspace_updated_at",
+        "workspace_states",
+        [sa.text("updated_at DESC")],
+    )
+    op.create_index(
+        "idx_workspace_unique_thread",
+        "workspace_states",
+        ["user_email", "thread_id"],
+        unique=True,
+        postgresql_where=sa.text("thread_id IS NOT NULL"),
+    )
+    op.create_index(
+        "idx_workspace_unique_draft",
+        "workspace_states",
+        ["user_email"],
+        unique=True,
+        postgresql_where=sa.text("thread_id IS NULL"),
+    )
+    op.create_index(
+        "idx_workspace_thread_id",
+        "workspace_states",
+        ["thread_id"],
+        postgresql_where=sa.text("thread_id IS NOT NULL"),
+    )
+
 
 def downgrade() -> None:
+    op.drop_index("idx_workspace_thread_id", table_name="workspace_states")
+    op.drop_index("idx_workspace_unique_draft", table_name="workspace_states")
+    op.drop_index("idx_workspace_unique_thread", table_name="workspace_states")
+    op.drop_index("idx_workspace_updated_at", table_name="workspace_states")
+    op.drop_index("idx_workspace_user_email", table_name="workspace_states")
+    op.drop_table("workspace_states")
     op.drop_table("weblog_event_log")
     op.drop_table("tasks")
     # Note: checkpoints table is not dropped here since it's managed by LangGraph

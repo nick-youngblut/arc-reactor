@@ -4,5 +4,14 @@ from .runs import Run
 from .tasks import Task
 from .users import User
 from .weblog_event_log import WeblogEventLog
+from .workspace import WorkspaceState
 
-__all__ = ["Base", "Checkpoint", "Run", "Task", "User", "WeblogEventLog"]
+__all__ = [
+    "Base",
+    "Checkpoint",
+    "Run",
+    "Task",
+    "User",
+    "WeblogEventLog",
+    "WorkspaceState",
+]
