@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { SamplesheetEditor } from '@/components/editors/SamplesheetEditor';
 import { ConfigEditor } from '@/components/editors/ConfigEditor';
@@ -22,7 +22,11 @@ export function FileEditorPanel() {
   const samplesheetDirty = useWorkspaceStore((state) => state.samplesheetDirty);
   const configDirty = useWorkspaceStore((state) => state.configDirty);
   const selectedPipeline = useWorkspaceStore((state) => state.selectedPipeline);
+  const setSamplesheet = useWorkspaceStore((state) => state.setSamplesheet);
+  const setConfig = useWorkspaceStore((state) => state.setConfig);
   const [isMobile, setIsMobile] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const update = () => setIsMobile(window.innerWidth < 768);
@@ -31,17 +35,19 @@ export function FileEditorPanel() {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  const samplesheetColumns = useMemo(
-    () => getSamplesheetColumns(selectedPipeline).map((column) => column.key),
+  const samplesheetColumnDefs = useMemo(
+    () => getSamplesheetColumns(selectedPipeline),
     [selectedPipeline]
+  );
+  const samplesheetColumns = useMemo(
+    () => samplesheetColumnDefs.map((column) => column.key),
+    [samplesheetColumnDefs]
   );
 
   const samplesheetErrors =
     validationResult?.errors.filter((error) => samplesheetColumns.includes(error.field)) ?? [];
   const configErrors =
     validationResult?.errors.filter((error) => !samplesheetColumns.includes(error.field)) ?? [];
-
-  const hasFiles = samplesheet.trim().length > 0 || config.trim().length > 0;
 
   const tabMeta = {
     samplesheet: {
@@ -53,6 +59,87 @@ export function FileEditorPanel() {
       dirty: configDirty,
       errors: configErrors.length,
       valid: configErrors.length === 0 && config.trim().length > 0
+    }
+  };
+
+  const validateSamplesheetUpload = (content: string) => {
+    const trimmed = content.trim();
+    if (!trimmed) return null;
+
+    const headerLine = trimmed.split(/\r?\n/).find((line) => line.trim().length > 0);
+    if (!headerLine) return null;
+
+    const delimiter = headerLine.includes('\t') && !headerLine.includes(',') ? '\t' : ',';
+    const headers = headerLine
+      .split(delimiter)
+      .map((header) => header.trim().toLowerCase())
+      .filter((header) => header.length > 0);
+
+    const columnKeys = samplesheetColumnDefs.map((column) => column.key.toLowerCase());
+    const hasKnownHeader = headers.some((header) => columnKeys.includes(header));
+    if (!hasKnownHeader) {
+      return `Samplesheet CSV header must include columns like: ${samplesheetColumnDefs
+        .map((column) => column.key)
+        .join(', ')}.`;
+    }
+
+    const missingRequired = samplesheetColumnDefs
+      .filter((column) => column.required)
+      .map((column) => column.key.toLowerCase())
+      .filter((key) => !headers.includes(key));
+    if (missingRequired.length) {
+      return `Missing required columns: ${missingRequired.join(', ')}.`;
+    }
+
+    return null;
+  };
+
+  const isLikelyBinary = (content: string) => content.includes('\u0000');
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploadError(null);
+
+    if (file.size === 0) {
+      if (activeTab === 'samplesheet') {
+        setSamplesheet('');
+      } else {
+        setConfig('');
+      }
+      event.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => {
+      setUploadError('Unable to read the selected file.');
+    };
+    reader.onload = () => {
+      const content = String(reader.result ?? '');
+      if (isLikelyBinary(content)) {
+        setUploadError('This file appears to be binary. Please upload a text file.');
+        return;
+      }
+
+      if (activeTab === 'samplesheet') {
+        const validationError = validateSamplesheetUpload(content);
+        if (validationError) {
+          setUploadError(validationError);
+          return;
+        }
+        setSamplesheet(content);
+      } else {
+        setConfig(content);
+      }
+    };
+
+    try {
+      reader.readAsText(file);
+    } catch {
+      setUploadError('Unable to read the selected file.');
+    } finally {
+      event.target.value = '';
     }
   };
 
@@ -71,9 +158,33 @@ export function FileEditorPanel() {
         <button
           type="button"
           className="arc-button-primary"
+          onClick={() => fileInputRef.current?.click()}
         >
-          Ask AI to modify
+          <span className="flex items-center gap-2">
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 3v12" />
+              <path d="m7 8 5-5 5 5" />
+              <path d="M5 21h14" />
+            </svg>
+            Upload File
+          </span>
         </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv,.tsv,.config,.nf,.txt,text/*"
+          className="hidden"
+          onChange={handleFileUpload}
+        />
       </header>
 
       <div className="flex flex-wrap gap-1.5 rounded-2xl bg-panel p-1.5 border border-arc-gray-100 dark:border-arc-gray-800">
@@ -111,15 +222,17 @@ export function FileEditorPanel() {
         })}
       </div>
 
+      {uploadError ? (
+        <div className="rounded-2xl border border-arc-error/30 bg-arc-error/5 px-4 py-3 text-xs text-arc-gray-700 dark:text-arc-gray-100">
+          <p className="font-semibold uppercase tracking-[0.2em] text-arc-error">
+            Upload error
+          </p>
+          <p className="mt-2 text-arc-gray-600 dark:text-arc-gray-300">{uploadError}</p>
+        </div>
+      ) : null}
+
       <div className="flex-1 overflow-hidden">
-        {!hasFiles ? (
-          <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-arc-gray-200/80 bg-panel/60 p-6 text-center text-sm text-arc-gray-500 dark:border-arc-gray-800/80 dark:text-arc-gray-300">
-            <span className="text-3xl">📄</span>
-            <p className="max-w-xs">
-              No files yet. Chat with Arc Assistant to generate your samplesheet and config files.
-            </p>
-          </div>
-        ) : activeTab === 'config' ? (
+        {activeTab === 'config' ? (
           <ConfigEditor readOnly={isMobile} />
         ) : (
           <SamplesheetEditor readOnly={isMobile} />

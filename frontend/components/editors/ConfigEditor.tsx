@@ -51,7 +51,7 @@ export function ConfigEditor({ readOnly = false }: ConfigEditorProps) {
         />
         {!config && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-xs text-arc-gray-400">
-            Paste or generate a nextflow.config to begin editing.
+            Paste a nextflow.config here or use Upload File to begin editing.
           </div>
         )}
       </div>

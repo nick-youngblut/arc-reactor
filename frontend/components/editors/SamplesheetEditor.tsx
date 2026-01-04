@@ -31,8 +31,16 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
   const setValidationResult = useWorkspaceStore((state) => state.setValidationResult);
 
   const columns = useMemo(() => getSamplesheetColumns(selectedPipeline), [selectedPipeline]);
+  const createEmptyRow = (columnDefs: typeof columns) => {
+    return columnDefs.reduce<SamplesheetRow>((acc, column) => {
+      acc[column.key] = column.defaultValue ?? '';
+      return acc;
+    }, {});
+  };
+  const ensureRows = (nextRows: SamplesheetRow[], columnDefs: typeof columns) =>
+    nextRows.length ? nextRows : [createEmptyRow(columnDefs)];
   const [rows, setRows] = useState<SamplesheetRow[]>(() =>
-    parseSamplesheetCsv(samplesheet, columns)
+    ensureRows(parseSamplesheetCsv(samplesheet, columns), columns)
   );
   const [invalidCells, setInvalidCells] = useState<Set<string>>(new Set());
 
@@ -41,7 +49,7 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
       isLocalUpdate.current = false;
       return;
     }
-    setRows(parseSamplesheetCsv(samplesheet, columns));
+    setRows(ensureRows(parseSamplesheetCsv(samplesheet, columns), columns));
   }, [samplesheet, columns]);
 
   useEffect(() => {
@@ -65,10 +73,12 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
     const hot = (hotRef.current as any)?.hotInstance;
     const data = hot?.getSourceData() as SamplesheetRow[] | undefined;
     if (!data) return;
-    setRows(data);
+    const nextCsv = serializeSamplesheetCsv(data, columns);
+    if (nextCsv === samplesheet) return;
 
+    setRows(data);
     isLocalUpdate.current = true;
-    setSamplesheet(serializeSamplesheetCsv(data, columns));
+    setSamplesheet(nextCsv);
   };
 
   const handleExport = () => {
@@ -88,7 +98,7 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
     const reader = new FileReader();
     reader.onload = () => {
       const text = String(reader.result ?? '');
-      const parsed = parseSamplesheetCsv(text, columns);
+      const parsed = ensureRows(parseSamplesheetCsv(text, columns), columns);
       setRows(parsed);
       isLocalUpdate.current = true;
       setSamplesheet(serializeSamplesheetCsv(parsed, columns));
