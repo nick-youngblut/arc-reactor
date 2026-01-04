@@ -44,8 +44,8 @@ class PipelineAgent:
         tool_list = tools if tools is not None else get_agent_tools()
         model = get_chat_model(settings)
         subagents = [
-            create_benchling_expert(model),
-            create_config_expert(model),
+            create_benchling_expert(settings),
+            create_config_expert(settings),
         ]
         middleware = [
             build_hitl_middleware(),
@@ -53,7 +53,7 @@ class PipelineAgent:
         agent = create_deep_agent(
             model=model,
             tools=tool_list,
-            system_prompt=PIPELINE_AGENT_SYSTEM_PROMPT.strip(),
+            system_prompt=PIPELINE_AGENT_SYSTEM_PROMPT.lstrip(),
             checkpointer=checkpointer,
             middleware=middleware,
             subagents=subagents,

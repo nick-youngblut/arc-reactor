@@ -8,6 +8,7 @@ from langchain.agents.middleware.human_in_the_loop import InterruptOnConfig
 HITL_REQUIRED_TOOLS = {
     "submit_run",
     "cancel_run",
+    "recover_run",
     "delete_file",
     "clear_samplesheet",
 }
