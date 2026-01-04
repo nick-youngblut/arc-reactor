@@ -1,6 +1,15 @@
 from __future__ import annotations
 
+import warnings
+
 from langchain_core.tools import BaseTool
+
+from .collections import (
+    get_benchling_expert_tools,
+    get_config_expert_tools,
+    get_execution_expert_tools,
+    get_orchestrator_tools,
+)
 
 from .benchling_discovery import get_entities, get_entry_content, get_entry_entities, list_entries
 from .entity_tools import (
@@ -32,6 +41,18 @@ SCHEMA_TOOL_CATEGORY = "schema"
 
 
 def get_agent_tools() -> list[BaseTool]:
+    """Get all agent tools (DEPRECATED).
+
+    .. deprecated::
+        Use tool collections from `backend.agents.tools.collections` instead.
+        This function returns all 28 tools for backwards compatibility only.
+    """
+    warnings.warn(
+        "get_agent_tools() is deprecated. Use tool collections from "
+        "backend.agents.tools.collections instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return [
         search_ngs_runs,
         get_ngs_run_samples,
@@ -62,3 +83,15 @@ def get_agent_tools() -> list[BaseTool]:
         list_projects,
         execute_warehouse_query,
     ]
+
+
+__all__ = [
+    "BENCHLING_TOOL_CATEGORY",
+    "NGS_TOOL_CATEGORY",
+    "SCHEMA_TOOL_CATEGORY",
+    "get_agent_tools",
+    "get_benchling_expert_tools",
+    "get_config_expert_tools",
+    "get_execution_expert_tools",
+    "get_orchestrator_tools",
+]
