@@ -63,6 +63,33 @@ export interface TaskItem {
   error_message: string | null;
 }
 
+export type ModifierType = 'agent' | 'user' | null;
+
+export interface FileState {
+  content: string | null;
+  modified_by: ModifierType;
+  modified_at: string | null;
+}
+
+export interface ValidationResult {
+  is_valid: boolean;
+  errors: Array<{ field: string; message: string; sample?: string }>;
+  warnings: Array<{ field: string; message: string; sample?: string }>;
+}
+
+export interface WorkspaceResponse {
+  id: string;
+  user_email: string;
+  thread_id: string | null;
+  pipeline: string | null;
+  version: string | null;
+  samplesheet: FileState;
+  config: FileState;
+  validation_result: ValidationResult | null;
+  created_at: string;
+  updated_at: string;
+}
+
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL
     ? `${process.env.NEXT_PUBLIC_API_URL}/api`
@@ -134,6 +161,68 @@ export const fetchTasks = async (runId: string) => {
 
 export const fetchTaskSummary = async (runId: string) => {
   const { data } = await apiClient.get<TaskSummary>(`/runs/${runId}/tasks/summary`);
+  return data;
+};
+
+export const fetchWorkspaceDraft = async () => {
+  const { data } = await apiClient.get<WorkspaceResponse | null>('/workspaces/draft');
+  return data;
+};
+
+export const fetchWorkspaceByThread = async (threadId: string) => {
+  const { data } = await apiClient.get<WorkspaceResponse>(`/workspaces/by-thread/${threadId}`);
+  return data;
+};
+
+export const createWorkspace = async (payload: {
+  thread_id?: string | null;
+  pipeline?: string | null;
+  version?: string | null;
+  samplesheet?: string | null;
+  config?: string | null;
+}) => {
+  const { data } = await apiClient.post<WorkspaceResponse>('/workspaces', payload);
+  return data;
+};
+
+export const updateWorkspaceSamplesheet = async (workspaceId: string, content: string) => {
+  const { data } = await apiClient.patch<WorkspaceResponse>(
+    `/workspaces/${workspaceId}/samplesheet`,
+    { content }
+  );
+  return data;
+};
+
+export const updateWorkspaceConfig = async (workspaceId: string, content: string) => {
+  const { data } = await apiClient.patch<WorkspaceResponse>(
+    `/workspaces/${workspaceId}/config`,
+    { content }
+  );
+  return data;
+};
+
+export const updateWorkspacePipeline = async (
+  workspaceId: string,
+  pipeline: string,
+  version?: string | null
+) => {
+  const { data } = await apiClient.patch<WorkspaceResponse>(
+    `/workspaces/${workspaceId}/pipeline`,
+    { pipeline, version: version ?? null }
+  );
+  return data;
+};
+
+export const associateWorkspaceThread = async (workspaceId: string, threadId: string) => {
+  const { data } = await apiClient.post<WorkspaceResponse>(
+    `/workspaces/${workspaceId}/associate`,
+    { thread_id: threadId }
+  );
+  return data;
+};
+
+export const deleteWorkspace = async (workspaceId: string) => {
+  const { data } = await apiClient.delete<boolean>(`/workspaces/${workspaceId}`);
   return data;
 };
 
