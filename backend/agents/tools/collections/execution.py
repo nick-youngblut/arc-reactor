@@ -1,4 +1,5 @@
 """Execution expert tool collection."""
+
 from __future__ import annotations
 
 from langchain_core.tools import BaseTool
@@ -8,6 +9,7 @@ from backend.agents.tools.submission import (
     cancel_run,
     clear_samplesheet,
     delete_file,
+    recover_run,
     submit_run,
 )
 from backend.agents.tools.workspace_tools import (
@@ -18,20 +20,20 @@ from backend.agents.tools.workspace_tools import (
 
 
 # New tools added in Phase 4
-# from backend.agents.tools.monitoring_tools import (
-#     get_run_status,
-#     get_run_tasks,
-#     list_user_runs,
-# )
-# from backend.agents.tools.troubleshooting_tools import (
-#     analyze_failure,
-#     get_run_logs,
-#     get_task_logs,
-# )
-# from backend.agents.tools.output_tools import (
-#     get_run_outputs,
-#     get_signed_download_url,
-# )
+from backend.agents.tools.monitoring_tools import (
+    get_run_status,
+    get_run_tasks,
+    list_user_runs,
+)
+from backend.agents.tools.troubleshooting_tools import (
+    analyze_failure,
+    get_run_logs,
+    get_task_logs,
+)
+from backend.agents.tools.output_tools import (
+    get_run_outputs,
+    get_signed_download_url,
+)
 
 
 def get_execution_expert_tools() -> list[BaseTool]:
@@ -45,8 +47,6 @@ def get_execution_expert_tools() -> list[BaseTool]:
     - Outputs NEW (2): get_run_outputs, get_signed_download_url
     - Cleanup HITL (2): delete_file, clear_samplesheet
     - Workspace (3): get_workspace_status, get_current_samplesheet, get_current_config
-
-    Note: New monitoring/troubleshooting/output tools added in Phase 4.
     """
     tools = [
         # Validation
@@ -54,7 +54,7 @@ def get_execution_expert_tools() -> list[BaseTool]:
         # Execution (HITL)
         submit_run,
         cancel_run,
-        # recover_run,  # Added in Phase 4
+        recover_run,
         # Cleanup (HITL)
         delete_file,
         clear_samplesheet,
@@ -62,23 +62,17 @@ def get_execution_expert_tools() -> list[BaseTool]:
         get_workspace_status,
         get_current_samplesheet,
         get_current_config,
+        # Monitoring
+        get_run_status,
+        get_run_tasks,
+        list_user_runs,
+        # Troubleshooting
+        get_run_logs,
+        get_task_logs,
+        analyze_failure,
+        # Outputs
+        get_run_outputs,
+        get_signed_download_url,
     ]
-
-    # Phase 4 additions (uncomment after implementing):
-    # tools.extend([
-    #     # Monitoring
-    #     get_run_status,
-    #     get_run_tasks,
-    #     list_user_runs,
-    #     # Troubleshooting
-    #     get_run_logs,
-    #     get_task_logs,
-    #     analyze_failure,
-    #     # Outputs
-    #     get_run_outputs,
-    #     get_signed_download_url,
-    #     # Execution (HITL)
-    #     recover_run,
-    # ])
 
     return tools

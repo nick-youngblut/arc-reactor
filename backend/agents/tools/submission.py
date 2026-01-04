@@ -13,7 +13,9 @@ from backend.config import settings
 from backend.models.schemas.runs import RunStatus
 from backend.services.database import DatabaseService
 from backend.services.pipelines import PipelineRegistry
+from backend.services.batch import BatchService
 from backend.services.runs import RunStoreService
+from backend.utils.errors import NotFoundError, ValidationError
 
 try:  # optional dependency
     from google.cloud import batch_v1
@@ -199,6 +201,14 @@ async def _get_run_store(runtime: Any | None) -> tuple[RunStoreService, Any]:
 
     session = await anext(database_service.get_session())
     return RunStoreService.create(session, settings), session
+
+
+def _get_batch_service(runtime: Any | None) -> BatchService:
+    configurable = _runtime_configurable(runtime)
+    batch_service = configurable.get("batch_service")
+    if batch_service is not None:
+        return batch_service
+    return BatchService.create(settings)
 
 
 async def _close_session(session) -> None:
@@ -413,3 +423,58 @@ async def clear_samplesheet(confirm: bool, runtime: Any | None = None) -> str:
         generated.pop("samplesheet.csv", None)
 
     return "Samplesheet cleared from agent state."
+
+
+@tool
+@tool_error_handler
+async def recover_run(run_id: str, notes: str | None = None, runtime: Any | None = None) -> str:
+    """
+    Submit a recovery run using Nextflow's -resume flag.
+
+    This reuses the work directory from the failed run and skips
+    successfully completed tasks. Requires human approval.
+
+    Args:
+        run_id: The run identifier of the failed run to recover
+        notes: Optional notes about the recovery attempt
+
+    Returns:
+        New run ID if successful, or error message.
+    """
+    if not run_id:
+        return "Error: run_id is required."
+
+    context = get_tool_context(runtime)
+    storage = context.storage
+    if storage is None:
+        return "Error: Storage service unavailable."
+    if not context.user_email:
+        return "Error: user_email is required."
+
+    run_store, session = await _get_run_store(runtime)
+    try:
+        batch = _get_batch_service(runtime)
+        recovery_id = await run_store.submit_recovery_run(
+            parent_run_id=run_id,
+            user_email=context.user_email,
+            user_name=context.user_name,
+            storage=storage,
+            batch=batch,
+            notes=notes,
+        )
+
+        return (
+            "Recovery run submitted!\n\n"
+            f"New Run ID: {recovery_id}\n"
+            f"Original Run: {run_id}\n"
+            "Status: submitted\n\n"
+            "The run will resume from the last successful checkpoint."
+        )
+    except ValidationError as exc:
+        detail = exc.detail or exc.message
+        return f"Error: {detail}"
+    except NotFoundError as exc:
+        detail = exc.detail or exc.message
+        return f"Error: {detail}"
+    finally:
+        await _close_session(session)

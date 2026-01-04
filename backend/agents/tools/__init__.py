@@ -31,7 +31,10 @@ from .schema_tools import (
     get_schemas,
     list_projects,
 )
-from .submission import cancel_run, clear_samplesheet, delete_file, submit_run
+from .submission import cancel_run, clear_samplesheet, delete_file, recover_run, submit_run
+from .monitoring_tools import get_run_status, get_run_tasks, list_user_runs
+from .troubleshooting_tools import analyze_failure, get_run_logs, get_task_logs
+from .output_tools import get_run_outputs, get_signed_download_url
 from .file_generation import generate_config, generate_samplesheet, validate_inputs
 from .workspace_tools import get_current_config, get_current_samplesheet, get_workspace_status
 
@@ -94,4 +97,13 @@ __all__ = [
     "get_config_expert_tools",
     "get_execution_expert_tools",
     "get_orchestrator_tools",
+    "get_run_status",
+    "get_run_tasks",
+    "list_user_runs",
+    "get_run_logs",
+    "get_task_logs",
+    "analyze_failure",
+    "get_run_outputs",
+    "get_signed_download_url",
+    "recover_run",
 ]
