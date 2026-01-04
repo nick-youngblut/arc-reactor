@@ -51,6 +51,11 @@ The agent is built on LangChain v1 with the DeepAgents framework, providing plan
 │  │  • generate_samplesheet     │  │                                     │   │
 │  │  • generate_config          │  │                                     │   │
 │  │                             │  │                                     │   │
+│  │  Workspace Tools:           │  │                                     │   │
+│  │  • get_current_samplesheet  │  │                                     │   │
+│  │  • get_current_config       │  │                                     │   │
+│  │  • get_workspace_status     │  │                                     │   │
+│  │                             │  │                                     │   │
 │  │  Validation & Submission:   │  │                                     │   │
 │  │  • validate_inputs          │  │                                     │   │
 │  │  • submit_run (HITL)        │  │                                     │   │
@@ -169,6 +174,18 @@ class BenchlingService:
             return_format=return_format,
         )
 ```
+
+## Workspace Tools
+
+Workspace tools let the agent read user-edited files before regenerating content.
+They are backed by the workspace state stored in PostgreSQL and accessed via
+`WorkspaceService`.
+
+| Tool | Description | Behavior |
+|------|-------------|----------|
+| `get_current_samplesheet` | Return current samplesheet content | Reads latest user edits |
+| `get_current_config` | Return current config content | Reads latest user edits |
+| `get_workspace_status` | Summary of pipeline + modifier timestamps | Useful for conflict checks |
 
 ---
 

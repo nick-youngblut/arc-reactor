@@ -198,6 +198,18 @@ Agent Tool Call → Benchling Query → Data Transformation → CSV/Config Gener
                                                       Editor Render
 ```
 
+### Pattern 2b: Workspace Sync Flow
+
+```
+User edits file → Debounced REST PUT/PATCH → PostgreSQL workspace_states
+                                             ↓
+Agent tools read current state when needed
+                                             ↓
+WebSocket "b" event for agent-generated updates
+                                             ↓
+Frontend store updates without clobbering user edits
+```
+
 ### Pattern 3: Run Submission Flow
 
 ```

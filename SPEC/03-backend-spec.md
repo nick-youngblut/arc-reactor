@@ -211,6 +211,22 @@ recovery eligibility rules.
 | `GET /api/pipelines/{name}` | GET | Get pipeline details | Required |
 | `GET /api/pipelines/{name}/schema` | GET | Get samplesheet schema | Required |
 
+### Workspace State
+
+| Endpoint | Method | Description | Auth |
+|----------|--------|-------------|------|
+| `GET /api/workspaces` | GET | List workspaces for current user | Required |
+| `POST /api/workspaces` | POST | Create workspace (draft or thread) | Required |
+| `GET /api/workspaces/{id}` | GET | Get workspace by ID | Required |
+| `GET /api/workspaces/by-thread/{thread_id}` | GET | Get workspace by thread ID | Required |
+| `GET /api/workspaces/draft` | GET | Get draft workspace | Required |
+| `PUT /api/workspaces/{id}` | PUT | Full workspace update | Required |
+| `PATCH /api/workspaces/{id}/samplesheet` | PATCH | Update samplesheet only | Required |
+| `PATCH /api/workspaces/{id}/config` | PATCH | Update config only | Required |
+| `PATCH /api/workspaces/{id}/pipeline` | PATCH | Update pipeline selection | Required |
+| `POST /api/workspaces/{id}/associate` | POST | Associate draft with thread | Required |
+| `DELETE /api/workspaces/{id}` | DELETE | Delete workspace | Required |
+
 ### Chat
 
 | Endpoint | Method | Description | Auth |

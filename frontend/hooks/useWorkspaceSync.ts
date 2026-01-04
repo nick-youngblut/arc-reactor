@@ -124,6 +124,7 @@ export function useWorkspaceSync() {
     selectedVersion
   ]);
 
+  // Tracks unsent content + retry counts for offline/5xx failures.
   const pendingSyncs = useRef<{ samplesheet?: PendingSync; config?: PendingSync }>({});
   const workspaceCreationInFlight = useRef<Promise<string | null> | null>(null);
   const previousThreadId = useRef<string | null>(null);
@@ -143,6 +144,7 @@ export function useWorkspaceSync() {
     setSyncErrorRef.current(getErrorMessage(error));
   }, []);
 
+  // Mutex-protected workspace creation to avoid duplicate drafts/threads.
   const ensureWorkspace = useCallback(async () => {
     const existingId = useWorkspaceStore.getState().workspaceId;
     if (existingId) return existingId;
@@ -217,6 +219,7 @@ export function useWorkspaceSync() {
     [setSyncErrorMessage]
   );
 
+  // Low-level sync that assumes a workspace already exists.
   const syncFileToWorkspace = useCallback(
     async (workspaceId: string, type: 'samplesheet' | 'config', content: string) => {
       const state = useWorkspaceStore.getState();
@@ -252,6 +255,7 @@ export function useWorkspaceSync() {
     [handleSyncFailure]
   );
 
+  // Sync with auto-create, retry classification, and circuit-breaker tracking.
   const syncFile = useCallback(
     async (type: 'samplesheet' | 'config', content: string) => {
       const state = useWorkspaceStore.getState();
@@ -282,6 +286,7 @@ export function useWorkspaceSync() {
     void syncFile('config', content);
   }, SYNC_DEBOUNCE_MS);
 
+  // Ensure dirty edits are persisted before switching threads.
   const saveUnsavedChangesBeforeSwitch = useCallback(async () => {
     const state = useWorkspaceStore.getState();
     const tasks: Array<Promise<void>> = [];
@@ -305,6 +310,7 @@ export function useWorkspaceSync() {
     await Promise.all(tasks);
   }, [syncFileToWorkspace]);
 
+  // Load draft or thread workspace, creating if missing.
   const loadWorkspaceForThread = useCallback(async () => {
     setSyncingRef.current(true);
     try {
@@ -342,6 +348,7 @@ export function useWorkspaceSync() {
     }
   }, [setSyncErrorMessage, threadId]);
 
+  // Retry queued syncs when the browser is back online/visible.
   const retryPendingSyncs = useCallback(() => {
     const pending = pendingSyncs.current;
     (['samplesheet', 'config'] as const).forEach((type) => {
