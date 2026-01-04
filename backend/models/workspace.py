@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Any
+from uuid import uuid4
 
 from sqlalchemy import DateTime, Index, String, Text, text
-from sqlalchemy.dialects.postgresql import JSONB, UUID as PG_UUID
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import JSON
 
@@ -22,6 +24,7 @@ class WorkspaceState(Base):
     id: Mapped[str] = mapped_column(
         PG_UUID(as_uuid=True),
         primary_key=True,
+        default=uuid4,
         server_default=text("gen_random_uuid()"),
     )
 
@@ -33,9 +36,7 @@ class WorkspaceState(Base):
 
     samplesheet: Mapped[str | None] = mapped_column(Text)
     samplesheet_modified_by: Mapped[str | None] = mapped_column(String(10))
-    samplesheet_modified_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True)
-    )
+    samplesheet_modified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     config: Mapped[str | None] = mapped_column(Text)
     config_modified_by: Mapped[str | None] = mapped_column(String(10))
@@ -46,11 +47,11 @@ class WorkspaceState(Base):
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=text("now()"), nullable=False
+        DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP"), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=text("now()"),
-        onupdate=text("now()"),
+        server_default=text("CURRENT_TIMESTAMP"),
+        onupdate=text("CURRENT_TIMESTAMP"),
         nullable=False,
     )
