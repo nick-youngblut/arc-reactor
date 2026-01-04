@@ -13,6 +13,24 @@ default:
   gemini_model: "gemini-3-flash-preview"
   gemini_thinking_level: "medium"
 
+  # Agent Configuration (per-agent model overrides)
+  agent:
+    orchestrator:
+      # Inherits from gemini_model and gemini_thinking_level by default
+      # Override here if needed:
+      # model: "google_genai:gemini-3-flash-preview"
+      # thinking_level: "low"
+
+    subagents:
+      benchling_expert:
+        thinking_level: "medium"
+
+      config_expert:
+        thinking_level: "low"
+
+      execution_expert:
+        thinking_level: "medium"
+
   checkpointer_pool_min_size: 5
   checkpointer_pool_max_size: 50
   checkpointer_pool_timeout: 30.0
