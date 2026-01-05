@@ -16,10 +16,11 @@ interface ChatInputProps {
   isLoading: boolean;
   onChange: (value: string) => void;
   onSubmit: () => void;
+  onStop: () => void;
   isExpanded?: boolean;
 }
 
-export function ChatInput({ input, isLoading, onChange, onSubmit, isExpanded = false }: ChatInputProps) {
+export function ChatInput({ input, isLoading, onChange, onSubmit, onStop, isExpanded = false }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const maxChars = 1200;
 
@@ -77,11 +78,21 @@ export function ChatInput({ input, isLoading, onChange, onSubmit, isExpanded = f
           </div>
           <button
             type="button"
-            onClick={onSubmit}
-            disabled={isLoading || input.trim().length === 0}
-            className="arc-button-primary scale-90 origin-right transition-transform disabled:scale-95 disabled:opacity-30"
+            onClick={isLoading ? onStop : onSubmit}
+            disabled={!isLoading && input.trim().length === 0}
+            className={`scale-90 origin-right transition-all duration-200 active:scale-95 disabled:opacity-30 ${isLoading
+              ? 'rounded-full px-6 py-2.5 text-sm font-semibold text-white bg-arc-marigold shadow-lg shadow-arc-marigold/30 hover:bg-arc-marigold/90'
+              : 'arc-button-primary'
+              }`}
           >
-            {isLoading ? 'Processing…' : 'Send'}
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-1.5 bg-white rounded-sm animate-pulse" />
+                Stop
+              </div>
+            ) : (
+              'Send'
+            )}
           </button>
         </div>
       </div>

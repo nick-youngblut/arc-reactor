@@ -6,7 +6,7 @@ import { ChatInput } from './ChatInput';
 import { MessageList } from './MessageList';
 
 export function ChatPanel() {
-  const { messages, input, setInput, sendMessage, isLoading, clearMessages } = useAgentChat();
+  const { messages, input, setInput, sendMessage, isLoading, clearMessages, stop } = useAgentChat();
 
   const handleSubmit = () => {
     if (!input.trim()) return;
@@ -55,6 +55,7 @@ export function ChatPanel() {
         isLoading={isLoading}
         onChange={setInput}
         onSubmit={handleSubmit}
+        onStop={stop}
         isExpanded={messages.length === 0}
       />
     </section>

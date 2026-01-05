@@ -282,10 +282,20 @@ export function useAgentChat() {
   );
 
   const stop = useCallback(() => {
-    manualClose.current = true;
-    wsRef.current?.close();
+    console.log('[useAgentChat] stop called');
+    if (wsRef.current) {
+      manualClose.current = true;
+      wsRef.current.close();
+    }
     setLoading(false);
-  }, [setLoading]);
+
+    // Re-establish connection immediately so the user can send a new message
+    // Small timeout to let the current close event settle
+    setTimeout(() => {
+      manualClose.current = false;
+      connect();
+    }, 100);
+  }, [connect, setLoading]);
 
   return {
     messages,
