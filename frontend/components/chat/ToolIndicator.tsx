@@ -25,7 +25,7 @@ function getCategory(toolName: string | null | undefined) {
   return 'default';
 }
 
-export function ToolIndicator({ invocation }: { invocation: ToolInvocation }) {
+export function ToolIndicator({ invocation, isNested = false }: { invocation: ToolInvocation; isNested?: boolean }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const status = statusConfig[invocation.state];
   const category = getCategory(invocation.toolName);
@@ -37,12 +37,15 @@ export function ToolIndicator({ invocation }: { invocation: ToolInvocation }) {
   );
 
   return (
-    <div className={`overflow-hidden rounded-2xl border bg-white/50 backdrop-blur-sm transition-all duration-300 ${isExpanded ? 'shadow-lg border-arc-blue/20 shadow-arc-blue/5 ring-1 ring-arc-blue/5' : 'border-arc-gray-100 dark:border-arc-gray-800 shadow-sm'} dark:bg-arc-night/50`}>
+    <div className={`overflow-hidden transition-all duration-300 ${isNested
+      ? 'ml-3 rounded-xl border-arc-blue/10 bg-white/40 dark:border-arc-blue/20 dark:bg-arc-night/40 shadow-none'
+      : 'rounded-2xl border-arc-gray-100 dark:border-arc-gray-800 shadow-sm bg-white/50 dark:bg-arc-night/50'
+      } border backdrop-blur-sm ${isExpanded ? 'shadow-lg border-arc-blue/20 shadow-arc-blue/5 ring-1 ring-arc-blue/5' : ''}`}>
       <button
         type="button"
         onClick={() => setIsExpanded((prev) => !prev)}
         disabled={invocation.state === 'pending' || invocation.state === 'running'}
-        className="flex w-full items-center justify-between gap-3 p-3.5 text-left"
+        className={`flex w-full items-center justify-between gap-3 text-left ${isNested ? 'p-2' : 'p-3.5'}`}
       >
         <div className="flex items-center gap-3">
           <div className="flex h-5 w-5 items-center justify-center rounded-md bg-arc-blue/10 text-arc-blue">
@@ -67,7 +70,7 @@ export function ToolIndicator({ invocation }: { invocation: ToolInvocation }) {
       </button>
 
       {isExpanded && invocation.state !== 'pending' && invocation.state !== 'running' ? (
-        <div className="mx-3 mb-3 space-y-3 rounded-xl border border-arc-gray-200/70 bg-white/90 p-3 text-xs dark:border-arc-gray-700 dark:bg-arc-night/80">
+        <div className={`space-y-3 rounded-xl border border-arc-gray-200/70 bg-white/90 text-xs dark:border-arc-gray-700 dark:bg-arc-night/80 ${isNested ? 'mx-2 mb-2 p-2' : 'mx-3 mb-3 p-3'}`}>
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-arc-gray-400 dark:text-arc-gray-400">
               Args
