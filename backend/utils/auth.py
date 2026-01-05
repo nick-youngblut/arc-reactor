@@ -39,7 +39,9 @@ ALLOWED_SERVICE_ACCOUNTS = {
 
 
 def _audience() -> str | None:
-    project_number = os.getenv("IAP_PROJECT_NUMBER") or getattr(settings, "iap_project_number", None)
+    project_number = os.getenv("IAP_PROJECT_NUMBER") or getattr(
+        settings, "iap_project_number", None
+    )
     project_id = os.getenv("IAP_PROJECT_ID") or getattr(settings, "iap_project_id", None)
     if not project_number or not project_id:
         return None
@@ -106,10 +108,27 @@ def verify_oidc_token(token: str, audience: str) -> dict:
 
 async def get_current_user(request: Request) -> UserContext:
     jwt_token = request.headers.get("X-Goog-IAP-JWT-Assertion")
-    if not jwt_token:
-        if settings.get("debug", False):
+    if jwt_token:
+        claims = verify_iap_jwt(jwt_token)
+        email = claims.get("email")
+        if not email:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+        name = claims.get("name", email)
+        is_admin = email.lower() in _admin_emails()
+        return UserContext(email=email, name=name, is_admin=is_admin)
+
+    # Check for Bearer token in debug mode
+    if settings.get("debug", False):
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            # In debug mode, accept any Bearer token and return dev user
             return UserContext(email="dev@example.com", name="Developer")
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+        else:
+            # No auth headers in debug mode, return dev user
+            return UserContext(email="dev@example.com", name="Developer")
+
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
 
     claims = verify_iap_jwt(jwt_token)
     email = claims.get("email")

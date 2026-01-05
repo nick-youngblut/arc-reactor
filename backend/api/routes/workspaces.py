@@ -17,7 +17,7 @@ from backend.services.workspace import WorkspaceService
 from backend.utils.auth import UserContext
 from backend.utils.errors import NotFoundError, ValidationError
 
-router = APIRouter(prefix="/api/workspaces", tags=["workspaces"])
+router = APIRouter(prefix="/workspaces", tags=["workspaces"])
 
 
 @router.get("", response_model=list[WorkspaceResponse])
