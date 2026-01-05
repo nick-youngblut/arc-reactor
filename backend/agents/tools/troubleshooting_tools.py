@@ -1,3 +1,5 @@
+"""Troubleshooting tools for failed pipeline runs."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -19,6 +21,14 @@ MAX_TASK_LOG_TAIL = 1000
 
 
 def _runtime_config(runtime: Any | None) -> dict[str, Any]:
+    """Extract the runtime config dict from a tool runtime.
+
+    Args:
+        runtime: Tool runtime passed by LangChain/DeepAgents.
+
+    Returns:
+        Configuration dictionary (empty if unavailable).
+    """
     if runtime is None:
         return {}
     config = getattr(runtime, "config", None)
@@ -26,12 +36,28 @@ def _runtime_config(runtime: Any | None) -> dict[str, Any]:
 
 
 def _runtime_configurable(runtime: Any | None) -> dict[str, Any]:
+    """Extract configurable overrides from runtime config.
+
+    Args:
+        runtime: Tool runtime passed by LangChain/DeepAgents.
+
+    Returns:
+        Configurable dict (empty if unavailable).
+    """
     config = _runtime_config(runtime)
     configurable = config.get("configurable")
     return configurable if isinstance(configurable, dict) else {}
 
 
 async def _get_run_store(runtime: Any | None) -> tuple[RunStoreService, Any | None]:
+    """Resolve the run store service and optional session.
+
+    Args:
+        runtime: Tool runtime passed by LangChain/DeepAgents.
+
+    Returns:
+        Tuple of (RunStoreService, session or None).
+    """
     configurable = _runtime_configurable(runtime)
     run_store = configurable.get("run_store_service")
     if run_store is not None and hasattr(run_store, "get_run"):
@@ -46,12 +72,25 @@ async def _get_run_store(runtime: Any | None) -> tuple[RunStoreService, Any | No
 
 
 async def _close_session(session: Any | None) -> None:
+    """Close the database session if provided.
+
+    Args:
+        session: SQLAlchemy session or None.
+    """
     if session is None:
         return
     await session.close()
 
 
 def _get_log_service(runtime: Any | None) -> LogService | None:
+    """Resolve the log service from runtime or storage.
+
+    Args:
+        runtime: Tool runtime passed by LangChain/DeepAgents.
+
+    Returns:
+        LogService instance or None when unavailable.
+    """
     configurable = _runtime_configurable(runtime)
     log_service = configurable.get("log_service")
     if log_service is not None:
@@ -64,11 +103,29 @@ def _get_log_service(runtime: Any | None) -> LogService | None:
 
 
 def _tail_lines(content: str, tail: int) -> str:
+    """Return the last N lines of content.
+
+    Args:
+        content: Full log content.
+        tail: Line count to return.
+
+    Returns:
+        Trailing lines joined by newlines.
+    """
     lines = content.splitlines()
     return "\n".join(lines[-tail:]) if lines else ""
 
 
 def _diagnose_error(log_text: str, exit_code: int | None) -> tuple[str, str] | None:
+    """Infer common failure patterns from log output.
+
+    Args:
+        log_text: Log content (stderr or stdout).
+        exit_code: Exit code from the task, if any.
+
+    Returns:
+        Tuple of (diagnosis, suggested_fix) or None if unknown.
+    """
     haystack = log_text.lower()
     if exit_code == 137 or "oom" in haystack or "out of memory" in haystack or "killed" in haystack:
         return (

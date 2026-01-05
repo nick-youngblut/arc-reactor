@@ -30,7 +30,7 @@ from backend.agents.tools.schema_tools import (
 
 
 def get_benchling_expert_tools() -> list[BaseTool]:
-    """Tools for the benchling_expert subagent (15 tools).
+    """Tools for the benchling_expert subagent (16 tools).
 
     Categories:
     - NGS Discovery (4): search_ngs_runs, get_ngs_run_samples, get_ngs_run_qc, get_fastq_paths

@@ -37,7 +37,7 @@ from backend.agents.tools.output_tools import (
 
 
 def get_execution_expert_tools() -> list[BaseTool]:
-    """Tools for the execution_expert subagent (15 tools after Phase 4).
+    """Tools for the execution_expert subagent (17 tools after Phase 4).
 
     Categories:
     - Validation (1): validate_inputs

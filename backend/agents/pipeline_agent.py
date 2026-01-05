@@ -22,6 +22,7 @@ else:
 
 
 def _ensure_available() -> None:
+    """Raise if DeepAgents dependency is unavailable."""
     if _IMPORT_ERROR is not None:
         raise RuntimeError("DeepAgents is not available") from _IMPORT_ERROR
 

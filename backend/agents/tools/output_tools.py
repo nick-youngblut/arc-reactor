@@ -1,3 +1,5 @@
+"""Output retrieval tools for pipeline runs."""
+
 from __future__ import annotations
 
 import fnmatch
@@ -15,6 +17,14 @@ MAX_EXPIRATION_MINUTES = 1440
 
 
 def _runtime_config(runtime: Any | None) -> dict[str, Any]:
+    """Extract the runtime config dict from a tool runtime.
+
+    Args:
+        runtime: Tool runtime passed by LangChain/DeepAgents.
+
+    Returns:
+        Configuration dictionary (empty if unavailable).
+    """
     if runtime is None:
         return {}
     config = getattr(runtime, "config", None)
@@ -22,12 +32,28 @@ def _runtime_config(runtime: Any | None) -> dict[str, Any]:
 
 
 def _runtime_configurable(runtime: Any | None) -> dict[str, Any]:
+    """Extract configurable overrides from runtime config.
+
+    Args:
+        runtime: Tool runtime passed by LangChain/DeepAgents.
+
+    Returns:
+        Configurable dict (empty if unavailable).
+    """
     config = _runtime_config(runtime)
     configurable = config.get("configurable")
     return configurable if isinstance(configurable, dict) else {}
 
 
 async def _get_run_store(runtime: Any | None) -> tuple[RunStoreService, Any | None]:
+    """Resolve the run store service and optional session.
+
+    Args:
+        runtime: Tool runtime passed by LangChain/DeepAgents.
+
+    Returns:
+        Tuple of (RunStoreService, session or None).
+    """
     configurable = _runtime_configurable(runtime)
     run_store = configurable.get("run_store_service")
     if run_store is not None and hasattr(run_store, "get_run"):
@@ -42,12 +68,25 @@ async def _get_run_store(runtime: Any | None) -> tuple[RunStoreService, Any | No
 
 
 async def _close_session(session: Any | None) -> None:
+    """Close the database session if provided.
+
+    Args:
+        session: SQLAlchemy session or None.
+    """
     if session is None:
         return
     await session.close()
 
 
 def _normalize_results_path(path: str) -> str:
+    """Normalize a results path to be relative to the results directory.
+
+    Args:
+        path: Raw path or filename.
+
+    Returns:
+        Normalized relative path without leading results/ prefix.
+    """
     normalized = path.lstrip("/")
     if normalized.startswith("results/"):
         return normalized[len("results/") :]

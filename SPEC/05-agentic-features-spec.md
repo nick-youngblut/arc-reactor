@@ -1276,6 +1276,31 @@ Schema entities have dedicated tables named `{schema_system_name}$raw`:
 
 ## Subagents
 
+**Tool Distribution Overview:**
+- Orchestrator: workspace tools only (3)
+- benchling_expert: NGS + Benchling + schema + warehouse query tools (16)
+- config_expert: pipeline info + file generation + workspace tools (7)
+- execution_expert: validation + submission/HITL + monitoring + troubleshooting + outputs + cleanup + workspace (17)
+
+### orchestrator
+
+The orchestrator is the main agent that delegates to specialized subagents.
+It keeps a minimal toolset (workspace tools only) and uses the DeepAgents
+`task` mechanism to hand off to subagents for Benchling, configuration, or
+execution work.
+
+**Configuration (conceptual):**
+```python
+orchestrator = {
+    "name": "orchestrator",
+    "description": "Main agent that routes work to specialized subagents",
+    "system_prompt": ORCHESTRATOR_SYSTEM_PROMPT,
+    "tools": [get_workspace_status, get_current_samplesheet, get_current_config],
+    "model": "google_genai:gemini-3-flash-preview",
+    "subagents": [benchling_expert, config_expert, execution_expert],
+}
+```
+
 ### benchling_expert
 
 Handles complex Benchling queries that require multi-step reasoning.
@@ -1302,7 +1327,7 @@ benchling_expert:
 benchling_expert = {
     "name": "benchling_expert",
     "description": "Expert at complex Benchling queries involving multiple data sources, relationship traversal, and data reconciliation",
-    "prompt": """You are an expert at querying Arc Institute's Benchling database.
+    "system_prompt": """You are an expert at querying Arc Institute's Benchling database.
     
     You have deep knowledge of:
     - NGS workflow: samples → library prep → pooling → sequencing
@@ -1321,7 +1346,24 @@ benchling_expert = {
     - NGS Run: Sequencing run metadata
     - NGS Run Output v2: Per-sample outputs with FASTQ paths
     """,
-    "tools": [search_ngs_runs, get_ngs_run_samples, get_entities, get_entity_relationships, list_entries, get_entry_entities, execute_warehouse_query],
+    "tools": [
+        search_ngs_runs,
+        get_ngs_run_samples,
+        get_ngs_run_qc,
+        get_fastq_paths,
+        get_entities,
+        get_entity_relationships,
+        trace_sample_lineage,
+        find_sample_descendants,
+        list_entries,
+        get_entry_content,
+        get_entry_entities,
+        get_schemas,
+        get_schema_field_info,
+        get_dropdown_values,
+        list_projects,
+        execute_warehouse_query,
+    ],
     "model": "google_genai:gemini-3-flash-preview",
 }
 ```
@@ -1362,7 +1404,7 @@ Consider cellranger if:
 config_expert = {
     "name": "config_expert",
     "description": "Expert at Nextflow pipeline configuration, parameter selection, and resource optimization",
-    "prompt": """You are an expert at configuring bioinformatics pipelines.
+    "system_prompt": """You are an expert at configuring bioinformatics pipelines.
     
     You have deep knowledge of:
     - nf-core pipeline parameters and their effects
@@ -1376,8 +1418,56 @@ config_expert = {
     3. Warn about potential issues
     4. Estimate runtime and costs
     """,
-    "tools": [list_pipelines, get_pipeline_schema, get_dropdown_values],
+    "tools": [
+        list_pipelines,
+        get_pipeline_schema,
+        generate_samplesheet,
+        generate_config,
+        get_workspace_status,
+        get_current_samplesheet,
+        get_current_config,
+    ],
     "model": "google_genai:gemini-3-flash-preview",
+}
+```
+
+### execution_expert
+
+Handles validation, submission, monitoring, and troubleshooting of pipeline runs.
+
+**Use Cases:**
+- Validating samplesheets and configs before submission
+- Submitting or recovering runs (requires approval)
+- Monitoring run/task status and reviewing logs
+- Retrieving output files or download links
+
+**Configuration:**
+```python
+execution_expert = {
+    "name": "execution_expert",
+    "description": "Expert at pipeline execution, monitoring, and troubleshooting",
+    "system_prompt": EXECUTION_EXPERT_PROMPT,
+    "tools": [
+        validate_inputs,
+        submit_run,
+        cancel_run,
+        recover_run,
+        delete_file,
+        clear_samplesheet,
+        get_workspace_status,
+        get_current_samplesheet,
+        get_current_config,
+        get_run_status,
+        get_run_tasks,
+        list_user_runs,
+        get_run_logs,
+        get_task_logs,
+        analyze_failure,
+        get_run_outputs,
+        get_signed_download_url,
+    ],
+    "model": "google_genai:gemini-3-flash-preview",
+    "interrupt_on": HITL_REQUIRED_TOOLS,
 }
 ```
 

@@ -1,3 +1,5 @@
+"""Monitoring tools for pipeline runs."""
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
@@ -20,6 +22,14 @@ MAX_DAYS_BACK = 90
 
 
 def _runtime_config(runtime: Any | None) -> dict[str, Any]:
+    """Extract the runtime config dict from a tool runtime.
+
+    Args:
+        runtime: Tool runtime passed by LangChain/DeepAgents.
+
+    Returns:
+        Configuration dictionary (empty if unavailable).
+    """
     if runtime is None:
         return {}
     config = getattr(runtime, "config", None)
@@ -27,12 +37,28 @@ def _runtime_config(runtime: Any | None) -> dict[str, Any]:
 
 
 def _runtime_configurable(runtime: Any | None) -> dict[str, Any]:
+    """Extract configurable overrides from runtime config.
+
+    Args:
+        runtime: Tool runtime passed by LangChain/DeepAgents.
+
+    Returns:
+        Configurable dict (empty if unavailable).
+    """
     config = _runtime_config(runtime)
     configurable = config.get("configurable")
     return configurable if isinstance(configurable, dict) else {}
 
 
 async def _get_run_store(runtime: Any | None) -> tuple[RunStoreService, Any | None]:
+    """Resolve the run store service and optional session.
+
+    Args:
+        runtime: Tool runtime passed by LangChain/DeepAgents.
+
+    Returns:
+        Tuple of (RunStoreService, session or None).
+    """
     configurable = _runtime_configurable(runtime)
     run_store = configurable.get("run_store_service")
     if run_store is not None and hasattr(run_store, "get_run"):
@@ -47,12 +73,25 @@ async def _get_run_store(runtime: Any | None) -> tuple[RunStoreService, Any | No
 
 
 async def _close_session(session: Any | None) -> None:
+    """Close the database session if provided.
+
+    Args:
+        session: SQLAlchemy session or None.
+    """
     if session is None:
         return
     await session.close()
 
 
 def _format_duration_ms(duration_ms: int | None) -> str:
+    """Format a duration in milliseconds into a short human string.
+
+    Args:
+        duration_ms: Duration in milliseconds.
+
+    Returns:
+        Human-friendly duration string.
+    """
     if not duration_ms:
         return "-"
     seconds = duration_ms / 1000.0
@@ -66,12 +105,28 @@ def _format_duration_ms(duration_ms: int | None) -> str:
 
 
 def _format_cpu_percent(cpu_percent: float | None) -> str:
+    """Format CPU percent as a string.
+
+    Args:
+        cpu_percent: CPU utilization percentage.
+
+    Returns:
+        Formatted CPU percentage or "-".
+    """
     if cpu_percent is None:
         return "-"
     return f"{cpu_percent:.1f}%"
 
 
 def _format_memory_gb(value: int | None) -> str:
+    """Format a memory value in bytes into GB string.
+
+    Args:
+        value: Memory in bytes.
+
+    Returns:
+        Memory in GB as a formatted string.
+    """
     if value is None:
         return "-"
     gb = value / (1024**3)
@@ -79,6 +134,16 @@ def _format_memory_gb(value: int | None) -> str:
 
 
 async def _get_task_summary(run_store: Any, session: Any | None, run_id: str) -> dict[str, int] | None:
+    """Compute task status counts for a run.
+
+    Args:
+        run_store: RunStoreService or compatible stub.
+        session: Optional database session.
+        run_id: Run identifier.
+
+    Returns:
+        Dict of counts or None if unavailable.
+    """
     if hasattr(run_store, "get_task_summary"):
         summary = await run_store.get_task_summary(run_id)
         if summary is None:
@@ -113,6 +178,14 @@ async def _get_task_summary(run_store: Any, session: Any | None, run_id: str) ->
 
 
 def _validate_status_filter(status_filter: str | None) -> RunStatus | None:
+    """Validate and coerce a status filter into RunStatus.
+
+    Args:
+        status_filter: Raw status string.
+
+    Returns:
+        RunStatus enum or None when not provided.
+    """
     if not status_filter:
         return None
     try:
