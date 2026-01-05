@@ -321,11 +321,27 @@ export function useWorkspaceSync() {
           if (getErrorStatus(error) !== 404) throw error;
         }
         if (!workspace) {
-          workspace = await createWorkspace({
-            thread_id: threadId,
-            pipeline: selectedPipelineRef.current ?? null,
-            version: selectedVersionRef.current ?? null
-          });
+          // Check for a draft workspace first and associate it with the threadId
+          // This preserves any config/samplesheet the user edited before starting chat
+          const draft = await fetchWorkspaceDraft();
+          if (draft) {
+            try {
+              workspace = await associateWorkspaceThread(draft.id, threadId);
+            } catch {
+              // Association failed (draft may already have a threadId), create new
+              workspace = await createWorkspace({
+                thread_id: threadId,
+                pipeline: selectedPipelineRef.current ?? null,
+                version: selectedVersionRef.current ?? null
+              });
+            }
+          } else {
+            workspace = await createWorkspace({
+              thread_id: threadId,
+              pipeline: selectedPipelineRef.current ?? null,
+              version: selectedVersionRef.current ?? null
+            });
+          }
         }
       } else {
         workspace = await fetchWorkspaceDraft();
@@ -391,16 +407,17 @@ export function useWorkspaceSync() {
       if (hasLoadedRef.current) {
         await saveUnsavedChangesBeforeSwitch();
       }
-      if (!currentThreadId && !generatedThreadRef.current) {
-        if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-          generatedThreadRef.current = true;
-          const fallbackId = `thread-${crypto.randomUUID()}`;
-          setThreadId(fallbackId);
-          previousThreadId.current = fallbackId;
-          hasLoadedRef.current = true;
-          return;
-        }
+    if (!currentThreadId && !generatedThreadRef.current) {
+      if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+        generatedThreadRef.current = true;
+        const fallbackId = `thread-${crypto.randomUUID()}`;
+        setThreadId(fallbackId);
+        previousThreadId.current = fallbackId;
+        // Don't set hasLoadedRef.current = true here - let the effect run again
+        // with the new threadId so loadWorkspaceForThread is called
+        return;
       }
+    }
       await loadWorkspaceForThread();
       const state = useWorkspaceStore.getState();
       if (state.workspaceId && threadId) {
