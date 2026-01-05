@@ -18,6 +18,14 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
           : 'max-w-[85%] bg-white border border-arc-gray-100 text-arc-night dark:bg-arc-night dark:border-arc-gray-800 dark:text-white rounded-tl-none'
           }`}
       >
+        {message.toolInvocations && message.toolInvocations.length > 0 && (
+          <div className="mb-4 space-y-2 border-b border-arc-gray-100/20 pb-3 dark:border-white/10">
+            {message.toolInvocations.map((invocation) => (
+              <ToolIndicator key={invocation.toolCallId} invocation={invocation} />
+            ))}
+          </div>
+        )}
+
         <div className={`prose prose-sm max-w-none prose-p:my-1.5 prose-pre:bg-arc-gray-900/95 prose-pre:text-white prose-pre:rounded-xl ${isUser ? 'prose-invert text-white' : 'text-inherit'}`}>
           {message.isStreaming ? (
             <StreamingMessage text={message.content} isStreaming />
@@ -25,14 +33,6 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
             <ReactMarkdown>{message.content || ' '}</ReactMarkdown>
           )}
         </div>
-
-        {message.toolInvocations && message.toolInvocations.length > 0 && (
-          <div className="mt-4 space-y-2 border-t border-arc-gray-100/20 pt-3 dark:border-white/10">
-            {message.toolInvocations.map((invocation) => (
-              <ToolIndicator key={invocation.toolCallId} invocation={invocation} />
-            ))}
-          </div>
-        )}
       </div>
       <p className="px-2 text-[10px] font-bold uppercase tracking-widest text-arc-gray-400 opacity-60">
         {isUser ? 'You' : 'Arc Assistant'} • {new Date(message.createdAt).toLocaleTimeString([], {
