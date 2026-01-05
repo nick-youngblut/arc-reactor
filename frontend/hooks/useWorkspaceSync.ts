@@ -93,7 +93,6 @@ export function useWorkspaceSync() {
   const markConfigSynced = useWorkspaceStore((state) => state.markConfigSynced);
   const loadFromBackend = useWorkspaceStore((state) => state.loadFromBackend);
   const setWorkspaceId = useWorkspaceStore((state) => state.setWorkspaceId);
-  const loadFromBackend = useWorkspaceStore((state) => state.loadFromBackend);
 
   const setSyncingRef = useRef(setSyncing);
   const setSyncErrorRef = useRef(setSyncError);

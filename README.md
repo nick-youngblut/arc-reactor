@@ -141,8 +141,12 @@ arc-reactor/
     docker compose exec postgres psql -U arc_reactor -d arc_reactor -c "\dt"
     ```
 
+5. **Test the application**:
+    The app will be available at: http://localhost:3000
 
-**Services:**
+
+#### Local Services
+
 | Service | URL |
 |---------|-----|
 | Frontend | http://localhost:3000 |
