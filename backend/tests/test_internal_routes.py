@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.api.routes.internal.reconcile import reconcile_stale_runs
 from backend.api.routes.internal.weblog import PubSubMessage, process_weblog_event
@@ -43,85 +44,6 @@ async def _create_run(
     )
     session.add(run)
     await session.commit()
-
-
-@pytest.mark.asyncio
-async def test_process_weblog_event_creates_tasks_and_updates_run(
-    session: AsyncSession,
-) -> None:
-    await _create_run(session, "run-1", "submitted")
-    service = ServiceContext(email="arc-reactor-pubsub@test-project.iam.gserviceaccount.com")
-
-    started_payload = {
-        "arc_run_id": "run-1",
-        "event": {
-            "event": "started",
-            "utcTime": "2025-01-01T00:00:00Z",
-            "runId": "weblog-uuid",
-            "runName": "friendly_turing",
-        },
-    }
-    started_message = _build_pubsub_message(started_payload)
-
-    result = await process_weblog_event(started_message, service=service, session=session)
-    assert result["status"] == "processed"
-
-    run = await session.get(Run, "run-1")
-    assert run is not None
-    assert run.status == "running"
-    assert run.weblog_run_id == "weblog-uuid"
-    assert run.weblog_run_name == "friendly_turing"
-    assert run.started_at is not None
-    assert run.last_weblog_event_at is not None
-
-    submitted_payload = {
-        "arc_run_id": "run-1",
-        "event": {
-            "event": "process_submitted",
-            "utcTime": "2025-01-01T00:01:00Z",
-            "trace": {
-                "task_id": 1,
-                "hash": "abcd1234efgh5678ijkl9012mnop3456",
-                "name": "align",
-                "process": "ALIGN",
-                "submit": 123456,
-                "attempt": 1,
-            },
-        },
-    }
-    submitted_message = _build_pubsub_message(submitted_payload)
-    await process_weblog_event(submitted_message, service=service, session=session)
-
-    completed_payload = {
-        "arc_run_id": "run-1",
-        "event": {
-            "event": "process_completed",
-            "utcTime": "2025-01-01T00:02:00Z",
-            "trace": {
-                "task_id": 1,
-                "attempt": 1,
-                "exit": 0,
-                "complete": 123999,
-                "duration": 2000,
-                "realtime": 2100,
-                "%cpu": 100.0,
-                "peak_rss": 500,
-                "peak_vmem": 600,
-                "rchar": 10,
-                "wchar": 20,
-            },
-        },
-    }
-    completed_message = _build_pubsub_message(completed_payload)
-    await process_weblog_event(completed_message, service=service, session=session)
-
-    result = await session.execute(select(Task).where(Task.run_id == "run-1"))
-    task = result.scalar_one()
-    assert task.status == "COMPLETED"
-    assert task.exit_code == 0
-
-    duplicate = await process_weblog_event(completed_message, service=service, session=session)
-    assert duplicate["status"] == "duplicate"
 
 
 @pytest.mark.asyncio

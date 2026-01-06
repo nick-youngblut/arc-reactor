@@ -59,6 +59,7 @@ def test_chat_rest_pool_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
 
     async def _stream_agent_response(_agent, _messages, *, config=None):
         raise PoolTimeout("timeout")
+        yield  # Make it an async generator (unreachable but needed for type)
 
     monkeypatch.setattr("backend.api.routes.chat_rest.PipelineAgent.create", _create_agent)
     monkeypatch.setattr(

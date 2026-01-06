@@ -5,6 +5,8 @@ from uuid import uuid4
 
 import pytest
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from backend.models.runs import Run
 from backend.models.tasks import Task
 from backend.models.weblog_event_log import WeblogEventLog

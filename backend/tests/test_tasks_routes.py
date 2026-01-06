@@ -5,6 +5,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.api.routes.tasks import get_task_summary, list_tasks
 from backend.models.runs import Run
