@@ -36,7 +36,13 @@ from .monitoring_tools import get_run_status, get_run_tasks, list_user_runs
 from .troubleshooting_tools import analyze_failure, get_run_logs, get_task_logs
 from .output_tools import get_run_outputs, get_signed_download_url
 from .file_generation import generate_config, generate_samplesheet, validate_inputs
-from .workspace_tools import get_current_config, get_current_samplesheet, get_workspace_status
+from .workspace_tools import (
+    get_current_config,
+    get_current_samplesheet,
+    get_workspace_status,
+    update_config,
+    update_samplesheet,
+)
 
 NGS_TOOL_CATEGORY = "ngs"
 BENCHLING_TOOL_CATEGORY = "benchling"
@@ -48,7 +54,7 @@ def get_agent_tools() -> list[BaseTool]:
 
     .. deprecated::
         Use tool collections from `backend.agents.tools.collections` instead.
-        This function returns all 28 tools for backwards compatibility only.
+        This function returns all 30 tools for backwards compatibility only.
     """
     warnings.warn(
         "get_agent_tools() is deprecated. Use tool collections from "
@@ -69,6 +75,8 @@ def get_agent_tools() -> list[BaseTool]:
         get_current_samplesheet,
         get_current_config,
         get_workspace_status,
+        update_samplesheet,
+        update_config,
         submit_run,
         cancel_run,
         delete_file,
@@ -106,4 +114,6 @@ __all__ = [
     "get_run_outputs",
     "get_signed_download_url",
     "recover_run",
+    "update_samplesheet",
+    "update_config",
 ]

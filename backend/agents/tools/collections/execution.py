@@ -16,6 +16,8 @@ from backend.agents.tools.workspace_tools import (
     get_current_config,
     get_current_samplesheet,
     get_workspace_status,
+    update_config,
+    update_samplesheet,
 )
 
 
@@ -37,7 +39,7 @@ from backend.agents.tools.output_tools import (
 
 
 def get_execution_expert_tools() -> list[BaseTool]:
-    """Tools for the execution_expert subagent (17 tools after Phase 4).
+    """Tools for the execution_expert subagent (19 tools after Phase 4).
 
     Categories:
     - Validation (1): validate_inputs
@@ -46,6 +48,7 @@ def get_execution_expert_tools() -> list[BaseTool]:
     - Troubleshooting NEW (3): get_run_logs, get_task_logs, analyze_failure
     - Outputs NEW (2): get_run_outputs, get_signed_download_url
     - Cleanup HITL (2): delete_file, clear_samplesheet
+    - File Updates (2): update_samplesheet, update_config
     - Workspace (3): get_workspace_status, get_current_samplesheet, get_current_config
     """
     tools = [
@@ -58,6 +61,9 @@ def get_execution_expert_tools() -> list[BaseTool]:
         # Cleanup (HITL)
         delete_file,
         clear_samplesheet,
+        # File Updates
+        update_samplesheet,
+        update_config,
         # Workspace (shared)
         get_workspace_status,
         get_current_samplesheet,
