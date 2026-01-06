@@ -12,7 +12,8 @@ export function useRunStatus(runId: string) {
     queryKey: ['runs', 'detail', runId],
     queryFn: () => fetchRun(runId),
     enabled: !!runId,
-    refetchInterval: (data) => {
+    refetchInterval: (query) => {
+      const data = query.state.data;
       if (!data) return 5000;
       return isTerminal(data.status) ? false : 10000;
     }

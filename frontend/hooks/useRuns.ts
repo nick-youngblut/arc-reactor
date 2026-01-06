@@ -36,9 +36,10 @@ export function useRuns(initialFilters: RunFilters = {}) {
   const query = useQuery({
     queryKey: ['runs'],
     queryFn: fetchRuns,
-    refetchInterval: (data) => {
+    refetchInterval: (query) => {
+      const data = query.state.data;
       if (!data) return 30000;
-      return data.some((run) => isActiveStatus(run.status)) ? 10000 : false;
+      return data.some((run: RunSummary) => isActiveStatus(run.status)) ? 10000 : false;
     }
   });
 

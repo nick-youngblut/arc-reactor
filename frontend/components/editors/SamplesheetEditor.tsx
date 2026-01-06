@@ -1,7 +1,7 @@
 'use client';
 
 import { HotTable } from '@handsontable/react';
-import type { HotTableClass } from 'handsontable/base';
+import type { HotTableClass } from '@handsontable/react';
 import { registerAllModules } from 'handsontable/registry';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -71,7 +71,7 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
 
   const handleDataChange = (_changes: unknown, source?: string) => {
     if (source === 'loadData') return;
-    const hot = hotRef.current?.hotInstance;
+    const hot = (hotRef.current as any)?.hotInstance;
     const data = hot?.getSourceData() as SamplesheetRow[] | undefined;
     if (!data) return;
     const nextCsv = serializeSamplesheetCsv(data, columns);

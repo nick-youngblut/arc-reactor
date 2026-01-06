@@ -41,7 +41,7 @@ export function ChatPanel() {
       <div
         className={`flex-1 min-h-0 overflow-y-auto text-sm ${messages.length === 0 ? 'hidden' : ''}`}
       >
-        <MessageList messages={messages} onSelectPrompt={setInput} />
+        <MessageList messages={messages} />
       </div>
 
       {isLoading ? (

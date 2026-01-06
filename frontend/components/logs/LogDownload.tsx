@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from 'react';
 
-export function LogDownload() {
+interface LogDownloadProps {
+  runId: string;
+}
+
+export function LogDownload({ runId }: LogDownloadProps) {
   const [progress, setProgress] = useState(0);
   const [downloading, setDownloading] = useState(false);
 
