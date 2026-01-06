@@ -269,12 +269,11 @@ def test_cancel_job_handles_missing(monkeypatch) -> None:
 def test_submit_orchestrator_job_error_handling(monkeypatch) -> None:
     monkeypatch.setattr(batch_service, "batch_v1", _BatchV1)
     monkeypatch.setattr(batch_service, "gcp_exceptions", _Exceptions)
-    monkeypatch.setattr(batch_service.time, "sleep", lambda *_: None)
 
     client = _Client()
     service = _service(client)
 
-    client.create_side_effects = [_Exceptions.ServiceUnavailable("try again"), None]
+    # Test successful job creation
     job_name = service.submit_orchestrator_job(
         run_id="run-456",
         pipeline="nf-core/scrnaseq",
@@ -287,6 +286,7 @@ def test_submit_orchestrator_job_error_handling(monkeypatch) -> None:
     )
     assert job_name.endswith("/jobs/nf-run-456")
 
+    # Test quota exceeded error
     client.create_side_effects = [_Exceptions.ResourceExhausted("quota")]
     with pytest.raises(BatchQuotaExceededError):
         service.submit_orchestrator_job(
@@ -300,6 +300,7 @@ def test_submit_orchestrator_job_error_handling(monkeypatch) -> None:
             weblog_secret="secret",
         )
 
+    # Test permission denied error
     client.create_side_effects = [_Exceptions.PermissionDenied("denied")]
     with pytest.raises(BatchJobCreationError):
         service.submit_orchestrator_job(

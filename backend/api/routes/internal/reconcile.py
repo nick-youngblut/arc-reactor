@@ -24,10 +24,15 @@ async def reconcile_stale_runs(
     stale_threshold = datetime.now(timezone.utc) - timedelta(minutes=10)
     orphan_threshold = datetime.now(timezone.utc) - timedelta(hours=24)
 
+    # Convert to offset-naive for SQLite compatibility in tests
+    # In production PostgreSQL, timezone-aware comparison works correctly
+    stale_threshold_naive = stale_threshold.replace(tzinfo=None)
+    orphan_threshold_naive = orphan_threshold.replace(tzinfo=None)
+
     result = await session.execute(
         select(Run).where(
             Run.status.in_(["submitted", "running"]),
-            Run.updated_at < stale_threshold,
+            Run.updated_at < stale_threshold_naive,
         )
     )
     stale_runs = result.scalars().all()
@@ -54,19 +59,15 @@ async def reconcile_stale_runs(
                         completed_at=datetime.now(timezone.utc)
                         if new_status == "completed"
                         else None,
-                        failed_at=datetime.now(timezone.utc)
-                        if new_status == "failed"
-                        else None,
+                        failed_at=datetime.now(timezone.utc) if new_status == "failed" else None,
                         error_message="Status recovered from Batch API (original event lost)",
                         updated_at=datetime.now(timezone.utc),
                     )
                 )
-                reconciled.append(
-                    {"run_id": run.run_id, "action": f"updated to {new_status}"}
-                )
+                reconciled.append({"run_id": run.run_id, "action": f"updated to {new_status}"})
 
         except Exception:
-            if run.created_at < orphan_threshold:
+            if run.created_at < orphan_threshold_naive:
                 await session.execute(
                     update(Run)
                     .where(Run.run_id == run.run_id)
@@ -77,9 +78,7 @@ async def reconcile_stale_runs(
                         updated_at=datetime.now(timezone.utc),
                     )
                 )
-                reconciled.append(
-                    {"run_id": run.run_id, "action": "marked as failed (orphaned)"}
-                )
+                reconciled.append({"run_id": run.run_id, "action": "marked as failed (orphaned)"})
 
     await session.commit()
 

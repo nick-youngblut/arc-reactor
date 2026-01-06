@@ -19,6 +19,7 @@ def _build_app() -> FastAPI:
     app.state.storage_service = object()
     app.state.database_service = object()
     app.state.checkpointer_service = SimpleNamespace(checkpointer=object())
+    app.state.workspace_service_factory = lambda: object()
     return app
 
 
@@ -28,11 +29,13 @@ def test_chat_rest_streaming_success(monkeypatch: pytest.MonkeyPatch) -> None:
     def _create_agent(*_args, **_kwargs):
         return SimpleNamespace(agent=object())
 
-    async def _stream_agent_response(_agent, _messages, _config):
+    async def _stream_agent_response(_agent, _messages, *, config=None):
         yield "ok"
 
     monkeypatch.setattr("backend.api.routes.chat_rest.PipelineAgent.create", _create_agent)
-    monkeypatch.setattr("backend.api.routes.chat_rest.stream_agent_response", _stream_agent_response)
+    monkeypatch.setattr(
+        "backend.api.routes.chat_rest.stream_agent_response", _stream_agent_response
+    )
 
     app.dependency_overrides[get_current_user_context] = lambda: UserContext(
         email="dev@example.com",
@@ -54,11 +57,13 @@ def test_chat_rest_pool_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
     def _create_agent(*_args, **_kwargs):
         return SimpleNamespace(agent=object())
 
-    async def _stream_agent_response(_agent, _messages, _config):
+    async def _stream_agent_response(_agent, _messages, *, config=None):
         raise PoolTimeout("timeout")
 
     monkeypatch.setattr("backend.api.routes.chat_rest.PipelineAgent.create", _create_agent)
-    monkeypatch.setattr("backend.api.routes.chat_rest.stream_agent_response", _stream_agent_response)
+    monkeypatch.setattr(
+        "backend.api.routes.chat_rest.stream_agent_response", _stream_agent_response
+    )
 
     app.dependency_overrides[get_current_user_context] = lambda: UserContext(
         email="dev@example.com",

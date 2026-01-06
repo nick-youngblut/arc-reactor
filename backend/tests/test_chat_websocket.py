@@ -19,6 +19,7 @@ def _build_app() -> FastAPI:
     app.state.storage_service = object()
     app.state.database_service = object()
     app.state.checkpointer_service = SimpleNamespace(checkpointer=object())
+    app.state.workspace_service_factory = lambda: object()
     return app
 
 
@@ -38,7 +39,7 @@ def test_websocket_reuses_agent_for_multiple_messages(monkeypatch: pytest.Monkey
         agent_instances.append(agent)
         return agent
 
-    async def _stream_agent_response(agent, _messages, _config):
+    async def _stream_agent_response(agent, _messages, *, config=None):
         stream_calls.append(agent)
         yield "ok"
 
@@ -91,7 +92,7 @@ def test_websocket_pool_timeout_keeps_connection_open(
 
     call_count = {"count": 0}
 
-    async def _stream_agent_response(_agent, _messages, _config):
+    async def _stream_agent_response(_agent, _messages, *, config=None):
         call_count["count"] += 1
         if call_count["count"] == 1:
             raise PoolTimeout("timeout")

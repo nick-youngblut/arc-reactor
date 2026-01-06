@@ -40,6 +40,18 @@ async def session() -> AsyncSession:
             clauseelement.text = clauseelement.text.replace("now()", "datetime('now')")
         return clauseelement, multiparams, params
 
+    # Handle server defaults in DDL
+    @event.listens_for(Base.metadata, "before_create")
+    def replace_now_in_ddl(target, connection, **kw):
+        """Replace now() in server defaults during table creation"""
+        for table in target.tables.values():
+            for column in table.columns:
+                if column.server_default is not None and hasattr(column.server_default, "text"):
+                    if "now()" in column.server_default.text:
+                        column.server_default.text = column.server_default.text.replace(
+                            "now()", "datetime('now')"
+                        )
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
