@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 
-import { RunStatusBadge } from '@/components/runs/RunStatusBadge';
 import { RunCard } from '@/components/runs/RunCard';
+import { RunStatusBadge } from '@/components/runs/RunStatusBadge';
 import { useRuns } from '@/hooks/useRuns';
 import type { RunSummary, RunStatus } from '@/lib/api';
 import { formatDuration } from '@/lib/utils';
@@ -97,22 +97,20 @@ export function RunList() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              view === 'table'
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${view === 'table'
                 ? 'bg-arc-blue text-white'
                 : 'border border-arc-gray-200/70 text-arc-gray-600 hover:bg-arc-gray-100 dark:border-arc-gray-800/70 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800'
-            }`}
+              }`}
             onClick={() => setView('table')}
           >
             Table
           </button>
           <button
             type="button"
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              view === 'cards'
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${view === 'cards'
                 ? 'bg-arc-blue text-white'
                 : 'border border-arc-gray-200/70 text-arc-gray-600 hover:bg-arc-gray-100 dark:border-arc-gray-800/70 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800'
-            }`}
+              }`}
             onClick={() => setView('cards')}
           >
             Cards

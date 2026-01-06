@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 const placeholders = [
   'Find my samples from last week or find SspArc0300',
@@ -34,7 +34,7 @@ export function ChatInput({ input, isLoading, onChange, onSubmit, onStop, isExpa
     // Ensure height accommodates the placeholder list if empty
     const minHeight = input ? 30 : (placeholders.length + 1) * 20;
     textareaRef.current.style.height = `${Math.max(scrollHeight, minHeight)}px`;
-  }, [input]);
+  }, [input, isExpanded]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {

@@ -3,11 +3,11 @@
 import { useMemo, useState } from 'react';
 
 import { LogDownload } from '@/components/logs/LogDownload';
+import type { LogLevel } from '@/components/logs/LogLine';
 import { LogSearch } from '@/components/logs/LogSearch';
 import { TaskList } from '@/components/logs/TaskList';
 import { TaskLogViewer } from '@/components/logs/TaskLogViewer';
 import { WorkflowLogViewer } from '@/components/logs/WorkflowLogViewer';
-import type { LogLevel } from '@/components/logs/LogLine';
 
 interface RunLogsProps {
   runId: string;
@@ -31,22 +31,20 @@ export function RunLogs({ runId }: RunLogsProps) {
           <button
             type="button"
             onClick={() => setActiveTab('workflow')}
-            className={`rounded-full px-4 py-2 transition ${
-              activeTab === 'workflow'
+            className={`rounded-full px-4 py-2 transition ${activeTab === 'workflow'
                 ? 'bg-arc-blue text-white'
                 : 'text-arc-gray-500 hover:bg-arc-gray-100 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800'
-            }`}
+              }`}
           >
             Workflow Log
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('tasks')}
-            className={`rounded-full px-4 py-2 transition ${
-              activeTab === 'tasks'
+            className={`rounded-full px-4 py-2 transition ${activeTab === 'tasks'
                 ? 'bg-arc-blue text-white'
                 : 'text-arc-gray-500 hover:bg-arc-gray-100 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800'
-            }`}
+              }`}
           >
             Task Logs
           </button>

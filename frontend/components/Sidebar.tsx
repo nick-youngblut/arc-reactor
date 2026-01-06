@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -123,7 +124,7 @@ export function Sidebar() {
             <div className="overflow-hidden rounded-2xl border border-arc-gray-200/50 bg-element/50 p-5 dark:border-arc-gray-800/50">
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-8 w-8 rounded-lg bg-arc-blue p-1.5 shadow-sm">
-                  <img src="/arc-logo-white.png" alt="Arc" className="h-full w-full object-contain" />
+                  <Image src="/arc-logo-white.png" alt="Arc" width={32} height={32} className="h-full w-full object-contain" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-content leading-tight">Arc Institute</p>

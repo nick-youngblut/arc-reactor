@@ -1,9 +1,10 @@
 'use client';
 
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { ThemeProvider } from '@/components/ThemeProvider';
-import { QueryProvider } from '@/components/providers/QueryProvider';
 import { Toaster } from 'sonner';
+
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { QueryProvider } from '@/components/providers/QueryProvider';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (

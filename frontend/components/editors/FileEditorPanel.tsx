@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { SamplesheetEditor } from '@/components/editors/SamplesheetEditor';
 import { ConfigEditor } from '@/components/editors/ConfigEditor';
-import { getSamplesheetColumns } from '@/lib/handsontable/columnConfig';
+import { SamplesheetEditor } from '@/components/editors/SamplesheetEditor';
 import { useWorkspaceSync } from '@/hooks/useWorkspaceSync';
+import { getSamplesheetColumns } from '@/lib/handsontable/columnConfig';
 import { useUiStore } from '@/stores/uiStore';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 
@@ -235,38 +235,38 @@ export function FileEditorPanel() {
 
       <div className="flex items-center justify-between gap-3 rounded-2xl bg-panel p-1.5 border border-arc-gray-100 dark:border-arc-gray-800">
         <div className="flex flex-wrap gap-1.5">
-        {tabConfig.map((tab) => {
-          const meta = tabMeta[tab.id];
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-300 ${isActive
-                ? 'bg-arc-blue text-white shadow-md shadow-arc-blue/20'
-                : 'text-arc-gray-500 hover:bg-element/50'
-                }`}
-            >
-              {tab.label}
-              <div className="flex items-center gap-1">
-                {meta.dirty ? (
-                  <span className="h-1.5 w-1.5 rounded-full bg-arc-marigold shadow-[0_0_8px_rgba(243,154,34,0.5)]" />
-                ) : null}
-                {meta.errors ? (
-                  <div className="flex h-4 w-4 items-center justify-center rounded-md bg-arc-clay/15 text-[9px] font-black text-arc-clay ring-1 ring-arc-clay/20">
-                    !
-                  </div>
-                ) : null}
-                {!meta.errors && meta.valid ? (
-                  <div className="flex h-4 w-4 items-center justify-center rounded-md bg-arc-evergreen/15 text-[9px] font-black text-arc-evergreen ring-1 ring-arc-evergreen/20">
-                    ✓
-                  </div>
-                ) : null}
-              </div>
-            </button>
-          );
-        })}
+          {tabConfig.map((tab) => {
+            const meta = tabMeta[tab.id];
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-300 ${isActive
+                  ? 'bg-arc-blue text-white shadow-md shadow-arc-blue/20'
+                  : 'text-arc-gray-500 hover:bg-element/50'
+                  }`}
+              >
+                {tab.label}
+                <div className="flex items-center gap-1">
+                  {meta.dirty ? (
+                    <span className="h-1.5 w-1.5 rounded-full bg-arc-marigold shadow-[0_0_8px_rgba(243,154,34,0.5)]" />
+                  ) : null}
+                  {meta.errors ? (
+                    <div className="flex h-4 w-4 items-center justify-center rounded-md bg-arc-clay/15 text-[9px] font-black text-arc-clay ring-1 ring-arc-clay/20">
+                      !
+                    </div>
+                  ) : null}
+                  {!meta.errors && meta.valid ? (
+                    <div className="flex h-4 w-4 items-center justify-center rounded-md bg-arc-evergreen/15 text-[9px] font-black text-arc-evergreen ring-1 ring-arc-evergreen/20">
+                      ✓
+                    </div>
+                  ) : null}
+                </div>
+              </button>
+            );
+          })}
         </div>
         <div className="pr-2">{renderSyncStatus()}</div>
       </div>
