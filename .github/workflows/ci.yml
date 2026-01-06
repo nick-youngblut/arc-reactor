@@ -21,6 +21,11 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Configure Git for private repositories
+        run: |
+          git config --global credential.helper store
+          echo "https://x-access-token:${GH_PAT}@github.com" > ~/.git-credentials
+
       - name: Install backend dependencies
         run: pip install -e ./backend[dev]
 

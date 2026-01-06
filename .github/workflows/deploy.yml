@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: 
+    branches: [none_for_now]
 
 env:
   PROJECT_ID: arc-genomics02
