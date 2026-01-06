@@ -119,7 +119,7 @@ arc-reactor/
 2. **Start all services**:
    ```bash
    export BENCHLING_TEST_DATABASE_URI='postgresql://...'   # provide full URL; need to deal with $
-   docker compose up --build --detach
+   docker compose up --build     # use `--detach` to run in the background
    ```
 
 > The docker container will be running in the background.
