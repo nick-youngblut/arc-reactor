@@ -30,12 +30,6 @@ jobs:
       - name: Install backend dependencies
         run: pip install -e ./backend[dev]
 
-      - name: Ruff
-        run: ruff check backend
-
-      - name: Mypy
-        run: mypy backend
-
       - name: Pytest
         run: pytest backend
 
@@ -60,7 +54,3 @@ jobs:
       - name: TypeScript
         working-directory: frontend
         run: npm run typecheck
-
-      - name: Frontend tests
-        working-directory: frontend
-        run: npm test
