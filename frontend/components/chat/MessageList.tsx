@@ -9,10 +9,9 @@ import { MessageBubble } from './MessageBubble';
 
 interface MessageListProps {
   messages: ChatMessage[];
-  onSelectPrompt: (prompt: string) => void;
 }
 
-export function MessageList({ messages, onSelectPrompt }: MessageListProps) {
+export function MessageList({ messages }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [showPrompts, setShowPrompts] = useState(true);
   const [isFading, setIsFading] = useState(false);

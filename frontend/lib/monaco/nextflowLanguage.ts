@@ -3,7 +3,7 @@ import type { Monaco } from '@monaco-editor/react';
 export const registerNextflowLanguage = (monaco: Monaco) => {
   const languageId = 'nextflow';
 
-  if (monaco.languages.getLanguages().some((lang) => lang.id === languageId)) {
+  if (monaco.languages.getLanguages().some((lang: { id: string }) => lang.id === languageId)) {
     return;
   }
 

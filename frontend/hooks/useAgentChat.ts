@@ -2,12 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { fetchWorkspaceByThread } from '@/lib/api';
 import { useChatStore } from '@/stores/chatStore';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
+import { toast } from 'sonner';
 
 const MAX_RECONNECTS = 5;
 const RECONNECT_DELAY_MS = 2000;
 const CONNECT_DELAY_MS = 100; // Delay to handle React Strict Mode double-mount
+const MAX_REFRESH_RETRIES = 3;
+const REFRESH_RETRY_BASE_MS = 500;
 
 function buildWebSocketUrl() {
   if (typeof window === 'undefined') return null;
@@ -44,9 +48,6 @@ export function useAgentChat() {
   const setThreadId = useChatStore((state) => state.setThreadId);
   const clearMessages = useChatStore((state) => state.clearMessages);
 
-  const setSamplesheet = useWorkspaceStore((state) => state.setSamplesheet);
-  const setConfig = useWorkspaceStore((state) => state.setConfig);
-
   const updateToolInvocation = useCallback(
     (toolCallId: string, updates: Partial<{ state: string; result: unknown; args: Record<string, unknown>; toolName: string }>) => {
       updateLastMessage((prev) => {
@@ -77,6 +78,47 @@ export function useAgentChat() {
     },
     [updateLastMessage]
   );
+
+  const showSyncWarning = useCallback(() => {
+    toast.warning('Failed to sync workspace. Your files may be out of date.', {
+      duration: 5000
+    });
+  }, []);
+
+  const refreshWorkspaceFromBackend = useCallback(async () => {
+    const currentThreadId = useChatStore.getState().threadId;
+    if (!currentThreadId) {
+      console.log('[useAgentChat] No threadId, skipping workspace refresh');
+      return;
+    }
+
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt < MAX_REFRESH_RETRIES; attempt += 1) {
+      try {
+        const workspace = await fetchWorkspaceByThread(currentThreadId);
+        if (workspace) {
+          useWorkspaceStore.getState().loadFromBackend(workspace);
+          console.log('[useAgentChat] Workspace refreshed successfully');
+        }
+        return;
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        console.warn(
+          `[useAgentChat] Workspace refresh attempt ${attempt + 1} failed:`,
+          lastError.message
+        );
+
+        if (attempt < MAX_REFRESH_RETRIES - 1) {
+          const delayMs = REFRESH_RETRY_BASE_MS * Math.pow(2, attempt);
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
+      }
+    }
+
+    console.error('[useAgentChat] Workspace refresh failed after retries:', lastError);
+    showSyncWarning();
+  }, [showSyncWarning]);
 
   const handleStreamLine = useCallback(
     (line: string) => {
@@ -122,19 +164,10 @@ export function useAgentChat() {
         }
       }
 
-      if (code === 'b') {
-        const data = safeJsonParse<{
-          fileType: 'samplesheet' | 'config';
-          content: string;
-          metadata?: { modifiedBy?: 'agent'; modifiedAt?: string };
-        }>(payload);
-        if (data) {
-          if (data.fileType === 'samplesheet') {
-            setSamplesheet(data.content, 'agent');
-          }
-          if (data.fileType === 'config') {
-            setConfig(data.content, 'agent');
-          }
+      if (code === 'w') {
+        const data = safeJsonParse<{ refresh?: string }>(payload);
+        if (data?.refresh === 'workspace') {
+          void refreshWorkspaceFromBackend();
         }
       }
 
@@ -148,7 +181,7 @@ export function useAgentChat() {
         if (data?.messageId) setThreadId(data.messageId);
       }
     },
-    [setConfig, setLoading, setSamplesheet, setThreadId, updateLastMessage, updateToolInvocation]
+    [refreshWorkspaceFromBackend, setLoading, setThreadId, updateLastMessage, updateToolInvocation]
   );
 
   const handleStreamChunk = useCallback(

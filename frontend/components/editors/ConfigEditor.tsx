@@ -1,7 +1,7 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import type { Monaco } from '@monaco-editor/react';
+import dynamic from 'next/dynamic';
 
 import { registerNextflowLanguage } from '@/lib/monaco/nextflowLanguage';
 import { useUiStore } from '@/stores/uiStore';

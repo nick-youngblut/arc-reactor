@@ -6,6 +6,7 @@ interface LogDownloadProps {
   runId: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function LogDownload({ runId }: LogDownloadProps) {
   const [progress, setProgress] = useState(0);
   const [downloading, setDownloading] = useState(false);

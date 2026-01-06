@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: 
+    branches: [main]
 
 env:
   PROJECT_ID: arc-genomics02
@@ -14,6 +14,7 @@ env:
 
 jobs:
   deploy:
+    if: false  # Workflow is disabled
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 
-import type { RunSummary, RunStatus } from '@/lib/api';
-import { RunStatusBadge } from '@/components/runs/RunStatusBadge';
-import { RunOverview } from '@/components/runs/RunOverview';
-import { RunFiles } from '@/components/runs/RunFiles';
-import { RunParameters } from '@/components/runs/RunParameters';
-import { RunLogs } from '@/components/runs/RunLogs';
 import { RecoveryModal } from '@/components/runs/RecoveryModal';
+import { RunFiles } from '@/components/runs/RunFiles';
+import { RunLogs } from '@/components/runs/RunLogs';
+import { RunOverview } from '@/components/runs/RunOverview';
+import { RunParameters } from '@/components/runs/RunParameters';
+import { RunStatusBadge } from '@/components/runs/RunStatusBadge';
 import { TaskProgress } from '@/components/runs/TaskProgress';
 import { TaskTable } from '@/components/runs/TaskTable';
+import type { RunSummary, RunStatus } from '@/lib/api';
 
 const tabs = [
   { id: 'overview', label: 'Overview' },
@@ -92,11 +92,10 @@ export function RunDetail({ run, statusOverride }: RunDetailProps) {
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
-            className={`rounded-full px-4 py-2 transition ${
-              activeTab === tab.id
+            className={`rounded-full px-4 py-2 transition ${activeTab === tab.id
                 ? 'bg-arc-blue text-white shadow-sm'
                 : 'text-arc-gray-500 hover:bg-arc-gray-100 dark:text-arc-gray-200 dark:hover:bg-arc-gray-800'
-            }`}
+              }`}
           >
             {tab.label}
           </button>

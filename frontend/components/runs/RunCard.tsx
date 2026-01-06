@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 
-import type { RunSummary } from '@/lib/api';
 import { RunStatusBadge } from '@/components/runs/RunStatusBadge';
+import type { RunSummary } from '@/lib/api';
 
 const formatDate = (value?: string) => {
   if (!value) return '—';

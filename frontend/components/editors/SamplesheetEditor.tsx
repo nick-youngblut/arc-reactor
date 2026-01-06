@@ -1,17 +1,19 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
 import { HotTable } from '@handsontable/react';
+import type { HotTableClass } from '@handsontable/react';
+import type Handsontable from 'handsontable';
 import { registerAllModules } from 'handsontable/registry';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import 'handsontable/dist/handsontable.full.min.css';
 
 import { getSamplesheetColumns } from '@/lib/handsontable/columnConfig';
+import { parseSamplesheetCsv, serializeSamplesheetCsv } from '@/lib/handsontable/csv';
 import {
   type SamplesheetRow,
   validateSamplesheetRows
 } from '@/lib/handsontable/validators';
-import { parseSamplesheetCsv, serializeSamplesheetCsv } from '@/lib/handsontable/csv';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 
 registerAllModules();
@@ -21,7 +23,7 @@ interface SamplesheetEditorProps {
 }
 
 export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) {
-  const hotRef = useRef<any>(null);
+  const hotRef = useRef<HotTableClass | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isLocalUpdate = useRef(false);
 
@@ -31,14 +33,14 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
   const setValidationResult = useWorkspaceStore((state) => state.setValidationResult);
 
   const columns = useMemo(() => getSamplesheetColumns(selectedPipeline), [selectedPipeline]);
-  const createEmptyRow = (columnDefs: typeof columns) => {
+  const createEmptyRow = useCallback((columnDefs: typeof columns) => {
     return columnDefs.reduce<SamplesheetRow>((acc, column) => {
       acc[column.key] = column.defaultValue ?? '';
       return acc;
     }, {});
-  };
-  const ensureRows = (nextRows: SamplesheetRow[], columnDefs: typeof columns) =>
-    nextRows.length ? nextRows : [createEmptyRow(columnDefs)];
+  }, []);
+  const ensureRows = useCallback((nextRows: SamplesheetRow[], columnDefs: typeof columns) =>
+    nextRows.length ? nextRows : [createEmptyRow(columnDefs)], [createEmptyRow]);
   const [rows, setRows] = useState<SamplesheetRow[]>(() =>
     ensureRows(parseSamplesheetCsv(samplesheet, columns), columns)
   );
@@ -50,7 +52,7 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
       return;
     }
     setRows(ensureRows(parseSamplesheetCsv(samplesheet, columns), columns));
-  }, [samplesheet, columns]);
+  }, [samplesheet, columns, ensureRows]);
 
   useEffect(() => {
     const { result, invalidCells: nextInvalid } = validateSamplesheetRows(rows, columns);
@@ -70,7 +72,7 @@ export function SamplesheetEditor({ readOnly = false }: SamplesheetEditorProps) 
 
   const handleDataChange = (_changes: unknown, source?: string) => {
     if (source === 'loadData') return;
-    const hot = (hotRef.current as any)?.hotInstance;
+    const hot = hotRef.current?.hotInstance as Handsontable | undefined;
     const data = hot?.getSourceData() as SamplesheetRow[] | undefined;
     if (!data) return;
     const nextCsv = serializeSamplesheetCsv(data, columns);

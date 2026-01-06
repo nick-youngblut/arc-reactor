@@ -19,28 +19,6 @@ from backend.config import settings
 from backend.services.pipelines import PipelineRegistry
 
 
-def _store_generated_file(
-    runtime: Any | None,
-    *,
-    filename: str,
-    content: str,
-    metadata: dict[str, Any],
-) -> None:
-    if runtime is None:
-        return
-    config = getattr(runtime, "config", None)
-    if not isinstance(config, dict):
-        return
-    configurable = config.setdefault("configurable", {})
-    if not isinstance(configurable, dict):
-        return
-    generated = configurable.setdefault("generated_files", {})
-    if not isinstance(generated, dict):
-        generated = {}
-        configurable["generated_files"] = generated
-    generated[filename] = {"content": content, "metadata": metadata}
-
-
 def _pipeline_expected_cells_default(registry: PipelineRegistry, pipeline: str) -> int | None:
     schema = registry.get_pipeline(pipeline)
     if not schema:
@@ -304,18 +282,6 @@ async def generate_samplesheet(
     persist_error = await _persist_samplesheet(runtime, csv_content, pipeline)
     if persist_error:
         return persist_error
-    _store_generated_file(
-        runtime,
-        filename="samplesheet.csv",
-        content=csv_content,
-        metadata={
-            "pipeline": pipeline,
-            "ngs_run": ngs_run,
-            "pooled_sample": pooled_sample,
-            "sample_count": len(rows),
-        },
-    )
-
     table_preview = format_table(rows[:5])
     preview_note = "\n\nSample preview (first 5 rows):\n" + table_preview if rows else ""
     return (
@@ -400,16 +366,6 @@ async def generate_config(
     persist_error = await _persist_config(runtime, config_content, pipeline)
     if persist_error:
         return persist_error
-
-    _store_generated_file(
-        runtime,
-        filename="nextflow.config",
-        content=config_content,
-        metadata={
-            "pipeline": pipeline,
-            "profile": profile_name,
-        },
-    )
 
     return f"Generated config for {pipeline}:\n\n{config_content}"
 

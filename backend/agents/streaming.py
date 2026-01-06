@@ -1,14 +1,20 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
-from datetime import datetime, timezone
 from typing import Any, AsyncIterator, Iterable
 
 logger = logging.getLogger(__name__)
 
-FILE_UPDATE_CODE = "b"
+WORKSPACE_REFRESH_TOOLS: frozenset[str] = frozenset(
+    {
+        "generate_samplesheet",
+        "update_samplesheet",
+        "generate_config",
+        "update_config",
+    }
+)
+WORKSPACE_REFRESH_CODE = "w"
 
 
 def _safe_serialize(obj: Any) -> Any:
@@ -91,100 +97,12 @@ def _tool_end_payload(event: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _content_hash(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
-
-
-def _format_file_update(
-    *,
-    filename: str,
-    content: str,
-    metadata: dict[str, Any],
-) -> dict[str, Any] | None:
-    file_type_map = {
-        "samplesheet.csv": "samplesheet",
-        "nextflow.config": "config",
-    }
-    file_type = file_type_map.get(filename)
-    if not file_type:
-        logger.warning("Unknown generated file type for %s", filename)
-        return None
-
-    event_metadata = dict(metadata)
-    if "sample_count" in event_metadata and "sampleCount" not in event_metadata:
-        event_metadata["sampleCount"] = event_metadata["sample_count"]
-
-    event_metadata["modifiedBy"] = "agent"
-    event_metadata["modifiedAt"] = datetime.now(timezone.utc).isoformat()
-
-    return {
-        "fileType": file_type,
-        "content": content,
-        "metadata": event_metadata,
-    }
-
-
-def _extract_file_updates(
-    config: dict[str, Any] | None,
-    emitted_hashes: dict[str, str],
-) -> list[dict[str, Any]]:
-    updates: list[dict[str, Any]] = []
-    try:
-        if not isinstance(config, dict):
-            logger.warning("Streaming config is not a dict; skipping file updates.")
-            return updates
-        configurable = config.get("configurable")
-        if not isinstance(configurable, dict):
-            logger.warning("Streaming config missing configurable dict; skipping file updates.")
-            return updates
-        generated = configurable.get("generated_files")
-        if not isinstance(generated, dict):
-            logger.warning("Streaming config missing generated_files dict; skipping file updates.")
-            return updates
-
-        for filename, file_data in generated.items():
-            if not isinstance(file_data, dict):
-                logger.warning("Invalid generated file entry for %s", filename)
-                continue
-            content = file_data.get("content")
-            if content is None:
-                logger.warning("Generated file %s missing content", filename)
-                continue
-            if not isinstance(content, str):
-                try:
-                    content = str(content)
-                except Exception:
-                    logger.warning("Generated file %s content is not serializable", filename)
-                    continue
-
-            content_hash = _content_hash(content)
-            if emitted_hashes.get(filename) == content_hash:
-                continue
-            emitted_hashes[filename] = content_hash
-
-            metadata = file_data.get("metadata", {})
-            if metadata is None:
-                metadata = {}
-            if not isinstance(metadata, dict):
-                logger.warning("Generated file %s metadata is invalid", filename)
-                metadata = {}
-
-            update = _format_file_update(filename=filename, content=content, metadata=metadata)
-            if update:
-                updates.append(update)
-    except Exception as exc:
-        logger.exception("Failed to extract file updates: %s", exc)
-
-    return updates
-
-
 async def stream_agent_response(
     agent: Any,
     messages: list[Any],
     *,
     config: dict[str, Any] | None = None,
 ) -> AsyncIterator[str]:
-    emitted_hashes: dict[str, str] = {}
     try:
         async for event in agent.astream_events(
             {"messages": messages},
@@ -205,8 +123,9 @@ async def stream_agent_response(
                 yield _format_chunk("9", _tool_start_payload(event))
             elif event_type == "on_tool_end":
                 yield _format_chunk("a", _tool_end_payload(event))
-                for update in _extract_file_updates(config, emitted_hashes):
-                    yield _format_chunk(FILE_UPDATE_CODE, update)
+                tool_name = event.get("name")
+                if tool_name in WORKSPACE_REFRESH_TOOLS:
+                    yield _format_chunk(WORKSPACE_REFRESH_CODE, {"refresh": "workspace"})
     except Exception as exc:
         logger.exception("Error during agent streaming: %s", exc)
         yield _format_chunk("3", str(exc))

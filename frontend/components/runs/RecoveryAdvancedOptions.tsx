@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useState } from 'react';
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react').then(mod => mod.Editor), { ssr: false });
 

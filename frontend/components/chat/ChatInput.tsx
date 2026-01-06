@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 const placeholders = [
-  'Find my samples from last week',
-  'Search for SspArc0050',
+  'Find my samples from last week or find SspArc0300',
   'Run scRNA-seq analysis',
   'Show available pipelines'
 ];
@@ -22,7 +21,7 @@ interface ChatInputProps {
 
 export function ChatInput({ input, isLoading, onChange, onSubmit, onStop, isExpanded = false }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const maxChars = 1200;
+  const maxChars = 2000;
 
   useEffect(() => {
     if (!textareaRef.current) return;
@@ -33,9 +32,9 @@ export function ChatInput({ input, isLoading, onChange, onSubmit, onStop, isExpa
     textareaRef.current.style.height = '0px';
     const scrollHeight = textareaRef.current.scrollHeight;
     // Ensure height accommodates the placeholder list if empty
-    const minHeight = input ? 44 : 24 + (placeholders.length + 1) * 20;
+    const minHeight = input ? 30 : (placeholders.length + 1) * 20;
     textareaRef.current.style.height = `${Math.max(scrollHeight, minHeight)}px`;
-  }, [input]);
+  }, [input, isExpanded]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -53,7 +52,7 @@ export function ChatInput({ input, isLoading, onChange, onSubmit, onStop, isExpa
           onChange={(event) => onChange(event.target.value.slice(0, maxChars))}
           onKeyDown={handleKeyDown}
           disabled={isLoading}
-          className={`relative z-10 w-full resize-none border-0 bg-transparent text-sm font-medium text-content outline-none transition-all duration-200 ${isExpanded ? 'flex-1' : 'min-h-[44px]'}`}
+          className={`relative z-10 w-full resize-none border-0 bg-transparent text-sm font-medium text-content outline-none transition-all duration-200 ${isExpanded ? 'flex-1' : 'min-h-[30px]'}`}
           rows={1}
         />
         {!input && (

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -29,9 +30,11 @@ export function Header() {
         <div className="flex items-center gap-4">
           <Link href="/workspace" className="flex items-center gap-3 group">
             <div className="relative h-10 w-10 overflow-hidden rounded-xl transition-transform group-hover:scale-105">
-              <img
+              <Image
                 src={theme === 'dark' ? '/arc-logo-white.png' : '/arc-logo_blue-circle.png'}
                 alt="Arc Logo"
+                width={40}
+                height={40}
                 className="h-full w-full object-contain"
               />
             </div>

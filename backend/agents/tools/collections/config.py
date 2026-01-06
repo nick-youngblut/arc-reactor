@@ -9,15 +9,18 @@ from backend.agents.tools.workspace_tools import (
     get_current_config,
     get_current_samplesheet,
     get_workspace_status,
+    update_config,
+    update_samplesheet,
 )
 
 
 def get_config_expert_tools() -> list[BaseTool]:
-    """Tools for the config_expert subagent (7 tools).
+    """Tools for the config_expert subagent (9 tools).
 
     Categories:
     - Pipeline Info (2): list_pipelines, get_pipeline_schema
     - File Generation (2): generate_samplesheet, generate_config
+    - File Updates (2): update_samplesheet, update_config
     - Workspace (3): get_workspace_status, get_current_samplesheet, get_current_config
     """
     return [
@@ -27,6 +30,9 @@ def get_config_expert_tools() -> list[BaseTool]:
         # File Generation
         generate_samplesheet,
         generate_config,
+        # File Updates
+        update_samplesheet,
+        update_config,
         # Workspace (shared)
         get_workspace_status,
         get_current_samplesheet,

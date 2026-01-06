@@ -6,7 +6,7 @@ volumes/
 files/
 tasks/
 external-repos/
-screenlog.*
+tsconfig.tsbuildinfo
 
 # Bytecode compiled files
 *.pyc

@@ -86,7 +86,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
           </div>
         )}
 
-        <div className={`prose prose-sm max-w-none prose-p:my-1.5 prose-pre:bg-arc-gray-900/95 prose-pre:text-white prose-pre:rounded-xl ${isUser ? 'prose-invert text-white' : 'text-inherit'}`}>
+        <div className={`prose prose-sm max-w-none prose-p:my-1.5 prose-pre:bg-arc-gray-900/95 prose-pre:text-white prose-pre:rounded-xl ${isUser ? 'prose-invert text-white text-right' : 'text-inherit'}`}>
           {message.isStreaming ? (
             <StreamingMessage text={message.content} isStreaming />
           ) : (

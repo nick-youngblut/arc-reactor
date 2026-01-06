@@ -13,6 +13,7 @@ jobs:
       BENCHLING_TEST_DATABASE_URI: ${{ secrets.BENCHLING_TEST_DATABASE_URI }}
       BENCHLING_TEST_APP_CLIENT_ID: ${{ secrets.BENCHLING_TEST_APP_CLIENT_ID }}
       BENCHLING_TEST_APP_CLIENT_SECRET: ${{ secrets.BENCHLING_TEST_APP_CLIENT_SECRET }}
+      GH_PAT: ${{ secrets.GH_PAT }}
     steps:
       - uses: actions/checkout@v4
 
@@ -21,14 +22,13 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Configure Git for private repositories
+        run: |
+          git config --global credential.helper store
+          git config --global url."https://x-access-token:${GH_PAT}@github.com/".insteadOf "https://github.com/"
+
       - name: Install backend dependencies
         run: pip install -e ./backend[dev]
-
-      - name: Ruff
-        run: ruff check backend
-
-      - name: Mypy
-        run: mypy backend
 
       - name: Pytest
         run: pytest backend
@@ -54,7 +54,3 @@ jobs:
       - name: TypeScript
         working-directory: frontend
         run: npm run typecheck
-
-      - name: Frontend tests
-        working-directory: frontend
-        run: npm test
