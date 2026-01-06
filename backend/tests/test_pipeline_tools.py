@@ -70,7 +70,7 @@ async def test_get_pipeline_schema_formats_params():
 
 
 @pytest.mark.asyncio
-async def test_generate_samplesheet_stores_file():
+async def test_generate_samplesheet_does_not_store_runtime_file():
     runtime = _Runtime(_BenchlingStub(), _StorageStub())
     output = await generate_samplesheet.ainvoke({
         "ngs_run": "NR-2024-0156",
@@ -79,8 +79,7 @@ async def test_generate_samplesheet_stores_file():
     })
     assert "samplesheet" in output
     generated = runtime.config["configurable"].get("generated_files", {})
-    assert "samplesheet.csv" in generated
-    assert "LPS-001" in generated["samplesheet.csv"]["content"]
+    assert generated == {}
 
 
 @pytest.mark.asyncio
