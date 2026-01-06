@@ -1,13 +1,10 @@
 /** @type {import('tailwindcss').Config} */
-const { heroui } = require('@heroui/theme');
-
 module.exports = {
   content: [
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './hooks/**/*.{ts,tsx}',
-    './stores/**/*.{ts,tsx}',
-    './node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}'
+    './stores/**/*.{ts,tsx}'
   ],
   darkMode: 'class',
   theme: {
@@ -43,16 +40,7 @@ module.exports = {
         display: ['"Space Grotesk"', '"IBM Plex Sans"', 'system-ui', 'sans-serif'],
         body: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace']
-      },
-      spacing: {
-        18: '4.5rem',
-        22: '5.5rem',
-        30: '7.5rem'
-      },
-      boxShadow: {
-        glow: '0 0 30px rgba(29, 78, 216, 0.25)'
       }
     }
-  },
-  plugins: [heroui()]
+  }
 };

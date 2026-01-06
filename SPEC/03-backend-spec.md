@@ -6,9 +6,9 @@ The backend is a FastAPI application that serves three primary functions:
 
 1. **API Server**: REST endpoints for run management, pipeline configuration, and data queries
 2. **WebSocket Server**: Real-time chat interface for the AI agent
-3. **Static File Server**: Serves the compiled Next.js frontend
+3. **Internal Event Processor**: OIDC-protected endpoints for Pub/Sub weblog events and scheduler reconciliation
 
-The backend follows Arc Institute's established patterns for internal applications, using Dynaconf for configuration, Pydantic for validation, and async throughout.
+The backend follows Arc Institute's established patterns for internal applications, using Dynaconf for configuration, Pydantic for validation, and async throughout. The frontend is deployed as a separate Cloud Run service behind the same load balancer.
 
 ## Project Structure
 
@@ -27,13 +27,20 @@ backend/
 │       ├── __init__.py
 │       ├── chat.py         # WebSocket chat endpoint
 │       ├── runs.py         # Run CRUD operations
+│       ├── tasks.py        # Task-level queries
 │       ├── logs.py         # Log streaming and task log endpoints
 │       ├── pipelines.py    # Pipeline registry endpoints
-│       └── health.py       # Health check endpoints
+│       ├── health.py       # Health check endpoints
+│       └── internal/       # OIDC-protected internal endpoints
+│           ├── __init__.py
+│           ├── weblog.py   # Pub/Sub weblog event processor
+│           └── reconcile.py# Stale run reconciliation
 │
 ├── models/
 │   ├── __init__.py
 │   ├── runs.py             # Run request/response models
+│   ├── tasks.py            # Task models
+│   ├── weblog_event_log.py # Weblog deduplication model
 │   ├── pipelines.py        # Pipeline configuration models
 │   ├── chat.py             # Chat message models
 │   └── benchling.py        # Benchling data models
@@ -88,13 +95,13 @@ default:
   debug: false
   
   # GCP Configuration
-  gcp_project: "arc-ctc-project"
+  gcp_project: "arc-genomics02"
   gcp_region: "us-west1"
   
   # Service Configuration
   nextflow_bucket: "arc-reactor-runs"
-  nextflow_service_account: "nextflow-orchestrator@arc-ctc-project.iam.gserviceaccount.com"
-  orchestrator_image: "gcr.io/arc-ctc-project/nextflow-orchestrator:latest"
+  nextflow_service_account: "nextflow-orchestrator@arc-genomics02.iam.gserviceaccount.com"
+  orchestrator_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/nextflow-orchestrator:latest"
   
   # Benchling Configuration
   # Benchling settings are sourced via benchling-py Dynaconf (DYNACONF env var)
@@ -203,6 +210,22 @@ recovery eligibility rules.
 | `GET /api/pipelines` | GET | List available pipelines | Required |
 | `GET /api/pipelines/{name}` | GET | Get pipeline details | Required |
 | `GET /api/pipelines/{name}/schema` | GET | Get samplesheet schema | Required |
+
+### Workspace State
+
+| Endpoint | Method | Description | Auth |
+|----------|--------|-------------|------|
+| `GET /api/workspaces` | GET | List workspaces for current user | Required |
+| `POST /api/workspaces` | POST | Create workspace (draft or thread) | Required |
+| `GET /api/workspaces/{id}` | GET | Get workspace by ID | Required |
+| `GET /api/workspaces/by-thread/{thread_id}` | GET | Get workspace by thread ID | Required |
+| `GET /api/workspaces/draft` | GET | Get draft workspace | Required |
+| `PUT /api/workspaces/{id}` | PUT | Full workspace update | Required |
+| `PATCH /api/workspaces/{id}/samplesheet` | PATCH | Update samplesheet only | Required |
+| `PATCH /api/workspaces/{id}/config` | PATCH | Update config only | Required |
+| `PATCH /api/workspaces/{id}/pipeline` | PATCH | Update pipeline selection | Required |
+| `POST /api/workspaces/{id}/associate` | POST | Associate draft with thread | Required |
+| `DELETE /api/workspaces/{id}` | DELETE | Delete workspace | Required |
 
 ### Chat
 
@@ -456,6 +479,26 @@ gs://{settings.nextflow_bucket}/
             └── report.html
 ```
 
+### CheckpointerService
+
+Provides LangGraph checkpoint persistence using a shared psycopg3 `AsyncConnectionPool`.
+The pool is created on application startup and reused across WebSocket and REST chat.
+
+**Key Methods:**
+
+| Method | Description | Returns |
+|--------|-------------|---------|
+| `create()` | Initialize pool and `AsyncPostgresSaver` | `CheckpointerService` |
+| `health_check()` | Validate pool connectivity via `SELECT 1` | bool |
+| `close()` | Gracefully close pool | None |
+
+**Pool Settings (Dynaconf):**
+
+- `checkpointer_pool_min_size`
+- `checkpointer_pool_max_size`
+- `checkpointer_pool_timeout`
+- `checkpointer_pool_max_idle`
+
 ### RunStoreService (PostgreSQL)
 
 Manages run persistence in Cloud SQL PostgreSQL.
@@ -636,6 +679,10 @@ async def get_current_user(request: Request) -> User:
         name=claims.get("name", claims["email"]),
     )
 ```
+
+### Service-to-Service (OIDC) Integration
+
+Internal endpoints under `/api/internal/*` accept OIDC Bearer tokens from specific service accounts (Pub/Sub push subscription and Cloud Scheduler). These endpoints are mounted separately from user-facing routes to ensure IAP and OIDC auth can be enforced independently.
 
 ### Authorization Rules
 

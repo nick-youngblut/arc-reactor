@@ -4,8 +4,15 @@ import json
 
 import pytest
 
-from backend.agents.tools.submission import cancel_run, clear_samplesheet, delete_file, submit_run
+from backend.agents.tools.submission import (
+    cancel_run,
+    clear_samplesheet,
+    delete_file,
+    recover_run,
+    submit_run,
+)
 from backend.models.schemas.runs import RunStatus
+from backend.utils.errors import NotFoundError, ValidationError
 
 
 class _RunStub:
@@ -21,10 +28,13 @@ class _RunStoreStub:
         self.run = _RunStub("run-abc123", "dev@example.com", RunStatus.PENDING)
         self.created = False
         self.updated_status = None
+        self.recovery_id = "run-recover-123"
+        self.recovery_error: Exception | None = None
+        self.recovery_request: dict | None = None
 
     async def create_run(self, **kwargs):
         self.created = True
-        return self.run.run_id
+        return self.run.run_id, "secret"
 
     async def get_run(self, run_id: str):
         if run_id != self.run.run_id:
@@ -37,6 +47,12 @@ class _RunStoreStub:
             self.run.status = status
         self.updated_status = status
         return True
+
+    async def submit_recovery_run(self, **kwargs):
+        if self.recovery_error is not None:
+            raise self.recovery_error
+        self.recovery_request = kwargs
+        return self.recovery_id
 
 
 class _StorageStub:
@@ -52,11 +68,12 @@ class _StorageStub:
 
 
 class _Runtime:
-    def __init__(self, run_store, storage):
+    def __init__(self, run_store, storage, batch_service=None):
         self.config = {
             "configurable": {
                 "run_store_service": run_store,
                 "storage_service": storage,
+                "batch_service": batch_service,
                 "user_email": "dev@example.com",
                 "user_name": "Developer",
             }
@@ -71,13 +88,13 @@ async def test_submit_run_creates_run():
     samplesheet = "sample,fastq_1,fastq_2\nA,gs://a,gs://b"
     config = "params {\n  genome = \"GRCh38\"\n  protocol = \"10XV3\"\n}\n"
 
-    output = await submit_run(
-        samplesheet_csv=samplesheet,
-        config_content=config,
-        pipeline="nf-core/scrnaseq",
-        pipeline_version="2.7.1",
-        runtime=runtime,
-    )
+    output = await submit_run.ainvoke({
+        "samplesheet_csv": samplesheet,
+        "config_content": config,
+        "pipeline": "nf-core/scrnaseq",
+        "pipeline_version": "2.7.1",
+        "runtime": runtime,
+    })
 
     payload = json.loads(output)
     assert payload["run_id"] == "run-abc123"
@@ -90,7 +107,7 @@ async def test_cancel_run_updates_status():
     storage = _StorageStub()
     runtime = _Runtime(run_store, storage)
 
-    output = await cancel_run(run_id="run-abc123", runtime=runtime)
+    output = await cancel_run.ainvoke({"run_id": "run-abc123", "runtime": runtime})
     payload = json.loads(output)
     assert payload["status"] == RunStatus.CANCELLED.value
 
@@ -101,7 +118,7 @@ async def test_delete_file_missing():
     storage = _StorageStub(exists=False)
     runtime = _Runtime(run_store, storage)
 
-    output = await delete_file(run_id="run-abc123", file_path="inputs/missing.txt", runtime=runtime)
+    output = await delete_file.ainvoke({"run_id": "run-abc123", "file_path": "inputs/missing.txt", "runtime": runtime})
     assert "Error: File not found" in output
 
 
@@ -112,6 +129,45 @@ async def test_clear_samplesheet():
     runtime = _Runtime(run_store, storage)
     runtime.config["configurable"]["generated_files"] = {"samplesheet.csv": {"content": "x"}}
 
-    output = await clear_samplesheet(confirm=True, runtime=runtime)
+    output = await clear_samplesheet.ainvoke({"confirm": True, "runtime": runtime})
     assert "Samplesheet cleared" in output
     assert "samplesheet.csv" not in runtime.config["configurable"]["generated_files"]
+
+
+@pytest.mark.asyncio
+async def test_recover_run_success():
+    run_store = _RunStoreStub()
+    storage = _StorageStub()
+    runtime = _Runtime(run_store, storage, batch_service=object())
+
+    output = await recover_run.ainvoke({"run_id": "run-abc123", "notes": "Retry", "runtime": runtime})
+
+    assert "Recovery run submitted" in output
+    assert "New Run ID: run-recover-123" in output
+    assert run_store.recovery_request is not None
+    assert run_store.recovery_request["parent_run_id"] == "run-abc123"
+    assert run_store.recovery_request["notes"] == "Retry"
+
+
+@pytest.mark.asyncio
+async def test_recover_run_validation_error():
+    run_store = _RunStoreStub()
+    run_store.recovery_error = ValidationError(message="Run is not failed")
+    storage = _StorageStub()
+    runtime = _Runtime(run_store, storage, batch_service=object())
+
+    output = await recover_run.ainvoke({"run_id": "run-abc123", "runtime": runtime})
+
+    assert "Error: Run is not failed" in output
+
+
+@pytest.mark.asyncio
+async def test_recover_run_not_found_error():
+    run_store = _RunStoreStub()
+    run_store.recovery_error = NotFoundError(message="Work directory not found")
+    storage = _StorageStub()
+    runtime = _Runtime(run_store, storage, batch_service=object())
+
+    output = await recover_run.ainvoke({"run_id": "run-abc123", "runtime": runtime})
+
+    assert "Error: Work directory not found" in output

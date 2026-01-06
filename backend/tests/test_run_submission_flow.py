@@ -1,12 +1,6 @@
 from __future__ import annotations
 
-import os
-import tempfile
-
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
-from backend.models import Base
 from backend.models.schemas.runs import RunCreateRequest, RunStatus
 from backend.services.runs import RunStoreService
 
@@ -43,18 +37,6 @@ class _BatchStub:
         return f"batch/{kwargs['run_id']}"
 
 
-@pytest.fixture
-async def session() -> AsyncSession:
-    handle, path = tempfile.mkstemp(suffix=".db")
-    os.close(handle)
-    engine = create_async_engine(f"sqlite+aiosqlite:///{path}")
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    session_factory = async_sessionmaker(engine, expire_on_commit=False)
-    async with session_factory() as session:
-        yield session
-    await engine.dispose()
-    os.unlink(path)
 
 
 @pytest.mark.asyncio
@@ -85,6 +67,7 @@ async def test_submit_run_flow(session: AsyncSession) -> None:
     assert run.status == RunStatus.SUBMITTED
     assert run.batch_job_name == f"batch/{run_id}"
     assert f"{run_id}/inputs/samplesheet.csv" in storage.files
+    assert batch.submissions[0]["weblog_secret"]
 
 
 @pytest.mark.asyncio
@@ -93,7 +76,7 @@ async def test_submit_recovery_run_flow(session: AsyncSession) -> None:
     storage = _StorageStub()
     batch = _BatchStub()
 
-    parent_id = await service.create_run(
+    parent_id, _weblog_secret = await service.create_run(
         pipeline="nf-core/scrnaseq",
         pipeline_version="2.7.1",
         user_email="user@arc.org",
@@ -128,3 +111,4 @@ async def test_submit_recovery_run_flow(session: AsyncSession) -> None:
     assert recovery.status == RunStatus.SUBMITTED
     assert recovery.parent_run_id == parent_id
     assert recovery.batch_job_name == f"batch/{recovery_id}"
+    assert batch.submissions[0]["weblog_secret"]

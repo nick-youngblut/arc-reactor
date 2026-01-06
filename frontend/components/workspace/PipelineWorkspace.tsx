@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { ChatPanel } from '@/components/chat/ChatPanel';
 import { FileEditorPanel } from '@/components/editors/FileEditorPanel';
 import { SubmitPanel } from '@/components/workspace/SubmitPanel';
+import { updateWorkspacePipeline } from '@/lib/api';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 
 const pipelines = [
@@ -16,10 +17,19 @@ export function PipelineWorkspace() {
   const [pipeline, setPipeline] = useState(pipelines[0]);
   const [version, setVersion] = useState(pipelines[0].versions[0]);
   const setWorkspacePipeline = useWorkspaceStore((state) => state.setPipeline);
+  const workspaceId = useWorkspaceStore((state) => state.workspaceId);
+  const loadFromBackend = useWorkspaceStore((state) => state.loadFromBackend);
 
   useEffect(() => {
     setWorkspacePipeline(pipeline.name, version);
-  }, [pipeline.name, version, setWorkspacePipeline]);
+
+    if (workspaceId) {
+      void updateWorkspacePipeline(workspaceId, pipeline.name, version)
+        .then((workspace) => loadFromBackend(workspace))
+        .catch(() => undefined);
+    }
+  }, [pipeline.name, version, setWorkspacePipeline, workspaceId, loadFromBackend]);
+
 
   return (
     <section className="flex h-full flex-col gap-8 py-2">
@@ -58,10 +68,10 @@ export function PipelineWorkspace() {
       </header>
 
       <div className="grid flex-1 gap-8 lg:grid-cols-[2fr_3fr]">
-        <div className="arc-surface flex min-h-[580px] flex-col overflow-hidden border-arc-blue/10 bg-panel/40 ring-1 ring-arc-night/5 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
+        <div className="arc-surface flex h-[780px] flex-col overflow-hidden border-arc-blue/10 bg-panel/40 ring-1 ring-arc-night/5 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
           <ChatPanel />
         </div>
-        <div className="arc-surface flex min-h-[580px] flex-col overflow-hidden border-arc-blue/10 bg-panel/40 ring-1 ring-arc-night/5 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
+        <div className="arc-surface flex h-[780px] flex-col overflow-hidden border-arc-blue/10 bg-panel/40 ring-1 ring-arc-night/5 dark:ring-white/5 shadow-2xl shadow-arc-night/5">
           <FileEditorPanel />
         </div>
       </div>

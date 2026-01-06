@@ -13,7 +13,33 @@ default:
   gemini_model: "gemini-3-flash-preview"
   gemini_thinking_level: "medium"
 
+  # Agent Configuration (per-agent model overrides)
+  agent:
+    orchestrator:
+      # Inherits from gemini_model and gemini_thinking_level by default
+      # Override here if needed:
+      # model: "google_genai:gemini-3-flash-preview"
+      # thinking_level: "low"
+
+    subagents:
+      benchling_expert:
+        thinking_level: "medium"
+
+      config_expert:
+        thinking_level: "low"
+
+      execution_expert:
+        thinking_level: "medium"
+
+  checkpointer_pool_min_size: 5
+  checkpointer_pool_max_size: 50
+  checkpointer_pool_timeout: 30.0
+  checkpointer_pool_max_idle: 300.0
+
   frontend_out_dir: "/app/frontend/out"
+  frontend_image: ""
+  backend_image: ""
+  weblog_receiver_url: ""
 
   benchling_cb_failure_threshold: 5
   benchling_cb_recovery_timeout: 30
@@ -25,7 +51,10 @@ test:
   gcp_project: "multi-omics-dev"
   nextflow_bucket: "arc-reactor-runs-dev"
   nextflow_service_account: "nextflow-orchestrator@multi-omics-dev.iam.gserviceaccount.com"
-  orchestrator_image: "gcr.io/multi-omics-dev/nextflow-orchestrator:latest"
+  orchestrator_image: "us-docker.pkg.dev/multi-omics-dev/arc-reactor/nextflow-orchestrator:latest"
+  frontend_image: "us-docker.pkg.dev/multi-omics-dev/arc-reactor/arc-reactor-frontend:latest"
+  backend_image: "us-docker.pkg.dev/multi-omics-dev/arc-reactor/arc-reactor-backend:latest"
+  weblog_receiver_url: "https://arc-reactor-weblog-xxx.run.app/weblog"
   cors_allowed_origins:
   - "https://arc-reactor-dev.multi-omics-dev.arcinstitute.org"
   - "http://localhost:3000"
@@ -35,7 +64,12 @@ prod:
   gcp_project: "arc-genomics02"
   nextflow_bucket: "arc-reactor-runs"
   nextflow_service_account: "nextflow-orchestrator@arc-genomics02.iam.gserviceaccount.com"
-  orchestrator_image: "gcr.io/arc-genomics02/nextflow-orchestrator:latest"
+  orchestrator_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/nextflow-orchestrator:latest"
+  frontend_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/arc-reactor-frontend:latest"
+  backend_image: "us-docker.pkg.dev/arc-genomics02/arc-reactor/arc-reactor-backend:latest"
+  weblog_receiver_url: "https://arc-reactor-weblog-xxx.run.app/weblog"
+  checkpointer_pool_min_size: 10
+  checkpointer_pool_max_size: 100
   cors_allowed_origins:
   - "https://arc-reactor.genomics.arcinstitute.org"
   - "http://localhost:3000"

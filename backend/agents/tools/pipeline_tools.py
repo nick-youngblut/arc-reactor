@@ -15,7 +15,15 @@ _PIPELINE_CATEGORIES = {
 @tool
 @tool_error_handler
 async def list_pipelines(category: str | None = None, runtime: Any | None = None) -> str:
-    """List available pipelines in the registry."""
+    """
+    List available pipelines in the registry.
+
+    Args:
+        category: Filter by category (e.g., "scRNA-seq", "bulk-RNA-seq")
+
+    Returns:
+        String message containing the available pipelines
+    """
     registry = PipelineRegistry.create()
     rows = []
     category_filter = (category or "").strip().lower()
@@ -64,7 +72,16 @@ async def get_pipeline_schema(
     version: str | None = None,
     runtime: Any | None = None,
 ) -> str:
-    """Get schema details for a pipeline."""
+    """
+    Get schema details for a pipeline.
+
+    Args:
+        pipeline: Pipeline name
+        version: Pipeline version
+
+    Returns:
+        String message containing the pipeline schema
+    """
     if not pipeline:
         return "Error: pipeline is required."
 

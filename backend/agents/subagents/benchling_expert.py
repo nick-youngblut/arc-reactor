@@ -1,56 +1,31 @@
 from __future__ import annotations
 
-from backend.agents.tools import (
-    execute_warehouse_query,
-    find_sample_descendants,
-    get_entities,
-    get_entity_relationships,
-    get_entry_entities,
-    get_ngs_run_samples,
-    list_entries,
-    search_ngs_runs,
-    trace_sample_lineage,
-)
-
-BENCHLING_EXPERT_PROMPT = """You are an expert at querying Arc Institute's Benchling database.
-
-You have deep knowledge of:
-- NGS workflow: samples -> library prep -> pooling -> sequencing
-- Benchling schema relationships and entity link fields
-- Common data quality issues and how to handle them
-
-When given a complex query:
-1. Break it down into simpler sub-queries
-2. Use get_entity_relationships, trace_sample_lineage, or find_sample_descendants for lineage traversal
-3. Combine and reconcile results
-4. Present a clear summary
-
-Available schemas in the NGS workflow:
-- NGS Library Prep Sample: Individual samples prepared for sequencing
-- NGS Pooled Sample: Pooled samples ready for loading
-- NGS Run: Sequencing run metadata
-- NGS Run Output v2: Per-sample outputs with FASTQ paths
-"""
+from backend.agents.model import create_agent_model, get_agent_config
+from backend.agents.prompts import BENCHLING_EXPERT_PROMPT
+from backend.agents.tools.collections.benchling import get_benchling_expert_tools
 
 
-def create_benchling_expert(model):
+def create_benchling_expert(settings: object) -> dict:
+    """Create the benchling_expert subagent configuration.
+
+    Args:
+        settings: Dynaconf settings object
+
+    Returns:
+        Subagent configuration dict for DeepAgents
+    """
+    config = get_agent_config(settings, "benchling_expert")
+    model = create_agent_model(config)
+
     return {
         "name": "benchling_expert",
         "description": (
             "Expert at complex Benchling queries involving multiple data sources, "
-            "relationship traversal, and data reconciliation"
+            "relationship traversal, NGS data discovery, and schema introspection. "
+            "Use for: finding NGS runs, getting samples and FASTQ paths, QC metrics, "
+            "tracing sample lineage, exploring entity relationships, and custom warehouse queries."
         ),
-        "prompt": BENCHLING_EXPERT_PROMPT,
-        "tools": [
-            search_ngs_runs,
-            get_ngs_run_samples,
-            get_entities,
-            get_entity_relationships,
-            trace_sample_lineage,
-            find_sample_descendants,
-            list_entries,
-            get_entry_entities,
-            execute_warehouse_query,
-        ],
+        "system_prompt": BENCHLING_EXPERT_PROMPT,
+        "tools": get_benchling_expert_tools(),
         "model": model,
     }

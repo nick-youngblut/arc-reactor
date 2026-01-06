@@ -3,7 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, timedelta
 from functools import lru_cache, wraps
-from typing import Any, Iterable, Mapping, Sequence
+import logging
+from typing import Any, Awaitable, Callable, Iterable, Mapping, Sequence
 
 from backend.config import settings
 from backend.services.benchling import BenchlingService
@@ -16,6 +17,8 @@ try:  # LangChain v1 runtime injection
     from langchain.tools import ToolRuntime
 except Exception:  # pragma: no cover - optional typing only
     ToolRuntime = Any  # type: ignore
+
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_LIMIT = 50
@@ -30,6 +33,14 @@ class ToolContext:
     storage: StorageService | None
     user_email: str | None = None
     user_name: str | None = None
+
+
+@dataclass(frozen=True)
+class WorkspaceContext:
+    service: Any | None
+    thread_id: str | None
+    user_email: str | None
+    close: Callable[[], Awaitable[None]] | None = None
 
 
 def parse_semicolon_delimited(value: str | None) -> list[str]:
@@ -67,6 +78,15 @@ def q30_status(q30_value: float | None) -> str:
 
 
 def format_table(rows: Sequence[Mapping[str, Any]] | str) -> str:
+    """
+    Format table using TOON encoding.
+
+    Args:
+        rows: Sequence of rows to format
+
+    Returns:
+        String message containing the formatted table
+    """
     if not rows:
         return "No results found."
     if isinstance(rows, str):
@@ -104,12 +124,32 @@ def format_run_samples_result(
     summary: Mapping[str, Any],
     samples: Sequence[Mapping[str, Any]],
 ) -> str:
+    """
+    Format run samples result.
+
+    Args:
+        summary: Summary of the NGS run
+        samples: Sequence of sample information
+
+    Returns:
+        String message containing the run samples result
+    """
     table = format_table(samples)
     summary_text = format_run_summary(summary)
     return f"{summary_text}\n\nSamples:\n{table}"
 
 
 def format_fastq_paths(rows: Sequence[Mapping[str, Any]], validated: bool) -> str:
+    """
+    Format FASTQ paths.
+
+    Args:
+        rows: Sequence of rows to format
+        validated: Whether the FASTQ paths have been verified
+
+    Returns:
+        Toon formatted table of FASTQ file paths
+    """
     if not rows:
         return "No FASTQ paths found for the requested samples."
     table = format_table(rows)
@@ -178,6 +218,53 @@ def get_tool_context(runtime: ToolRuntime | None) -> ToolContext:
         storage=storage,
         user_email=configurable.get("user_email"),
         user_name=configurable.get("user_name"),
+    )
+
+
+async def get_workspace_context(runtime: ToolRuntime | None) -> WorkspaceContext:
+    configurable = _runtime_configurable(runtime)
+    thread_id = configurable.get("thread_id")
+    user_email = configurable.get("user_email")
+
+    factory = configurable.get("workspace_service_factory")
+    if factory is not None:
+        manager = factory()
+        try:
+            service = await manager.__aenter__()
+        except Exception:
+            logger.exception("Failed to enter workspace service factory")
+            return WorkspaceContext(service=None, thread_id=thread_id, user_email=user_email)
+
+        async def _close() -> None:
+            await manager.__aexit__(None, None, None)
+
+        return WorkspaceContext(
+            service=service,
+            thread_id=thread_id,
+            user_email=user_email,
+            close=_close,
+        )
+
+    database_service = configurable.get("database_service")
+    if database_service is None:
+        return WorkspaceContext(service=None, thread_id=thread_id, user_email=user_email)
+
+    try:
+        session = await anext(database_service.get_session())
+    except Exception:
+        logger.exception("Failed to acquire database session for workspace service")
+        return WorkspaceContext(service=None, thread_id=thread_id, user_email=user_email)
+
+    from backend.services.workspace import WorkspaceService
+
+    async def _close() -> None:
+        await session.close()
+
+    return WorkspaceContext(
+        service=WorkspaceService(session=session),
+        thread_id=thread_id,
+        user_email=user_email,
+        close=_close,
     )
 
 

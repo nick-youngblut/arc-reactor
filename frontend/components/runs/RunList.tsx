@@ -7,6 +7,7 @@ import { RunStatusBadge } from '@/components/runs/RunStatusBadge';
 import { RunCard } from '@/components/runs/RunCard';
 import { useRuns } from '@/hooks/useRuns';
 import type { RunSummary, RunStatus } from '@/lib/api';
+import { formatDuration } from '@/lib/utils';
 
 const statusOptions: Array<{ value: RunStatus | 'all'; label: string }> = [
   { value: 'all', label: 'All statuses' },
@@ -35,16 +36,7 @@ const getDurationMs = (run: RunSummary) => {
   return Math.max(0, end - start);
 };
 
-const formatDuration = (run: RunSummary) => {
-  const durationMs = getDurationMs(run);
-  if (!durationMs) return '—';
-  const minutes = Math.floor(durationMs / 60000);
-  const seconds = Math.floor((durationMs % 60000) / 1000);
-  if (minutes < 1) return `${seconds}s`;
-  const hours = Math.floor(minutes / 60);
-  if (hours) return `${hours}h ${minutes % 60}m`;
-  return `${minutes}m`;
-};
+const formatRunDuration = (run: RunSummary) => formatDuration(getDurationMs(run));
 
 export function RunList() {
   const router = useRouter();
@@ -262,7 +254,7 @@ export function RunList() {
                   </td>
                   <td className="px-4 py-3">{run.sampleCount ?? '—'}</td>
                   <td className="px-4 py-3 text-xs">{formatDate(run.createdAt)}</td>
-                  <td className="px-4 py-3 text-xs">{formatDuration(run)}</td>
+                  <td className="px-4 py-3 text-xs">{formatRunDuration(run)}</td>
                   <td className="px-4 py-3">
                     <button
                       type="button"

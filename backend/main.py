@@ -6,6 +6,12 @@ import os
 from pathlib import Path
 from typing import AsyncIterator
 
+# Configure logging before any other imports
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s:%(name)s:%(message)s",
+)
+
 # Load .env file before any other imports to ensure environment variables
 # are available to all modules, especially benchling-py which needs them
 from dotenv import load_dotenv
@@ -18,13 +24,16 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .api.routes import api_router
+from .api.routes.internal import internal_router
 from .api.routes.chat import router as chat_router
 from .api.routes.health import router as health_router
 from .config import settings
 from .services.benchling import BenchlingService
 from .services.database import DatabaseService
+from .services.checkpointer import CheckpointerService
 from .services.gemini import DisabledGeminiService, GeminiService
 from .services.storage import StorageService
+from .services.workspace import WorkspaceService
 from .utils.circuit_breaker import create_breakers
 from .utils.errors import register_exception_handlers
 
@@ -59,14 +68,27 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.database_service = DatabaseService.create(settings)
     app.state.storage_service = StorageService.create(settings)
     try:
+        app.state.checkpointer_service = await CheckpointerService.create(settings)
+    except Exception as exc:
+        logger.error("Failed to initialize checkpointer service: %s", exc)
+        raise
+    try:
         app.state.gemini_service = GeminiService.create(settings, breakers)
     except Exception as exc:
         logger.warning("Gemini service failed to initialize: %s", exc)
         app.state.gemini_service = DisabledGeminiService(error=exc)
 
+    @asynccontextmanager
+    async def workspace_service_factory() -> AsyncIterator[WorkspaceService]:
+        async for session in app.state.database_service.get_session():
+            yield WorkspaceService(session=session)
+
+    app.state.workspace_service_factory = workspace_service_factory
+
     yield
 
     logger.info("Shutting down Arc Reactor services")
+    await app.state.checkpointer_service.close()
     app.state.benchling_service.close()
     # BenchlingService.close_all_engines()
     await app.state.database_service.close()
@@ -91,6 +113,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(api_router, prefix="/api")
+    app.include_router(internal_router)
     app.include_router(chat_router)
 
     dist_dir = Path(settings.get("frontend_out_dir", "frontend/out")).resolve()

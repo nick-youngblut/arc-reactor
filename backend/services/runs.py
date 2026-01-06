@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import logging
+import secrets
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
@@ -11,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.models.runs import Run
 from backend.models.schemas.runs import RunListResponse, RunResponse, RunStatus
+from backend.models.schemas.tasks import TaskResponse, TaskSummaryResponse
 from backend.services.batch import BatchService
 from backend.services.storage import StorageService
 from backend.utils.errors import BatchError, NotFoundError, ValidationError
@@ -89,6 +92,12 @@ class RunStoreService:
         logger.info("metric %s=%s %s", name, value, tags)
 
     @staticmethod
+    def _generate_weblog_secret() -> tuple[str, str]:
+        weblog_secret = secrets.token_urlsafe(24)
+        weblog_secret_hash = hashlib.sha256(weblog_secret.encode()).hexdigest()
+        return weblog_secret, weblog_secret_hash
+
+    @staticmethod
     def _to_response(run: Run) -> RunResponse:
         return RunResponse(
             run_id=run.run_id,
@@ -131,9 +140,10 @@ class RunStoreService:
         sample_count: int,
         source_ngs_runs: list[str] | None = None,
         source_project: str | None = None,
-    ) -> str:
-        run_id = f"run-{uuid4().hex[:8]}"
+    ) -> tuple[str, str]:
+        run_id = f"run-{uuid4().hex[:12]}"
         now = self._now()
+        weblog_secret, weblog_secret_hash = self._generate_weblog_secret()
         run = Run(
             run_id=run_id,
             pipeline=pipeline,
@@ -149,16 +159,102 @@ class RunStoreService:
             source_ngs_runs=source_ngs_runs,
             source_project=source_project,
             is_recovery=False,
+            weblog_secret_hash=weblog_secret_hash,
         )
         self.session.add(run)
         await self.session.commit()
-        return run_id
+        return run_id, weblog_secret
 
     async def get_run(self, run_id: str) -> RunResponse | None:
         run = await self.session.get(Run, run_id)
         if not run:
             return None
         return self._to_response(run)
+
+    async def get_task_summary(self, run_id: str) -> TaskSummaryResponse:
+        """Get aggregated task counts by status.
+
+        Args:
+            run_id: The run identifier
+
+        Returns:
+            TaskSummaryResponse with counts per status
+        """
+        from backend.models.tasks import Task
+
+        result = await self.session.execute(
+            select(
+                Task.status,
+                func.count(Task.id).label("count"),
+            )
+            .where(Task.run_id == run_id)
+            .group_by(Task.status)
+        )
+
+        counts = {row.status: row.count for row in result}
+
+        return TaskSummaryResponse(
+            total=sum(counts.values()),
+            completed=counts.get("COMPLETED", 0),
+            running=counts.get("RUNNING", 0),
+            submitted=counts.get("SUBMITTED", 0),
+            failed=counts.get("FAILED", 0),
+            cached=counts.get("CACHED", 0),
+        )
+
+    async def get_run_tasks(
+        self,
+        run_id: str,
+        *,
+        status_filter: str | None = None,
+        limit: int = 50,
+    ) -> list[TaskResponse]:
+        """Get task details for a run.
+
+        Args:
+            run_id: The run identifier
+            status_filter: Optional status filter (COMPLETED, RUNNING, FAILED, etc.)
+            limit: Maximum tasks to return
+
+        Returns:
+            List of TaskResponse objects
+        """
+        from backend.models.tasks import Task
+
+        query = select(Task).where(Task.run_id == run_id)
+
+        if status_filter:
+            query = query.where(Task.status == status_filter.upper())
+
+        query = query.order_by(Task.submit_time.desc()).limit(limit)
+
+        result = await self.session.execute(query)
+        return [TaskResponse.model_validate(t) for t in result.scalars().all()]
+
+    async def get_task_by_name(
+        self,
+        run_id: str,
+        task_name: str,
+    ) -> TaskResponse | None:
+        """Get a specific task by name.
+
+        Args:
+            run_id: The run identifier
+            task_name: Task name (e.g., "STAR_ALIGN (1)")
+
+        Returns:
+            TaskResponse or None if not found
+        """
+        from backend.models.tasks import Task
+
+        result = await self.session.execute(
+            select(Task)
+            .where(Task.run_id == run_id, Task.name == task_name)
+            .order_by(Task.attempt.desc())
+            .limit(1)
+        )
+        task = result.scalar_one_or_none()
+        return TaskResponse.model_validate(task) if task else None
 
     async def list_runs(
         self,
@@ -280,13 +376,14 @@ class RunStoreService:
         notes: str | None = None,
         override_params: dict[str, Any] | None = None,
         reused_work_dir: str | None = None,
-    ) -> str | None:
+    ) -> tuple[str, str] | None:
         parent = await self.session.get(Run, parent_run_id)
         if not parent:
             return None
 
-        run_id = f"run-{uuid4().hex[:8]}"
+        run_id = f"run-{uuid4().hex[:12]}"
         now = self._now()
+        weblog_secret, weblog_secret_hash = self._generate_weblog_secret()
         run = Run(
             run_id=run_id,
             pipeline=parent.pipeline,
@@ -305,10 +402,11 @@ class RunStoreService:
             is_recovery=True,
             recovery_notes=notes,
             reused_work_dir=reused_work_dir or self._work_dir(parent.run_id),
+            weblog_secret_hash=weblog_secret_hash,
         )
         self.session.add(run)
         await self.session.commit()
-        return run_id
+        return run_id, weblog_secret
 
     async def submit_run(
         self,
@@ -329,7 +427,7 @@ class RunStoreService:
         if not all([samplesheet_csv, config_content, params is not None, pipeline, pipeline_version]):
             raise ValidationError("Missing required submission inputs")
 
-        run_id = await self.create_run(
+        run_id, weblog_secret = await self.create_run(
             pipeline=pipeline,
             pipeline_version=pipeline_version,
             user_email=user_email,
@@ -369,6 +467,7 @@ class RunStoreService:
                 params_gcs_path=params_gcs_path,
                 work_dir=work_dir,
                 is_recovery=False,
+                weblog_secret=weblog_secret,
                 user_email=user_email,
             )
 
@@ -421,7 +520,7 @@ class RunStoreService:
             raise ValidationError("Recovery unavailable: work directory not found")
 
         reused_work_dir = f"gs://{storage.bucket_name}/runs/{parent_run_id}/work/"
-        run_id = await self.create_recovery_run(
+        recovery = await self.create_recovery_run(
             parent_run_id=parent_run_id,
             user_email=user_email,
             user_name=user_name,
@@ -429,8 +528,9 @@ class RunStoreService:
             override_params=override_params,
             reused_work_dir=reused_work_dir if reuse_work_dir else None,
         )
-        if not run_id:
+        if not recovery:
             raise NotFoundError("Run not found", detail=f"No run exists with ID {parent_run_id}")
+        run_id, weblog_secret = recovery
 
         logger.info(
             "Submitting recovery run",
@@ -486,6 +586,7 @@ class RunStoreService:
                 params_gcs_path=params_gcs_path,
                 work_dir=work_dir,
                 is_recovery=True,
+                weblog_secret=weblog_secret,
                 user_email=user_email,
             )
 

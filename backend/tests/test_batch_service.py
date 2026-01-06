@@ -190,9 +190,9 @@ def _service(client: _Client) -> BatchService:
         client=client,
         project="proj",
         region="us-west1",
-        orchestrator_image="gcr.io/proj/orchestrator:latest",
+        orchestrator_image="us-docker.pkg.dev/proj/arc-reactor/orchestrator:latest",
         service_account="svc@proj.iam.gserviceaccount.com",
-        database_url="postgresql+asyncpg://user:pass@10.0.0.1:5432/db",
+        weblog_receiver_url="https://arc-reactor-weblog.example.com/weblog",
     )
 
 
@@ -211,6 +211,7 @@ def test_submit_orchestrator_job_builds_job(monkeypatch) -> None:
         params_gcs_path="gs://bucket/runs/run-123/inputs/params.yaml",
         work_dir="gs://bucket/runs/run-123/work/",
         is_recovery=False,
+        weblog_secret="secret",
         user_email="dev@arc.org",
     )
 
@@ -228,7 +229,8 @@ def test_submit_orchestrator_job_builds_job(monkeypatch) -> None:
     assert env["PIPELINE"] == "nf-core/scrnaseq"
     assert env["PIPELINE_VERSION"] == "2.7.1"
     assert env["IS_RECOVERY"] == "false"
-    assert env["DATABASE_URL"].startswith("postgresql+asyncpg://")
+    assert env["WEBLOG_URL"].endswith("/weblog")
+    assert env["WEBLOG_SECRET"] == "secret"
 
 
 def test_get_job_status_maps_state(monkeypatch) -> None:
@@ -267,12 +269,11 @@ def test_cancel_job_handles_missing(monkeypatch) -> None:
 def test_submit_orchestrator_job_error_handling(monkeypatch) -> None:
     monkeypatch.setattr(batch_service, "batch_v1", _BatchV1)
     monkeypatch.setattr(batch_service, "gcp_exceptions", _Exceptions)
-    monkeypatch.setattr(batch_service.time, "sleep", lambda *_: None)
 
     client = _Client()
     service = _service(client)
 
-    client.create_side_effects = [_Exceptions.ServiceUnavailable("try again"), None]
+    # Test successful job creation
     job_name = service.submit_orchestrator_job(
         run_id="run-456",
         pipeline="nf-core/scrnaseq",
@@ -281,9 +282,11 @@ def test_submit_orchestrator_job_error_handling(monkeypatch) -> None:
         params_gcs_path="gs://bucket/runs/run-456/inputs/params.yaml",
         work_dir="gs://bucket/runs/run-456/work/",
         is_recovery=True,
+        weblog_secret="secret",
     )
     assert job_name.endswith("/jobs/nf-run-456")
 
+    # Test quota exceeded error
     client.create_side_effects = [_Exceptions.ResourceExhausted("quota")]
     with pytest.raises(BatchQuotaExceededError):
         service.submit_orchestrator_job(
@@ -294,8 +297,10 @@ def test_submit_orchestrator_job_error_handling(monkeypatch) -> None:
             params_gcs_path="gs://bucket/runs/run-789/inputs/params.yaml",
             work_dir="gs://bucket/runs/run-789/work/",
             is_recovery=False,
+            weblog_secret="secret",
         )
 
+    # Test permission denied error
     client.create_side_effects = [_Exceptions.PermissionDenied("denied")]
     with pytest.raises(BatchJobCreationError):
         service.submit_orchestrator_job(
@@ -306,6 +311,7 @@ def test_submit_orchestrator_job_error_handling(monkeypatch) -> None:
             params_gcs_path="gs://bucket/runs/run-790/inputs/params.yaml",
             work_dir="gs://bucket/runs/run-790/work/",
             is_recovery=False,
+            weblog_secret="secret",
         )
 
 

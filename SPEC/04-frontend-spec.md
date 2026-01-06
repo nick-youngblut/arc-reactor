@@ -4,7 +4,7 @@
 
 The frontend is a Next.js 14 application using the App Router with static export (`output: 'export'`). It provides a conversational interface for pipeline configuration combined with direct editing capabilities for generated files. The UI is designed for wet lab scientists who may have limited computational experience.
 
-**Deployment Note:** As a static export, the frontend relies on the backend to implement the "SPA Fallback" pattern (serving `index.html` for 404s) to support deep linking to dynamic routes like `/runs/[id]`.
+**Deployment Note (Refactor v2):** The frontend is deployed as a separate Cloud Run service behind the load balancer. The load balancer routes `/api/*` to the backend and all other paths to the frontend. As a static export, the frontend still relies on SPA fallback (serving `index.html`) for deep linking to dynamic routes like `/runs/[id]`.
 
 ## Project Structure
 
@@ -458,24 +458,34 @@ Manages the pipeline configuration workspace.
 
 ```typescript
 interface WorkspaceStore {
-  // Pipeline selection
-  pipeline: string;
-  version: string;
-  setPipeline: (pipeline: string) => void;
-  setVersion: (version: string) => void;
-  
-  // Generated files
-  samplesheet: string | null;
-  config: string | null;
-  setSamplesheet: (csv: string) => void;
-  setConfig: (config: string) => void;
-  
-  // Validation
-  errors: ValidationError[];
-  setErrors: (errors: ValidationError[]) => void;
-  
-  // Reset
-  reset: () => void;
+  workspaceId: string | null;
+  selectedPipeline: string | null;
+  selectedVersion: string | null;
+  samplesheet: string;
+  config: string;
+  samplesheetModifiedBy: "agent" | "user" | null;
+  samplesheetModifiedAt: string | null;
+  configModifiedBy: "agent" | "user" | null;
+  configModifiedAt: string | null;
+  validationResult: ValidationResult | null;
+  isDirty: boolean;
+  samplesheetDirty: boolean;
+  configDirty: boolean;
+  isSyncing: boolean;
+  syncError: string | null;
+  lastSyncedAt: string | null;
+
+  setPipeline: (pipeline: string | null, version?: string | null) => void;
+  setSamplesheet: (value: string, modifiedBy?: "agent" | "user" | null) => void;
+  setConfig: (value: string, modifiedBy?: "agent" | "user" | null) => void;
+  loadFromBackend: (workspace: WorkspacePayload) => void;
+  markSamplesheetSynced: () => void;
+  markConfigSynced: () => void;
+  setWorkspaceId: (id: string | null) => void;
+  setSyncing: (isSyncing: boolean) => void;
+  setSyncError: (message: string | null) => void;
+  setLastSyncedAt: (timestamp: string | null) => void;
+  clearWorkspace: () => void;
 }
 ```
 
@@ -535,29 +545,19 @@ function useRuns(filters: RunFilters) {
 
 ### useAgentChat
 
-Integrates with the AI chat backend using Vercel AI SDK patterns.
+Integrates with the AI chat backend using WebSocket streaming. File updates are
+sent on a dedicated `b` event with `modifiedBy: "agent"` metadata to avoid triggering
+sync-back to the backend.
 
-```typescript
-function useAgentChat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: "/api/chat",
-    onToolCall: async ({ toolCall }) => {
-      // Handle file generation tools
-      if (toolCall.toolName === "generate_samplesheet") {
-        workspaceStore.setSamplesheet(toolCall.result);
-      }
-    },
-  });
-  
-  return {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
-    // ... additional helpers
-  };
-}
+### useWorkspaceSync
+
+Handles workspace persistence and reliability:
+- Loads draft or thread workspaces on mount/thread change.
+- Debounces saves (500ms) for samplesheet/config edits.
+- Retries network/5xx failures with exponential backoff.
+- Queues pending syncs for offline/visibility changes.
+- Uses a mutex to prevent duplicate workspace creation.
+- Warns on tab close if unsaved edits exist.
 ```
 
 ### useRuns

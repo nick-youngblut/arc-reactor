@@ -3,10 +3,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      args:
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
     ports:
       - "8000:8000"
     environment:
-      DYNACONF: ${DYNACONF:-dev}
+      DYNACONF: ${DYNACONF:-test}
       GOOGLE_API_KEY: ${GOOGLE_API_KEY}
       DATABASE_URL: ${DATABASE_URL}
       BENCHLING_PROD_API_KEY: ${BENCHLING_PROD_API_KEY}
@@ -20,7 +22,7 @@ services:
       IAP_PROJECT_NUMBER: ${IAP_PROJECT_NUMBER}
       IAP_PROJECT_ID: ${IAP_PROJECT_ID}
       IAP_ALLOWED_DOMAIN: ${IAP_ALLOWED_DOMAIN}
-      ARC_REACTOR_NEXTFLOW_BUCKET: ${ARC_REACTOR_NEXTFLOW_BUCKET}
+      ARC_REACTOR_NEXTFLOW_BUCKET: ${ARC_REACTOR_NEXTFLOW_BUCKET:-arc-reactor-runs-dev}
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -32,6 +34,9 @@ services:
     command: sh -c "npm install && npm run dev"
     ports:
       - "3000:3000"
+    environment:
+      NEXT_PUBLIC_CHAT_WS_URL: ws://localhost:8000/ws/chat
+      NEXT_PUBLIC_API_URL: http://localhost:8000
     volumes:
       - ./frontend:/app
 

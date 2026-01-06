@@ -11,6 +11,16 @@
 - `backend/`: FastAPI app (`main.py`), agents (`agents/`), routes (`api/`), tools (`tools/`), services (`services/`), settings (`settings.yml`).
 - `frontend/`: Next.js (App Router) with `app/`, `components/`, `hooks/`, `stores/`, `lib/`.
 
+## Agent Architecture (Arc Reactor)
+- Orchestrator: `backend/agents/pipeline_agent.py` creates the main DeepAgents orchestrator.
+- Subagents: `backend/agents/subagents/` provides benchling/config/execution experts.
+- Tool collections: `backend/agents/tools/collections/` defines tool distribution per agent.
+- Monitoring/troubleshooting/output tools: `backend/agents/tools/monitoring_tools.py`,
+  `backend/agents/tools/troubleshooting_tools.py`, `backend/agents/tools/output_tools.py`.
+- HITL approvals: `backend/agents/middleware/hitl.py` gates destructive actions.
+- Services: `backend/services/runs.py`, `backend/services/pipelines.py`, `backend/services/benchling.py`
+  provide data access for tools and agents.
+
 ## Build, Test, and Development Commands
 - Backend install (dev): `uv pip install -e 'backend/.[dev]'`
 - Run backend (dev): `uvicorn backend.main:app --reload --port 8000`

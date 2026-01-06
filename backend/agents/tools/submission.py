@@ -13,7 +13,9 @@ from backend.config import settings
 from backend.models.schemas.runs import RunStatus
 from backend.services.database import DatabaseService
 from backend.services.pipelines import PipelineRegistry
+from backend.services.batch import BatchService
 from backend.services.runs import RunStoreService
+from backend.utils.errors import NotFoundError, ValidationError
 
 try:  # optional dependency
     from google.cloud import batch_v1
@@ -66,7 +68,7 @@ def _extract_params_from_config(config_content: str) -> dict[str, Any]:
         value = value.strip().rstrip(",")
         if value.lower() in {"true", "false"}:
             params[key] = value.lower() == "true"
-        elif value.startswith(("\"", "'")) and value.endswith(("\"", "'")):
+        elif value.startswith(('"', "'")) and value.endswith(('"', "'")):
             params[key] = value[1:-1]
         else:
             try:
@@ -84,7 +86,7 @@ def _render_params_yaml(params: dict[str, Any]) -> str:
         elif isinstance(value, (int, float)):
             rendered = str(value)
         else:
-            rendered = f"\"{value}\""
+            rendered = f'"{value}"'
         lines.append(f"{key}: {rendered}")
     return "\n".join(lines)
 
@@ -107,6 +109,7 @@ def _submit_orchestrator_job(
     config_uri: str,
     params_uri: str,
     work_dir: str,
+    weblog_secret: str,
 ) -> str | None:
     if batch_v1 is None:
         return None
@@ -115,6 +118,10 @@ def _submit_orchestrator_job(
         region = settings.get("gcp_region")
         service_account = settings.get("nextflow_service_account")
         orchestrator_image = settings.get("orchestrator_image")
+        weblog_url = settings.get("weblog_receiver_url")
+        if not weblog_url:
+            logger.error("Missing weblog_receiver_url setting for run %s", run_id)
+            return None
 
         env = {
             "RUN_ID": run_id,
@@ -123,6 +130,8 @@ def _submit_orchestrator_job(
             "CONFIG_GCS_PATH": config_uri,
             "PARAMS_GCS_PATH": params_uri,
             "WORK_DIR": work_dir,
+            "WEBLOG_URL": weblog_url,
+            "WEBLOG_SECRET": weblog_secret,
         }
 
         runnable = batch_v1.Runnable(
@@ -194,6 +203,14 @@ async def _get_run_store(runtime: Any | None) -> tuple[RunStoreService, Any]:
     return RunStoreService.create(session, settings), session
 
 
+def _get_batch_service(runtime: Any | None) -> BatchService:
+    configurable = _runtime_configurable(runtime)
+    batch_service = configurable.get("batch_service")
+    if batch_service is not None:
+        return batch_service
+    return BatchService.create(settings)
+
+
 async def _close_session(session) -> None:
     if session is None:
         return
@@ -209,7 +226,18 @@ async def submit_run(
     pipeline_version: str,
     runtime: Any | None = None,
 ) -> str:
-    """Submit a validated pipeline run to GCP Batch."""
+    """
+    Submit a validated pipeline run to GCP Batch.
+
+    Args:
+        samplesheet_csv: CSV string containing samplesheet data
+        config_content: Nextflow config content
+        pipeline: Pipeline name
+        pipeline_version: Pipeline version
+
+    Returns:
+        JSON string containing run details
+    """
     if not samplesheet_csv or not config_content:
         return "Error: samplesheet_csv and config_content are required."
 
@@ -233,7 +261,7 @@ async def submit_run(
 
     run_store, session = await _get_run_store(runtime)
     try:
-        run_id = await run_store.create_run(
+        run_id, weblog_secret = await run_store.create_run(
             pipeline=pipeline,
             pipeline_version=pipeline_version,
             user_email=context.user_email or "unknown",
@@ -264,6 +292,7 @@ async def submit_run(
             config_uri=config_uri,
             params_uri=params_uri,
             work_dir=work_dir,
+            weblog_secret=weblog_secret,
         )
 
         await run_store.update_run_status(
@@ -289,7 +318,15 @@ async def submit_run(
 @tool
 @tool_error_handler
 async def cancel_run(run_id: str, runtime: Any | None = None) -> str:
-    """Cancel a running pipeline job."""
+    """
+    Cancel a running pipeline job.
+
+    Args:
+        run_id: ID of the run to cancel
+
+    Returns:
+        JSON string containing run details
+    """
     if not run_id:
         return "Error: run_id is required."
 
@@ -326,7 +363,16 @@ async def cancel_run(run_id: str, runtime: Any | None = None) -> str:
 @tool
 @tool_error_handler
 async def delete_file(run_id: str, file_path: str, runtime: Any | None = None) -> str:
-    """Delete a run file from GCS."""
+    """
+    Delete a run file from GCS.
+
+    Args:
+        run_id: ID of the run
+        file_path: Path of the file to delete
+
+    Returns:
+        JSON string containing run details
+    """
     if not run_id or not file_path:
         return "Error: run_id and file_path are required."
 
@@ -359,7 +405,15 @@ async def delete_file(run_id: str, file_path: str, runtime: Any | None = None) -
 @tool
 @tool_error_handler
 async def clear_samplesheet(confirm: bool, runtime: Any | None = None) -> str:
-    """Clear samplesheet from agent state."""
+    """
+    Clear samplesheet from agent state.
+
+    Args:
+        confirm: Whether to confirm the action
+
+    Returns:
+        String message indicating the action was performed
+    """
     if not confirm:
         return "Error: confirm must be true to clear samplesheet."
 
@@ -369,3 +423,58 @@ async def clear_samplesheet(confirm: bool, runtime: Any | None = None) -> str:
         generated.pop("samplesheet.csv", None)
 
     return "Samplesheet cleared from agent state."
+
+
+@tool
+@tool_error_handler
+async def recover_run(run_id: str, notes: str | None = None, runtime: Any | None = None) -> str:
+    """
+    Submit a recovery run using Nextflow's -resume flag.
+
+    This reuses the work directory from the failed run and skips
+    successfully completed tasks. Requires human approval.
+
+    Args:
+        run_id: The run identifier of the failed run to recover
+        notes: Optional notes about the recovery attempt
+
+    Returns:
+        New run ID if successful, or error message.
+    """
+    if not run_id:
+        return "Error: run_id is required."
+
+    context = get_tool_context(runtime)
+    storage = context.storage
+    if storage is None:
+        return "Error: Storage service unavailable."
+    if not context.user_email:
+        return "Error: user_email is required."
+
+    run_store, session = await _get_run_store(runtime)
+    try:
+        batch = _get_batch_service(runtime)
+        recovery_id = await run_store.submit_recovery_run(
+            parent_run_id=run_id,
+            user_email=context.user_email,
+            user_name=context.user_name,
+            storage=storage,
+            batch=batch,
+            notes=notes,
+        )
+
+        return (
+            "Recovery run submitted!\n\n"
+            f"New Run ID: {recovery_id}\n"
+            f"Original Run: {run_id}\n"
+            "Status: submitted\n\n"
+            "The run will resume from the last successful checkpoint."
+        )
+    except ValidationError as exc:
+        detail = exc.detail or exc.message
+        return f"Error: {detail}"
+    except NotFoundError as exc:
+        detail = exc.detail or exc.message
+        return f"Error: {detail}"
+    finally:
+        await _close_session(session)

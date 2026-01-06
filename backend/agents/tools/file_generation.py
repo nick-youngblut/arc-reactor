@@ -10,6 +10,7 @@ from langchain_core.tools import tool
 from backend.agents.tools.base import (
     ensure_limit,
     format_table,
+    get_workspace_context,
     get_tool_context,
     parse_semicolon_delimited,
     tool_error_handler,
@@ -56,6 +57,76 @@ def _format_missing_paths(missing: list[str]) -> str:
     return f"Missing FASTQ files: {preview}{suffix}"
 
 
+async def _persist_samplesheet(
+    runtime: Any | None,
+    content: str,
+    pipeline: str | None,
+) -> str | None:
+    context = await get_workspace_context(runtime)
+    try:
+        if not context.service or not context.thread_id or not context.user_email:
+            return None
+
+        workspace = await context.service.get_or_create_for_thread(
+            context.user_email,
+            context.thread_id,
+        )
+        if pipeline:
+            await context.service.update_pipeline(
+                workspace.id,
+                context.user_email,
+                pipeline,
+                workspace.version,
+            )
+        await context.service.update_samplesheet(
+            workspace.id,
+            context.user_email,
+            content,
+            "agent",
+        )
+        return None
+    except ValueError as exc:
+        return f"Error: {exc}"
+    finally:
+        if context.close:
+            await context.close()
+
+
+async def _persist_config(
+    runtime: Any | None,
+    content: str,
+    pipeline: str | None,
+) -> str | None:
+    context = await get_workspace_context(runtime)
+    try:
+        if not context.service or not context.thread_id or not context.user_email:
+            return None
+
+        workspace = await context.service.get_or_create_for_thread(
+            context.user_email,
+            context.thread_id,
+        )
+        if pipeline:
+            await context.service.update_pipeline(
+                workspace.id,
+                context.user_email,
+                pipeline,
+                workspace.version,
+            )
+        await context.service.update_config(
+            workspace.id,
+            context.user_email,
+            content,
+            "agent",
+        )
+        return None
+    except ValueError as exc:
+        return f"Error: {exc}"
+    finally:
+        if context.close:
+            await context.close()
+
+
 def _extract_params(config_content: str) -> dict[str, Any]:
     params: dict[str, Any] = {}
     in_params = False
@@ -79,7 +150,7 @@ def _extract_params(config_content: str) -> dict[str, Any]:
         value = value.strip().rstrip(",")
         if value.lower() in {"true", "false"}:
             params[key] = value.lower() == "true"
-        elif value.startswith(("\"", "'")) and value.endswith(("\"", "'")):
+        elif value.startswith(('"', "'")) and value.endswith(('"', "'")):
             params[key] = value[1:-1]
         else:
             try:
@@ -109,7 +180,19 @@ async def generate_samplesheet(
     expected_cells: int | None = None,
     runtime: Any | None = None,
 ) -> str:
-    """Generate a samplesheet CSV for a pipeline."""
+    """
+    Generate a samplesheet CSV for a pipeline.
+
+    Args:
+        ngs_run: NGS Run name (e.g., "NR-2024-0156")
+        pooled_sample: Pooled sample / SspArc name (e.g., "SspArc0050")
+        sample_ids: Sample IDs, semicolon-delimited (e.g., "LPS-001;LPS-002")
+        pipeline: Pipeline name (e.g., "nf-core/scrnaseq")
+        expected_cells: Expected cells per sample (default: 10000)
+
+    Returns:
+        String message containing the samplesheet CSV
+    """
     if not pipeline:
         return "Error: pipeline is required."
     if not ngs_run and not pooled_sample:
@@ -137,7 +220,7 @@ async def generate_samplesheet(
         placeholders = ", ".join(f":sample_{i}" for i in range(len(sample_list)))
         params.update({f"sample_{i}": sample for i, sample in enumerate(sample_list)})
         sample_filter = (
-            f"AND (lps.sample_id IN ({placeholders}) OR lps.\"name$\" IN ({placeholders}))"
+            f'AND (lps.sample_id IN ({placeholders}) OR lps."name$" IN ({placeholders}))'
         )
 
     sql = f"""
@@ -178,9 +261,7 @@ async def generate_samplesheet(
         return "No samples found for the requested run."
 
     missing_fastq = [
-        row.get("sample_id")
-        for row in rows
-        if not row.get("fastq_1") or not row.get("fastq_2")
+        row.get("sample_id") for row in rows if not row.get("fastq_1") or not row.get("fastq_2")
     ]
     if missing_fastq:
         preview = ", ".join(str(sample) for sample in missing_fastq[:5])
@@ -220,6 +301,9 @@ async def generate_samplesheet(
         writer.writerow(record)
 
     csv_content = buffer.getvalue().strip()
+    persist_error = await _persist_samplesheet(runtime, csv_content, pipeline)
+    if persist_error:
+        return persist_error
     _store_generated_file(
         runtime,
         filename="samplesheet.csv",
@@ -249,7 +333,17 @@ async def generate_config(
     profile: str | None = None,
     runtime: Any | None = None,
 ) -> str:
-    """Generate a Nextflow config for a pipeline."""
+    """
+    Generate a Nextflow config for a pipeline.
+
+    Args:
+        pipeline: Pipeline name (e.g., "nf-core/scrnaseq")
+        params: Pipeline parameters to include
+        profile: Execution profile (default: "gcp_batch")
+
+    Returns:
+        String message containing the Nextflow config
+    """
     if not pipeline:
         return "Error: pipeline is required."
 
@@ -284,16 +378,16 @@ async def generate_config(
             f"profiles {{",
             f"  {profile_name} {{",
             "    process {",
-            "      executor = \"google-batch\"",
-            "      errorStrategy = \"retry\"",
+            '      executor = "google-batch"',
+            '      errorStrategy = "retry"',
             "      maxRetries = 3",
             "      scratch = true",
             "    }",
             "    google {",
-            f"      project = \"{gcp_project}\"",
-            f"      location = \"{gcp_region}\"",
+            f'      project = "{gcp_project}"',
+            f'      location = "{gcp_region}"',
             "      batch {",
-            f"        serviceAccountEmail = \"{service_account}\"",
+            f'        serviceAccountEmail = "{service_account}"',
             "        spot = true",
             "        maxSpotAttempts = 3",
             "      }",
@@ -302,6 +396,10 @@ async def generate_config(
             "}",
         ]
     )
+
+    persist_error = await _persist_config(runtime, config_content, pipeline)
+    if persist_error:
+        return persist_error
 
     _store_generated_file(
         runtime,
@@ -324,7 +422,17 @@ async def validate_inputs(
     pipeline: str,
     runtime: Any | None = None,
 ) -> str:
-    """Validate samplesheet and config contents."""
+    """
+    Validate samplesheet and config contents.
+
+    Args:
+        samplesheet_csv: CSV content
+        config_content: Config content
+        pipeline: Pipeline name (e.g., "nf-core/scrnaseq")
+
+    Returns:
+        JSON string containing the validation results
+    """
     registry = PipelineRegistry.create()
     pipeline_schema = registry.get_pipeline(pipeline)
     if not pipeline_schema:

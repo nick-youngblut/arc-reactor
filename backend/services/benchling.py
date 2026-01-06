@@ -32,16 +32,16 @@ class BenchlingService:
     Wraps benchling-py's synchronous BenchlingSession for async FastAPI compatibility.
     The DYNACONF environment variable determines which tenant (prod/test) is used.
 
-    Properties exposed from BenchlingSession:
+    Properties exposed from BenchlingSession (read-only):
         - warehouse: WarehouseClient for SQL queries
         - warehouse.entity: Warehouse EntityOperations (queries)
         - warehouse.schema: SchemaOperations
         - warehouse.entry: EntryOperations
         - warehouse.dropdown: DropdownOperations
         - warehouse.folder: FolderOperations
-        - entities: API EntityOperations (CRUD via Benchling API)
+        - entities: API EntityOperations (read-only operations)
         - navigator: RelationshipNavigator
-        - api_client: Full APIClient access
+        - api_client: Full APIClient access (read-only)
     """
 
     _session: BenchlingSession = field(repr=False)

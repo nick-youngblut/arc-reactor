@@ -7,9 +7,9 @@ This document summarizes the end-to-end run flow and file lifecycle for Arc Reac
 
 1. Run record created in PostgreSQL with status `pending`.
 2. Inputs are uploaded to GCS and the Batch job is submitted; status becomes `submitted`.
-3. Orchestrator starts and updates status to `running` via Nextflow hooks.
-4. On completion, the orchestrator updates status to `completed` or `failed`.
-5. On error, the orchestrator updates status to `failed`.
+3. Orchestrator starts and Nextflow emits `started` weblog event.
+4. Backend updates status to `completed` or `failed` on weblog events.
+5. Task-level updates stream into the `tasks` table in real time.
 
 Valid transitions:
 ```

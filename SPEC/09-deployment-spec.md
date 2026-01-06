@@ -44,11 +44,11 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 
 ## Infrastructure Components
 
-### Cloud Run Service
+### Cloud Run Services
 
 | Setting | Production | Dev |
 |---------|------------|---------|
-| Service name | `arc-reactor` | `arc-reactor-dev` |
+| Service name | `arc-reactor-backend` | `arc-reactor-backend-dev` |
 | Region | `us-west1` | `us-west1` |
 | Min instances | 1 | 0 |
 | Max instances | 10 | 3 |
@@ -58,10 +58,9 @@ The platform is deployed on Google Cloud Platform using Cloud Run for the web ap
 | Concurrency | 80 | 40 |
 
 **Cloud SQL Connection:**
-- Attach Cloud SQL instance to Cloud Run service
+- Attach Cloud SQL instance to backend and weblog receiver services
 - Provide `DATABASE_URL` using the Cloud SQL Unix socket for Cloud Run
-- For GCP Batch jobs, pass `DATABASE_URL` using the Cloud SQL **Private IP**
-  (not the Unix socket), e.g. `postgresql+asyncpg://USER:PASS@PRIVATE_IP:5432/DB`
+- GCP Batch does not connect to Cloud SQL (uses weblog events instead)
 
 ### GCS Buckets
 
@@ -156,42 +155,28 @@ CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8080"]
 
 ```dockerfile
 # Dockerfile.orchestrator
-FROM nextflow/nextflow:24.04.4
+FROM nextflow/nextflow:25.10.2
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     curl \
-    python3 \
-    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Google Cloud SDK
 RUN curl -sSL https://sdk.cloud.google.com | bash
 ENV PATH="/root/google-cloud-sdk/bin:$PATH"
 
-# Install PostgreSQL client
-RUN pip3 install --no-cache-dir asyncpg
-
 # Copy scripts
 COPY orchestrator/entrypoint.sh /entrypoint.sh
-COPY orchestrator/update_status.py /update_status.py
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 ```
 
 **Run status updates (required):**
-- The orchestrator image must include `orchestrator/update_status.py` at `/update_status.py`.
-- The container needs `asyncpg` and access to Cloud SQL via `DATABASE_URL`.
-- Batch job spec must pass `DATABASE_URL` and `RUN_ID` to the container.
-- `DATABASE_URL` for Batch must use the Cloud SQL **Private IP**, not the Unix socket.
-
-**Nextflow hook invocation (example):**
-```groovy
-workflow.onStart {
-  "python3 /update_status.py ${params.run_id} running --started_at '${new Date().toInstant().toString()}'".execute()
-}
-```
+- The orchestrator must pass `-with-weblog` to Nextflow.
+- Batch job spec must pass `WEBLOG_URL`, `WEBLOG_SECRET`, and `RUN_ID`.
+- The orchestrator does **not** connect to Cloud SQL.
 
 ## CI/CD Pipeline
 
@@ -208,7 +193,7 @@ on:
     branches: [main, develop]
 
 env:
-  PROJECT_ID: arc-ctc-project
+  PROJECT_ID: arc-genomics02
   REGION: us-west1
   
 jobs:
@@ -281,11 +266,11 @@ jobs:
         run: |
           DOCKER_BUILDKIT=1 docker build \
             --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
-            -t gcr.io/$PROJECT_ID/${{ steps.env.outputs.service }}:${{ github.sha }} \
-            -t gcr.io/$PROJECT_ID/${{ steps.env.outputs.service }}:latest \
+            -t us-docker.pkg.dev/$PROJECT_ID/arc-reactor/${{ steps.env.outputs.service }}:${{ github.sha }} \
+            -t us-docker.pkg.dev/$PROJECT_ID/arc-reactor/${{ steps.env.outputs.service }}:latest \
             .
-          docker push gcr.io/$PROJECT_ID/${{ steps.env.outputs.service }}:${{ github.sha }}
-          docker push gcr.io/$PROJECT_ID/${{ steps.env.outputs.service }}:latest
+          docker push us-docker.pkg.dev/$PROJECT_ID/arc-reactor/${{ steps.env.outputs.service }}:${{ github.sha }}
+          docker push us-docker.pkg.dev/$PROJECT_ID/arc-reactor/${{ steps.env.outputs.service }}:latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
@@ -318,7 +303,7 @@ jobs:
         with:
           service: ${{ steps.env.outputs.service }}
           region: ${{ env.REGION }}
-          image: gcr.io/${{ env.PROJECT_ID }}/${{ steps.env.outputs.service }}:${{ github.sha }}
+          image: us-docker.pkg.dev/${{ env.PROJECT_ID }}/arc-reactor/${{ steps.env.outputs.service }}:${{ github.sha }}
           flags: |
             --min-instances=1
             --max-instances=10
@@ -349,7 +334,7 @@ jobs:
 # settings.yaml - prod section
 prod:
   debug: false
-  gcp_project: "arc-ctc-project"
+  gcp_project: "arc-genomics02"
   gcp_region: "us-west1"
   nextflow_bucket: "arc-reactor-runs"
   log_level: "INFO"
@@ -361,7 +346,7 @@ prod:
 # settings.yaml - test section
 test:
   debug: true
-  gcp_project: "arc-ctc-project"
+  gcp_project: "multi-omics-dev"
   gcp_region: "us-west1"
   nextflow_bucket: "arc-reactor-runs-dev"
   log_level: "DEBUG"

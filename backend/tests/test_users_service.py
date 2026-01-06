@@ -1,27 +1,8 @@
 from __future__ import annotations
 
-import os
-import tempfile
-
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from backend.models import Base
 from backend.services.users import DEFAULT_PREFERENCES, DEFAULT_STATS, UserService
-
-
-@pytest.fixture
-async def session() -> AsyncSession:
-    handle, path = tempfile.mkstemp(suffix=".db")
-    os.close(handle)
-    engine = create_async_engine(f"sqlite+aiosqlite:///{path}")
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    session_factory = async_sessionmaker(engine, expire_on_commit=False)
-    async with session_factory() as session:
-        yield session
-    await engine.dispose()
-    os.unlink(path)
 
 
 @pytest.mark.asyncio

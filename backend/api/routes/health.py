@@ -11,11 +11,13 @@ from ... import __version__
 from ...dependencies import (
     get_benchling_service,
     get_breakers,
+    get_checkpointer_service,
     get_database_service,
     get_gemini_service,
     get_storage_service,
 )
 from ...services.benchling import BenchlingService
+from ...services.checkpointer import CheckpointerService
 from ...services.database import DatabaseService
 from ...services.gemini import DisabledGeminiService, GeminiService
 from ...services.storage import StorageService
@@ -51,6 +53,7 @@ async def readiness_check(
     database: DatabaseService = Depends(get_database_service),
     storage: StorageService = Depends(get_storage_service),
     gemini: GeminiService | DisabledGeminiService = Depends(get_gemini_service),
+    checkpointer: CheckpointerService = Depends(get_checkpointer_service),
     breakers: Breakers = Depends(get_breakers),
 ) -> JSONResponse:
     benchling_ok = await benchling.health_check()
@@ -58,6 +61,7 @@ async def readiness_check(
     gcs_ok = await asyncio.to_thread(storage.health_check)
     batch_ok = await check_batch_access()
     gemini_ok = await gemini.health_check()
+    checkpointer_ok = await checkpointer.health_check()
 
     if is_breaker_open(breakers.benchling):
         benchling_ok = False
@@ -70,9 +74,10 @@ async def readiness_check(
         "gcs": gcs_ok,
         "batch": batch_ok,
         "gemini": gemini_ok,
+        "checkpointer": checkpointer_ok,
     }
 
-    critical = ["postgres", "gcs", "batch"]
+    critical = ["postgres", "gcs", "batch", "checkpointer"]
     critical_healthy = all(checks[name] for name in critical)
     degraded = not all(checks.values())
 

@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from backend.dependencies import (
     get_benchling_service,
     get_breakers,
+    get_checkpointer_service,
     get_database_service,
     get_gemini_service,
     get_storage_service,
@@ -46,6 +47,7 @@ def test_readiness_endpoint(monkeypatch) -> None:
     app.dependency_overrides[get_database_service] = lambda: _DummyService(True)
     app.dependency_overrides[get_storage_service] = lambda: _DummyStorage(True)
     app.dependency_overrides[get_gemini_service] = lambda: _DummyService(True)
+    app.dependency_overrides[get_checkpointer_service] = lambda: _DummyService(True)
     app.dependency_overrides[get_breakers] = lambda: dummy_breakers
 
     async def _batch_ok() -> bool:

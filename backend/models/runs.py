@@ -61,6 +61,10 @@ class Run(Base):
     metrics: Mapped[dict[str, Any] | None] = mapped_column(
         JSONB().with_variant(JSON, "sqlite")
     )
+    weblog_secret_hash: Mapped[str | None] = mapped_column(String(64))
+    weblog_run_id: Mapped[str | None] = mapped_column(String(36))
+    weblog_run_name: Mapped[str | None] = mapped_column(String(255))
+    last_weblog_event_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     __table_args__ = (
         Index(
